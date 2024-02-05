@@ -17,10 +17,6 @@ file(GLOB_RECURSE SRC
 
 add_library(${PROJECT_NAME} ${SRC})
 
-add_executable(${PROJECT_NAME}_test_rclone_remote test/rclone_remote_test.cpp)
-add_executable(${PROJECT_NAME}_test_rclone_file test/rclone_file_test.cpp)
-
 target_link_libraries(${PROJECT_NAME} boost::boost)
 
-target_link_libraries(${PROJECT_NAME}_test_rclone_remote ${PROJECT_NAME} boost::boost)
-target_link_libraries(${PROJECT_NAME}_test_rclone_file ${PROJECT_NAME} boost::boost)
+add_subdirectory(tests)
