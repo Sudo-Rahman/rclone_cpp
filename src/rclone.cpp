@@ -11,6 +11,7 @@ namespace Iridium
     namespace bp = boost::process;
     std::string rclone::_path_rclone;
     bool rclone::_is_initialized = false;
+    const std::string rclone::endl = "\n";
 
     void rclone::initialize(const std::string &path_rclone)
     {
@@ -41,50 +42,47 @@ namespace Iridium
 
     void rclone::write_input(const std::string &input)
     {
-        *_in << input;
+        if (_state != state::launched)
+            throw std::runtime_error("rclone not started");
+
+        if (_in->pipe().is_open())
+            _in->pipe().write(input.c_str(), input.size());
     }
 
     void rclone::read_output()
     {
         std::string line;
         while (std::getline(*_out, line) && !_out->eof())
-        {
             std::cout << line << std::endl;
-        }
-        delete _out;
+        _out.reset();
     }
 
     void rclone::read_error()
     {
         std::string line;
         while (std::getline(*_err, line) && !_err->eof())
-        {
             std::cerr << line << std::endl;
-        }
-        delete _err;
+        _err.reset();
     }
 
     rclone &rclone::execute()
     {
         if (!_is_initialized)
-        {
             throw std::runtime_error("rclone not initialized");
-        }
 
         if (_state != state::not_launched)
-        {
             throw std::runtime_error("rclone already started");
-        }
 
-        try {
-            _in = new bp::opstream{};
-            _out = new bp::ipstream{};
-            _err = new bp::ipstream{};
+        try
+        {
+            _in = std::make_unique<bp::opstream>();
+            _out = std::make_unique<bp::ipstream>();
+            _err = std::make_unique<bp::ipstream>();
             _child = bp::child(
                     _path_rclone, _args,
                     bp::std_in < *_in, bp::std_out > *_out,
                     bp::std_err > *_err);
-        }catch (const std::exception &e)
+        } catch (const std::exception &e)
         {
             std::cerr << e.what() << std::endl;
             exit(1);
@@ -102,7 +100,7 @@ namespace Iridium
         {
             _child.wait();
             _state = state::finished;
-            delete _in;
+            _in.reset();
             _cv.notify_all();
         });
 
@@ -116,5 +114,35 @@ namespace Iridium
         return *this;
     }
 
+    void rclone::stop()
+    {
+        _in.reset();
+        _pool.stop();
+        _child.terminate();
+        _state = state::stopped;
+    }
+
+    rclone &rclone::config()
+    {
+        _args.emplace_back("config");
+        return *this;
+    }
+
+    rclone &rclone::operator<<(const std::string &input)
+    {
+        write_input(input);
+        return *this;
+    }
+
+    rclone::~rclone()
+    {
+        if (_state == state::launched)
+        {
+//            if the child waiting for an input, close it
+            _in->pipe().close();
+            std::cerr << "rclone are destroyed without being stopped" << std::endl;
+        }
+
+    }
 
 } // namespace Iridium

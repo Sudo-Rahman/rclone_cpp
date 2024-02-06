@@ -18,6 +18,8 @@ namespace Iridium
 
         rclone() = default;
 
+        ~rclone();
+
         enum class state {
             not_launched,
             launched,
@@ -38,6 +40,13 @@ namespace Iridium
 
         rclone &version();
 
+        rclone &config();
+
+        void stop();
+
+        static const std::string endl;
+        rclone &operator<<(const std::string &input);
+
         void write_input(const std::string &input);
 
 
@@ -51,9 +60,9 @@ namespace Iridium
         state _state{state::not_launched};
 
         boost::process::child _child{};
-        boost::process::ipstream *_out{};
-        boost::process::ipstream *_err{};
-        boost::process::opstream *_in{};
+        std::unique_ptr<boost::process::ipstream> _out{};
+        std::unique_ptr<boost::process::ipstream> _err{};
+        std::unique_ptr<boost::process::opstream> _in{};
 
         boost::asio::thread_pool _pool{5};
 
