@@ -5,18 +5,29 @@
 #include "rclone.hpp"
 #include <iostream>
 
+
 namespace Iridium
 {
     namespace ba = boost::asio;
     namespace bp = boost::process;
+    namespace bs2 = boost::signals2;
     std::string rclone::_path_rclone;
     bool rclone::_is_initialized = false;
     const std::string rclone::endl = "\n";
+
 
     void rclone::initialize(const std::string &path_rclone)
     {
         _path_rclone = path_rclone;
         _is_initialized = true;
+    }
+
+    rclone::rclone()
+    {
+        if (!_is_initialized)
+            throw std::runtime_error("rclone not initialized");
+        _signal_every_line = std::make_unique<bs2::signal<void(const std::string&)>>();
+        _signal_finish = std::make_unique<bs2::signal<void(int)>>();
     }
 
     rclone &rclone::wait_for_start()
@@ -53,7 +64,11 @@ namespace Iridium
     {
         std::string line;
         while (std::getline(*_out, line) && !_out->eof())
-            std::cout << line << std::endl;
+        {
+            if (_signal_every_line != nullptr)
+                (*_signal_every_line)(line);
+//            std ::cout << boost::this_thread::get_id() << std::endl;
+        }
         _out.reset();
     }
 
@@ -67,9 +82,6 @@ namespace Iridium
 
     rclone &rclone::execute()
     {
-        if (!_is_initialized)
-            throw std::runtime_error("rclone not initialized");
-
         if (_state != state::not_launched)
             throw std::runtime_error("rclone already started");
 
@@ -100,8 +112,11 @@ namespace Iridium
         {
             _child.wait();
             _state = state::finished;
+            if (_signal_finish != nullptr)
+                (*_signal_finish)(_child.exit_code());
             _in.reset();
             _cv.notify_all();
+
         });
 
         return *this;
@@ -134,6 +149,7 @@ namespace Iridium
         return *this;
     }
 
+
     rclone::~rclone()
     {
         if (_state == state::launched)
@@ -143,6 +159,35 @@ namespace Iridium
             std::cerr << "rclone are destroyed without being stopped" << std::endl;
         }
 
+    }
+
+    rclone &rclone::every_line(const std::function<void(const std::string&)> &&callback)
+    {
+
+        _signal_every_line->connect(
+                [this,callback](const std::string &line)
+                {
+                    ba::post(_pool, [callback, line]
+                    {
+                        callback(line);
+                    });
+                }
+        );
+        return *this;
+    }
+
+    rclone &rclone::finished(const std::function<void(int)> &&callback)
+    {
+        _signal_finish->connect(
+                [this,callback](const int &exit_code)
+                {
+                    ba::post(_pool, [callback, exit_code]
+                    {
+                        callback(exit_code);
+                    });
+                }
+        );
+        return *this;
     }
 
 } // namespace Iridium

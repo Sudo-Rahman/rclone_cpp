@@ -9,6 +9,8 @@
 #include <boost/process.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
+#include <future>
+#include <boost/signals2.hpp>
 
 namespace Iridium
 {
@@ -16,7 +18,7 @@ namespace Iridium
 
     public:
 
-        rclone() = default;
+        rclone();
 
         ~rclone();
 
@@ -49,6 +51,10 @@ namespace Iridium
 
         void write_input(const std::string &input);
 
+        rclone &every_line(const std::function<void(const std::string&)> &&callback);
+
+        rclone &finished(const std::function<void(int)> &&callback);
+
 
     private:
         static std::string _path_rclone;
@@ -64,13 +70,16 @@ namespace Iridium
         std::unique_ptr<boost::process::ipstream> _err{};
         std::unique_ptr<boost::process::opstream> _in{};
 
-        boost::asio::thread_pool _pool{5};
+        boost::asio::thread_pool _pool{6};
 
         std::vector<std::string> _args;
 
         void read_output();
 
         void read_error();
+
+        std::unique_ptr<boost::signals2::signal<void(const std::string &line)>> _signal_every_line{};
+        std::unique_ptr<boost::signals2::signal<void(int)>> _signal_finish{};
 
     };
 } // namespace Iridium
