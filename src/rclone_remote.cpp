@@ -43,4 +43,18 @@ namespace Iridium
     {
         return std::make_unique<rclone_remote>(std::move(name), type, std::move(path));
     }
+
+    const std::map<std::string, rclone_remote::remote_type> rclone_remote::string_to_remote_type = {
+            {"drive",     remote_type::google_drive},
+            {"sftp",      remote_type::sftp},
+            {"onedrive",  remote_type::onedrive},
+            {"dropbox",   remote_type::dropbox},
+            {"ftp",       remote_type::ftp},
+            {"mega",      remote_type::mega},
+            {"opendrive", remote_type::opendrive},
+            {"pcloud",    remote_type::pcloud},
+            {"box",       remote_type::box},
+            {"smb",       remote_type::smb},
+    };
+
 } // Iridium

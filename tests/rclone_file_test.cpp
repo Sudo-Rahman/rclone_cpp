@@ -8,8 +8,8 @@ using namespace std;
 BOOST_AUTO_TEST_SUITE(Suite)
 
 BOOST_AUTO_TEST_CASE(testRcloneFileEquality) {
-        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", GoogleDrive, "/tests/path");
-        auto r_ptr2 = rclone_remote::create_shared_ptr("AnotherRemote", Sftp, "/another/path");
+        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", rclone_remote::google_drive, "/tests/path");
+        auto r_ptr2 = rclone_remote::create_shared_ptr("AnotherRemote", rclone_remote::sftp, "/another/path");
 
         rclone_file file1(nullptr,"/tests/path", 100, false, boost::posix_time::second_clock::local_time(), r_ptr);
         rclone_file file2(nullptr,"/tests/path", 100, false, boost::posix_time::second_clock::local_time(), r_ptr);
@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(testRcloneFileEquality) {
 }
 
 BOOST_AUTO_TEST_CASE(testRcloneFileOutputOperator) {
-        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", GoogleDrive, "/tests/path");
+        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", rclone_remote::google_drive, "/tests/path");
 
         rclone_file file(nullptr, "/tests/path", 100, false, boost::posix_time::second_clock::local_time(), r_ptr);
 
@@ -31,12 +31,12 @@ BOOST_AUTO_TEST_CASE(testRcloneFileOutputOperator) {
 }
 
 BOOST_AUTO_TEST_CASE(testRcloneFileSetters) {
-        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", GoogleDrive, "/tests/path");
+        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", rclone_remote::google_drive, "/tests/path");
 
         rclone_file file(nullptr,"/tests/path", 100, false, boost::posix_time::second_clock::local_time(), r_ptr);
 
         file.set_path("/new/path");
-        file.set_remote(rclone_remote::create_shared_ptr("NewRemote", Sftp, "/new/path"));
+        file.set_remote(rclone_remote::create_shared_ptr("NewRemote", rclone_remote::sftp, "/new/path"));
         file.set_size(200);
         file.set_is_dir(true);
         file.set_mod_time(boost::posix_time::second_clock::local_time());
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(testRcloneFileSetters) {
 }
 
 BOOST_AUTO_TEST_CASE(testRcloneFileCopyConstructor) {
-        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", GoogleDrive, "/tests/path");
+        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", rclone_remote::google_drive, "/tests/path");
 
         rclone_file file(nullptr,"/tests/path", 100, false, boost::posix_time::second_clock::local_time(), r_ptr);
         rclone_file fileCopy(file);
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(testRcloneFileCopyConstructor) {
 }
 
 BOOST_AUTO_TEST_CASE(testRcloneFileMoveConstructor) {
-        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", GoogleDrive, "/tests/path");
+        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", rclone_remote::google_drive, "/tests/path");
 
         rclone_file file(nullptr,"/tests/path", 100, false, boost::posix_time::second_clock::local_time(), r_ptr);
         rclone_file fileCopy(std::move(file));
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(testRcloneFileMoveConstructor) {
 }
 
 BOOST_AUTO_TEST_CASE(testRcloneFileCopyAssignment) {
-        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", GoogleDrive, "/tests/path");
+        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", rclone_remote::google_drive, "/tests/path");
 
         rclone_file file(nullptr,"/tests/path", 100, false, boost::posix_time::second_clock::local_time(), r_ptr);
         rclone_file fileCopy = file;
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(testRcloneFileCopyAssignment) {
 }
 
 BOOST_AUTO_TEST_CASE(testRcloneFileMoveAssignment) {
-        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", GoogleDrive, "/tests/path");
+        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", rclone_remote::google_drive, "/tests/path");
 
         rclone_file file(nullptr,"/tests/path", 100, false, boost::posix_time::second_clock::local_time(), r_ptr);
         rclone_file fileCopy = std::move(file);
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(testRcloneFileMoveAssignment) {
 }
 
 BOOST_AUTO_TEST_CASE(testRcloneFileMoveAssignmentSetter) {
-        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", GoogleDrive, "/tests/path");
+        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", rclone_remote::google_drive, "/tests/path");
 
         rclone_file file(nullptr,"/tests/path", 100, false, boost::posix_time::second_clock::local_time(), r_ptr);
         rclone_file fileCopy = std::move(file);
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(testRcloneFileMoveAssignmentSetter) {
         BOOST_CHECK_EQUAL(fileCopy.mod_time(), boost::posix_time::second_clock::local_time());
 
         fileCopy.set_path("/new/path");
-        fileCopy.set_remote(rclone_remote::create_shared_ptr("NewRemote", Sftp, "/new/path"));
+        fileCopy.set_remote(rclone_remote::create_shared_ptr("NewRemote", rclone_remote::sftp, "/new/path"));
         fileCopy.set_size(200);
         fileCopy.set_is_dir(true);
         fileCopy.set_mod_time(boost::posix_time::second_clock::local_time());
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(testRcloneFileMoveAssignmentSetter) {
 }
 
 BOOST_AUTO_TEST_CASE(testRcloneFileAddChild) {
-        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", GoogleDrive, "/tests/path");
+        auto r_ptr = rclone_remote::create_shared_ptr("TestRemote", rclone_remote::google_drive, "/tests/path");
 
         rclone_file file(nullptr,"/tests/path", 100, true, boost::posix_time::second_clock::local_time(), r_ptr);
         rclone_file child(&file,"/tests/path/child", 100, false, boost::posix_time::second_clock::local_time(), r_ptr);

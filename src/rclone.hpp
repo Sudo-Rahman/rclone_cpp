@@ -10,6 +10,7 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <future>
+#include <rclone_remote.hpp>
 #include <boost/signals2.hpp>
 
 namespace Iridium
@@ -40,9 +41,11 @@ namespace Iridium
 
         [[nodiscard]] int exit_code() const;
 
-        rclone &version();
+        [[nodiscard]] state get_state() const { return _state; }
 
-        rclone &config();
+        [[nodiscard]] std::vector<std::string> get_output() const { return _output; }
+
+        [[nodiscard]] std::vector<std::string> get_error() const { return _error; }
 
         void stop();
 
@@ -54,6 +57,15 @@ namespace Iridium
         rclone &every_line(const std::function<void(const std::string&)> &&callback);
 
         rclone &finished(const std::function<void(int)> &&callback);
+
+        rclone &version();
+
+        rclone &list_remotes(std::vector<rclone_remote> &remotes);
+
+        rclone &config();
+
+
+        rclone &lsjson(const rclone_remote &remote);
 
 
     private:
@@ -71,8 +83,11 @@ namespace Iridium
         std::unique_ptr<boost::process::opstream> _in{};
 
         boost::asio::thread_pool _pool{6};
+        std::atomic_int_fast8_t _counter{0};
 
         std::vector<std::string> _args;
+        std::vector<std::string> _output{};
+        std::vector<std::string> _error{};
 
         void read_output();
 

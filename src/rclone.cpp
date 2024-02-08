@@ -4,6 +4,7 @@
 
 #include "rclone.hpp"
 #include <iostream>
+#include <regex>
 
 
 namespace Iridium
@@ -26,7 +27,7 @@ namespace Iridium
     {
         if (!_is_initialized)
             throw std::runtime_error("rclone not initialized");
-        _signal_every_line = std::make_unique<bs2::signal<void(const std::string&)>>();
+        _signal_every_line = std::make_unique<bs2::signal<void(const std::string &)>>();
         _signal_finish = std::make_unique<bs2::signal<void(int)>>();
     }
 
@@ -63,11 +64,11 @@ namespace Iridium
     void rclone::read_output()
     {
         std::string line;
-        while (std::getline(*_out, line) && !_out->eof())
+        while (std::getline(*_out, line))
         {
+            _output.emplace_back(line);
             if (_signal_every_line != nullptr)
                 (*_signal_every_line)(line);
-//            std ::cout << boost::this_thread::get_id() << std::endl;
         }
         _out.reset();
     }
@@ -75,8 +76,11 @@ namespace Iridium
     void rclone::read_error()
     {
         std::string line;
-        while (std::getline(*_err, line) && !_err->eof())
+        while (std::getline(*_err, line))
+        {
+            _error.emplace_back(line);
             std::cerr << line << std::endl;
+        }
         _err.reset();
     }
 
@@ -91,7 +95,7 @@ namespace Iridium
             _out = std::make_unique<bp::ipstream>();
             _err = std::make_unique<bp::ipstream>();
             _child = bp::child(
-                    _path_rclone, _args,
+                    _path_rclone, bp::args(_args),
                     bp::std_in < *_in, bp::std_out > *_out,
                     bp::std_err > *_err);
         } catch (const std::exception &e)
@@ -104,13 +108,21 @@ namespace Iridium
         _cv.notify_all();
 
         ba::post(_pool, [this]
-        { read_output(); });
+        {
+            read_output();
+            _counter++;
+        });
         ba::post(_pool, [this]
-        { read_error(); });
+        {
+            read_error();
+            _counter++;
+        });
 
         ba::post(_pool, [this]
         {
             _child.wait();
+            while (_counter < 2)
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
             _state = state::finished;
             if (_signal_finish != nullptr)
                 (*_signal_finish)(_child.exit_code());
@@ -123,24 +135,12 @@ namespace Iridium
 
     }
 
-    rclone &rclone::version()
-    {
-        _args.emplace_back("--version");
-        return *this;
-    }
-
     void rclone::stop()
     {
         _in.reset();
         _pool.stop();
         _child.terminate();
         _state = state::stopped;
-    }
-
-    rclone &rclone::config()
-    {
-        _args.emplace_back("config");
-        return *this;
     }
 
     rclone &rclone::operator<<(const std::string &input)
@@ -161,11 +161,11 @@ namespace Iridium
 
     }
 
-    rclone &rclone::every_line(const std::function<void(const std::string&)> &&callback)
+    rclone &rclone::every_line(const std::function<void(const std::string &)> &&callback)
     {
 
         _signal_every_line->connect(
-                [this,callback](const std::string &line)
+                [this, callback](const std::string &line)
                 {
                     ba::post(_pool, [callback, line]
                     {
@@ -179,7 +179,7 @@ namespace Iridium
     rclone &rclone::finished(const std::function<void(int)> &&callback)
     {
         _signal_finish->connect(
-                [this,callback](const int &exit_code)
+                [this, callback](const int &exit_code)
                 {
                     ba::post(_pool, [callback, exit_code]
                     {
@@ -189,5 +189,48 @@ namespace Iridium
         );
         return *this;
     }
+
+    rclone &rclone::version()
+    {
+        _args = {"version"};
+        return *this;
+    }
+
+    rclone &rclone::list_remotes(std::vector<rclone_remote> &remotes)
+    {
+        _args = {"listremotes", "--long"};
+        _signal_finish->connect(
+                [this, &remotes](const int &exit_code)
+                {
+                    ba::post(_pool, [this, &remotes, exit_code]
+                    {
+//                                example of line : "drive:  drive"
+                        std::regex re(R"((\w+):\s+(\w+))");
+                        std::smatch match;
+                        for (const auto &line: _output)
+                        {
+                            if (std::regex_search(line, match, re))
+                            {
+                                remotes.emplace_back(match[1], rclone_remote::string_to_remote_type.at(match[2]), "");
+                            }
+                        }
+                    });
+                }
+        );
+        return *this;
+    }
+
+    rclone &rclone::config()
+    {
+        _args = {"config", "show"};
+        return *this;
+    }
+
+    rclone &rclone::lsjson(const rclone_remote &remote)
+    {
+        _args = {"lsjson", remote.full_path()};
+        return *this;
+    }
+
 
 } // namespace Iridium
