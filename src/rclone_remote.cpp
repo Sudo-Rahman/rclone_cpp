@@ -1,7 +1,3 @@
-//
-// Created by sr-71 on 01/02/2024.
-//
-
 #include "rclone_remote.hpp"
 
 #include <utility>

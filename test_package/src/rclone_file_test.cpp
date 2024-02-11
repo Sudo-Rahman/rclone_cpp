@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE RcloneFileTest
 #include <boost/test/included/unit_test.hpp>
-#include <rclone_file.hpp>
+#include <rclone_cpp.hpp>
+
 
 using namespace Iridium;
 using namespace std;

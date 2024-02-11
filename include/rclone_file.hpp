@@ -1,9 +1,4 @@
-//
-// Created by sr-71 on 01/02/2024.
-//
-
-#ifndef RCLONE_RCLONE_FILE_HPP
-#define RCLONE_RCLONE_FILE_HPP
+#pragma once
 
 #include <iostream>
 #include <boost/date_time.hpp>
@@ -105,6 +100,3 @@ namespace Iridium
     typedef std::shared_ptr<rclone_file> rclone_file_ptr;
 
 }
-
-
-#endif //RCLONE_RCLONE_FILE_HPP

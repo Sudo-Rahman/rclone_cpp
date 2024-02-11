@@ -1,10 +1,6 @@
-
 .idea/
-
 cmake-build-release/
-
 CMakeUserPresets.json
-
 conan_provider.cmake
-
 cmake-build-debug/
+build/

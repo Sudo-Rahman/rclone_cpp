@@ -1,15 +1,9 @@
-//
-// Created by sr-71 on 01/02/2024.
-//
-
-#ifndef RCLONE_RCLONE_REMOTE_HPP
-#define RCLONE_RCLONE_REMOTE_HPP
+#pragma once
 
 #include <iostream>
 #include <memory>
 #include <map>
 #include <string>
-
 
 namespace Iridium
 {
@@ -86,5 +80,3 @@ namespace Iridium
     typedef std::shared_ptr<rclone_remote> remote_ptr;
 
 } // Iridium
-
-#endif //RCLONE_RCLONE_REMOTE_HPP

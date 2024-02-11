@@ -1,9 +1,4 @@
-//
-// Created by sr-71 on 04/02/2024.
-//
-
-#ifndef RCLONE_RCLONE_HPP
-#define RCLONE_RCLONE_HPP
+#pragma once
 
 #include <string>
 #include <boost/process.hpp>
@@ -99,5 +94,3 @@ namespace Iridium
     };
 } // namespace Iridium
 
-
-#endif //RCLONE_RCLONE_HPP

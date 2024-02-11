@@ -1,9 +1,8 @@
 #define BOOST_TEST_MODULE RemoteTest
 #include <boost/test/included/unit_test.hpp>
-#include <rclone_remote.hpp>
+#include <rclone_cpp.hpp>
 
 using namespace Iridium;
-using Iridium::rclone_remote;
 using namespace std;
 
 BOOST_AUTO_TEST_SUITE(Suite)

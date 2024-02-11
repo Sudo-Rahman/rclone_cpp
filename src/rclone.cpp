@@ -1,7 +1,3 @@
-//
-// Created by sr-71 on 04/02/2024.
-//
-
 #include "rclone.hpp"
 #include <iostream>
 #include <regex>
