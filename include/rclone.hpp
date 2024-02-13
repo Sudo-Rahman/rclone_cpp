@@ -6,6 +6,7 @@
 #include <boost/thread.hpp>
 #include <future>
 #include <rclone_remote.hpp>
+#include <rclone_file.hpp>
 #include <boost/signals2.hpp>
 
 namespace Iridium
@@ -59,8 +60,11 @@ namespace Iridium
 
         rclone &config();
 
-
         rclone &lsjson(const rclone_remote &remote);
+
+        rclone &lsjson(rclone_file &file);
+
+        rclone &lsjson(rclone_file &file, const std::function<void(rclone_file)> &&callback);
 
 
     private:
@@ -77,7 +81,7 @@ namespace Iridium
         std::unique_ptr<boost::process::ipstream> _err{};
         std::unique_ptr<boost::process::opstream> _in{};
 
-        boost::asio::thread_pool _pool{6};
+        boost::asio::thread_pool _pool{5};
         std::atomic_int_fast8_t _counter{0};
 
         std::vector<std::string> _args;

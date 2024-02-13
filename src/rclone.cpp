@@ -1,6 +1,7 @@
 #include "rclone.hpp"
 #include <iostream>
 #include <regex>
+#include <boost/json.hpp>
 
 
 namespace Iridium
@@ -8,6 +9,7 @@ namespace Iridium
     namespace ba = boost::asio;
     namespace bp = boost::process;
     namespace bs2 = boost::signals2;
+    namespace bjson = boost::json;
     std::string rclone::_path_rclone;
     bool rclone::_is_initialized = false;
     const std::string rclone::endl = "\n";
@@ -163,10 +165,7 @@ namespace Iridium
         _signal_every_line->connect(
                 [this, callback](const std::string &line)
                 {
-                    ba::post(_pool, [callback, line]
-                    {
-                        callback(line);
-                    });
+                    callback(line);
                 }
         );
         return *this;
@@ -177,7 +176,7 @@ namespace Iridium
         _signal_finish->connect(
                 [this, callback](const int &exit_code)
                 {
-                    ba::post(_pool, [callback, exit_code]
+                    ba::post(_pool, [&callback, exit_code]
                     {
                         callback(exit_code);
                     });
@@ -198,7 +197,7 @@ namespace Iridium
         _signal_finish->connect(
                 [this, &remotes](const int &exit_code)
                 {
-                    ba::post(_pool, [this, &remotes, exit_code]
+                    ba::post(_pool, [this, &remotes]
                     {
 //                                example of line : "drive:  drive"
                         std::regex re(R"((\w+):\s+(\w+))");
@@ -225,6 +224,36 @@ namespace Iridium
     rclone &rclone::lsjson(const rclone_remote &remote)
     {
         _args = {"lsjson", remote.full_path()};
+        return *this;
+    }
+
+    rclone &rclone::lsjson(rclone_file &file)
+    {
+        _args = {"lsjson", file.absolute_path()};
+
+        every_line(
+                [&file](const std::string &line)
+                {
+                    rclone_file::from_json(line, &file);
+                }
+        );
+
+        return *this;
+    }
+
+    rclone &rclone::lsjson(rclone_file &file, const std::function<void(rclone_file child)> &&callback)
+    {
+        _args = {"lsjson", file.absolute_path()};
+
+        every_line(
+                [&file,callback](const std::string &line)
+                {
+                    auto child = rclone_file::from_json(line, &file);
+                    if (child)
+                        callback(*child);
+                }
+        );
+
         return *this;
     }
 

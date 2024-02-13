@@ -5,16 +5,16 @@
 namespace Iridium
 {
     rclone_remote::rclone_remote(std::string name, remote_type type, std::string path) :
-            _name(std::move(name)), _type(type), _path(std::move(path)) {}
+            _name(std::move(name)), _type(type) {
+        set_path(std::move(path));
+    }
 
     std::ostream &operator<<(std::ostream &os, const rclone_remote &remote)
     {
-        os << "\t\tRemote: " << std::endl <<
-           "------------------------------------------------" << std::endl <<
-           "name: " << remote._name << std::endl <<
-           "type: " << remote._type << std::endl <<
-           "path: " << remote._path << std::endl <<
-           "------------------------------------------------" << std::endl;
+        os << "Remote: {" << std::endl <<
+           "\tname: " << remote._name << "," << std::endl <<
+           "\ttype: " << remote._type << "," << std::endl <<
+           "\tpath: " << remote._path << std::endl << "}";
         return os;
     }
 

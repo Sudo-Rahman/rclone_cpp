@@ -56,7 +56,11 @@ namespace Iridium
         { _type = type; }
 
         void set_path(std::string path)
-        { _path = std::move(path); }
+        {
+            _path = std::move(path);
+            if(_path.ends_with("/"))
+                _path = _path.substr(0, _path.size() - 1);
+        }
 
         bool operator==(const rclone_remote &remote) const;
 
@@ -77,6 +81,6 @@ namespace Iridium
         static const std::map<std::string, remote_type> string_to_remote_type;
     };
 
-    typedef std::shared_ptr<rclone_remote> remote_ptr;
+    typedef std::shared_ptr<rclone_remote> rclone_remote_ptr;
 
 } // Iridium
