@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <boost/date_time.hpp>
-#include <rclone_remote.hpp>
+#include "rclone_remote.hpp"
 #include <utility>
 
 namespace Iridium
@@ -120,7 +120,6 @@ namespace Iridium
         bool _is_dir{};
         boost::posix_time::ptime _mod_time{};
 
-        friend class rclone_remote;
         friend class rclone;
     };
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <rclone_file.hpp>
-#include <rclone_remote.hpp>
-#include <rclone.hpp>
+#include "rclone_file.hpp"
+#include "rclone_remote.hpp"
+#include "rclone.hpp"
 
 
 #ifdef _WIN32

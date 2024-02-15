@@ -56,6 +56,3 @@ class rclone_cppRecipe(ConanFile):
 
     def tools_requires(self):
         self.tool_requires("cmake/[>=3.25]")
-
-    def package_info(self):
-        self.cpp_info.libs = ["rclone_cpp"]

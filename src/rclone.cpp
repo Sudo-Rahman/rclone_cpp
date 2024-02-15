@@ -199,7 +199,6 @@ namespace Iridium
                 {
                     ba::post(_pool, [this, &remotes]
                     {
-//                                example of line : "drive:  drive"
                         std::regex re(R"((\w+):\s+(\w+))");
                         std::smatch match;
                         for (const auto &line: _output)
@@ -214,6 +213,13 @@ namespace Iridium
         );
         return *this;
     }
+
+    rclone &rclone::delete_remote(const rclone_remote &remote)
+    {
+        _args = {"config", "delete", remote.name()};
+        return *this;
+    }
+
 
     rclone &rclone::config()
     {
@@ -246,7 +252,7 @@ namespace Iridium
         _args = {"lsjson", file.absolute_path()};
 
         every_line(
-                [&file,callback](const std::string &line)
+                [&file, callback](const std::string &line)
                 {
                     auto child = rclone_file::from_json(line, &file);
                     if (child)
@@ -257,5 +263,45 @@ namespace Iridium
         return *this;
     }
 
+    rclone &rclone::copy_to(const rclone_file &source, const rclone_file &destination)
+    {
+        _args = {"copyto", source.absolute_path(), destination.absolute_path()};
+        return *this;
+    }
+
+    rclone &rclone::move_to(const rclone_file &source, const rclone_file &destination)
+    {
+        _args = {"moveto", source.absolute_path(), destination.absolute_path()};
+        return *this;
+    }
+
+    rclone &rclone::delete_file(const rclone_file &file)
+    {
+        _args = {"delete", file.absolute_path()};
+        return *this;
+    }
+
+    rclone &rclone::mkdir(const rclone_file &file)
+    {
+        _args = {"mkdir", file.absolute_path()};
+        return *this;
+    }
+
+    rclone &rclone::cat(const Iridium::rclone_file &file)
+    {
+        _args = {"cat", file.absolute_path()};
+        return *this;
+    }
+
+    rclone &rclone::about(const rclone_remote &remote)
+    {
+        _args = {"about", remote.root_path()};
+        return *this;
+    }
+
+    rclone &rclone::size(const rclone_remote &remote){
+        _args = {"size", remote.root_path()};
+        return *this;
+    }
 
 } // namespace Iridium

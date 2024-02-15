@@ -9,6 +9,12 @@ if (NOT Boost_FOUND)
     message(FATAL_ERROR "Boost not found")
 endif ()
 
+include_directories(
+        include/iridium
+        include/iridium/rclone_cpp
+        include/iridium/entities
+)
+
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 file(GLOB_RECURSE HEADERS "include/*.hpp")
 

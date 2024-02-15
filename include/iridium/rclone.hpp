@@ -5,8 +5,7 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <future>
-#include <rclone_remote.hpp>
-#include <rclone_file.hpp>
+#include "rclone_file.hpp"
 #include <boost/signals2.hpp>
 
 namespace Iridium
@@ -58,6 +57,8 @@ namespace Iridium
 
         rclone &list_remotes(std::vector<rclone_remote> &remotes);
 
+        rclone &delete_remote(const rclone_remote &remote);
+
         rclone &config();
 
         rclone &lsjson(const rclone_remote &remote);
@@ -65,6 +66,20 @@ namespace Iridium
         rclone &lsjson(rclone_file &file);
 
         rclone &lsjson(rclone_file &file, const std::function<void(rclone_file)> &&callback);
+
+        rclone &copy_to(const rclone_file &source, const rclone_file &destination);
+
+        rclone &move_to(const rclone_file &source, const rclone_file &destination);
+
+        rclone &delete_file(const rclone_file &file);
+
+        rclone &mkdir(const rclone_file &file);
+
+        rclone &cat(const rclone_file &file);
+
+        rclone &about(const rclone_remote &remote);
+
+        rclone &size(const rclone_remote &remote);
 
 
     private:

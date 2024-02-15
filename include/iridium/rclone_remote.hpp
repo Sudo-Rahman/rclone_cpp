@@ -37,6 +37,13 @@ namespace Iridium
             return _name;
         }
 
+        [[nodiscard]] std::string root_path() const
+        {
+            if (not _name.ends_with(":"))
+                return _name + ":";
+            return _name;
+        }
+
         [[nodiscard]] remote_type type() const
         { return _type; }
 

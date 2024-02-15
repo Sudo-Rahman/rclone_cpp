@@ -2,6 +2,7 @@
 // Created by sr-71 on 05/02/2024.
 //
 #include <boost/thread.hpp>
+#include <boost/asio.hpp>
 #include <rclone_cpp.hpp>
 #include <iostream>
 
@@ -32,7 +33,7 @@ int main()
     std::cout << boost::this_thread::get_id() << std::endl << std::endl;
     auto lst = std::vector<Iridium::rclone_remote>{};
     auto n = new int {0};
-    auto remote = Iridium::rclone_remote::create_shared_ptr("drive", Iridium::rclone_remote::remote_type::google_drive, "");
+    auto remote = Iridium::rclone_remote::create_shared_ptr("test", Iridium::rclone_remote::remote_type::google_drive, "");
     auto file = Iridium::rclone_file{nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(), remote};
     rclone->
                     lsjson(file, [&,n](const Iridium::rclone_file &file)
@@ -64,7 +65,7 @@ int main()
                 .wait_for_finish()
 //            .stop()
             ;
-//    std::cout << "count: " << *n << std::endl;
+    std::cout << sizeof(bool) << std::endl;
     boost::this_thread::sleep_for(boost::chrono::microseconds(10000));
 //    rclone->wait_for_finish();
 //    std::cout << "i: " << i << std::endl;
