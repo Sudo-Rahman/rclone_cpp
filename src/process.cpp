@@ -1,35 +1,36 @@
-#include "rclone.hpp"
+#include "process.hpp"
 #include <iostream>
 #include <regex>
 #include <boost/json.hpp>
+#include <boost/algorithm/string/join.hpp>
 
 
-namespace Iridium
+namespace Iridium::rclone
 {
     namespace ba = boost::asio;
     namespace bp = boost::process;
     namespace bs2 = boost::signals2;
     namespace bjson = boost::json;
-    std::string rclone::_path_rclone;
-    bool rclone::_is_initialized = false;
-    const std::string rclone::endl = "\n";
+    std::string process::_path_rclone;
+    bool process::_is_initialized = false;
+    const std::string process::endl = "\n";
 
 
-    void rclone::initialize(const std::string &path_rclone)
+    void process::initialize(const std::string &path_rclone)
     {
         _path_rclone = path_rclone;
         _is_initialized = true;
     }
 
-    rclone::rclone()
+    process::process()
     {
         if (!_is_initialized)
-            throw std::runtime_error("rclone not initialized");
+            throw std::runtime_error("process not initialized");
         _signal_every_line = std::make_unique<bs2::signal<void(const std::string &)>>();
         _signal_finish = std::make_unique<bs2::signal<void(int)>>();
     }
 
-    rclone &rclone::wait_for_start()
+    process &process::wait_for_start()
     {
         std::unique_lock<std::mutex> lock(_mutex);
         _cv.wait(lock, [this]
@@ -37,7 +38,7 @@ namespace Iridium
         return *this;
     }
 
-    rclone &rclone::wait_for_finish()
+    process &process::wait_for_finish()
     {
         std::unique_lock<std::mutex> lock(_mutex);
         _cv.wait(lock, [this]
@@ -45,21 +46,21 @@ namespace Iridium
         return *this;
     }
 
-    int rclone::exit_code() const
+    int process::exit_code() const
     {
         return _child.exit_code();
     }
 
-    void rclone::write_input(const std::string &input)
+    void process::write_input(const std::string &input)
     {
         if (_state != state::launched)
-            throw std::runtime_error("rclone not started");
+            throw std::runtime_error("process not started");
 
         if (_in->pipe().is_open())
             _in->pipe().write(input.c_str(), input.size());
     }
 
-    void rclone::read_output()
+    void process::read_output()
     {
         std::string line;
         while (std::getline(*_out, line))
@@ -71,7 +72,7 @@ namespace Iridium
         _out.reset();
     }
 
-    void rclone::read_error()
+    void process::read_error()
     {
         std::string line;
         while (std::getline(*_err, line))
@@ -82,10 +83,10 @@ namespace Iridium
         _err.reset();
     }
 
-    rclone &rclone::execute()
+    process &process::execute()
     {
         if (_state != state::not_launched)
-            throw std::runtime_error("rclone already started");
+            throw std::runtime_error("process already started");
 
         try
         {
@@ -133,7 +134,7 @@ namespace Iridium
 
     }
 
-    void rclone::stop()
+    void process::stop()
     {
         _in.reset();
         _pool.stop();
@@ -141,25 +142,25 @@ namespace Iridium
         _state = state::stopped;
     }
 
-    rclone &rclone::operator<<(const std::string &input)
+    process &process::operator<<(const std::string &input)
     {
         write_input(input);
         return *this;
     }
 
 
-    rclone::~rclone()
+    process::~process()
     {
         if (_state == state::launched)
         {
 //            if the child waiting for an input, close it
             _in->pipe().close();
-            std::cerr << "rclone are destroyed without being stopped" << std::endl;
+            std::cerr << "process are destroyed without being stopped" << std::endl;
         }
 
     }
 
-    rclone &rclone::every_line(const std::function<void(const std::string &)> &&callback)
+    process &process::every_line(const std::function<void(const std::string &)> &&callback)
     {
 
         _signal_every_line->connect(
@@ -171,7 +172,7 @@ namespace Iridium
         return *this;
     }
 
-    rclone &rclone::finished(const std::function<void(int)> &&callback)
+    process &process::finished(const std::function<void(int)> &&callback)
     {
         _signal_finish->connect(
                 [this, callback](const int &exit_code)
@@ -185,13 +186,13 @@ namespace Iridium
         return *this;
     }
 
-    rclone &rclone::version()
+    process &process::version()
     {
         _args = {"version"};
         return *this;
     }
 
-    rclone &rclone::list_remotes(std::vector<rclone_remote> &remotes)
+    process &process::list_remotes(std::vector<remote> &remotes)
     {
         _args = {"listremotes", "--long"};
         _signal_finish->connect(
@@ -205,7 +206,7 @@ namespace Iridium
                         {
                             if (std::regex_search(line, match, re))
                             {
-                                remotes.emplace_back(match[1], rclone_remote::string_to_remote_type.at(match[2]), "");
+                                remotes.emplace_back(match[1], remote::string_to_remote_type.at(match[2]), "");
                             }
                         }
                     });
@@ -214,47 +215,49 @@ namespace Iridium
         return *this;
     }
 
-    rclone &rclone::delete_remote(const rclone_remote &remote)
+    process &process::delete_remote(const remote &remote)
     {
         _args = {"config", "delete", remote.name()};
         return *this;
     }
 
 
-    rclone &rclone::config()
+    process &process::config()
     {
         _args = {"config", "show"};
         return *this;
     }
 
-    rclone &rclone::lsjson(const rclone_remote &remote)
+    process &process::lsjson(const remote &remote)
     {
         _args = {"lsjson", remote.full_path()};
         return *this;
     }
 
-    rclone &rclone::lsjson(rclone_file &file)
+    process &process::lsjson(file &file)
     {
         _args = {"lsjson", file.absolute_path()};
 
         every_line(
                 [&file](const std::string &line)
                 {
-                    rclone_file::from_json(line, &file);
+                    file::from_json(line, &file);
                 }
         );
 
         return *this;
     }
 
-    rclone &rclone::lsjson(rclone_file &file, const std::function<void(rclone_file child)> &&callback)
+    process &process::lsjson(file &file, const std::function<void(Iridium::rclone::file)> &&callback)
     {
         _args = {"lsjson", file.absolute_path()};
 
         every_line(
-                [&file, callback](const std::string &line)
+                [&file, callback](
+                        const std::string &line
+                )
                 {
-                    auto child = rclone_file::from_json(line, &file);
+                    auto child = file::from_json(line, &file);
                     if (child)
                         callback(*child);
                 }
@@ -263,45 +266,56 @@ namespace Iridium
         return *this;
     }
 
-    rclone &rclone::copy_to(const rclone_file &source, const rclone_file &destination)
+    process &process::copy_to(const file &source, const file &destination)
     {
         _args = {"copyto", source.absolute_path(), destination.absolute_path()};
         return *this;
     }
 
-    rclone &rclone::move_to(const rclone_file &source, const rclone_file &destination)
+    process &process::move_to(const file &source, const file &destination)
     {
         _args = {"moveto", source.absolute_path(), destination.absolute_path()};
         return *this;
     }
 
-    rclone &rclone::delete_file(const rclone_file &file)
+    process &process::delete_file(const file &file)
     {
         _args = {"delete", file.absolute_path()};
         return *this;
     }
 
-    rclone &rclone::mkdir(const rclone_file &file)
+    process &process::mkdir(const file &file)
     {
         _args = {"mkdir", file.absolute_path()};
         return *this;
     }
 
-    rclone &rclone::cat(const Iridium::rclone_file &file)
+    process &process::cat(const file &file)
     {
         _args = {"cat", file.absolute_path()};
         return *this;
     }
 
-    rclone &rclone::about(const rclone_remote &remote)
+    process &process::about(const remote &remote, std::function<void(const Iridium::rclone::about &)> &&callback)
     {
         _args = {"about", remote.root_path()};
+        finished(
+                [this, callback](int exit_code)
+                {
+                    ba::post(_pool, [this, callback]
+                    {
+                        auto about = Iridium::rclone::about::create(boost::algorithm::join(_output, "\n"));
+                        callback(about);
+                    });
+                }
+        );
         return *this;
     }
 
-    rclone &rclone::size(const rclone_remote &remote){
+    process &process::size(const remote &remote)
+    {
         _args = {"size", remote.root_path()};
         return *this;
     }
 
-} // namespace Iridium
+} // namespace Iridium::rclone

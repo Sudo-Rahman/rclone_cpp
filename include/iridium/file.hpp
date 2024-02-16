@@ -2,32 +2,32 @@
 
 #include <iostream>
 #include <boost/date_time.hpp>
-#include "rclone_remote.hpp"
+#include "remote.hpp"
 #include <utility>
 
-namespace Iridium
+namespace Iridium::rclone
 {
-    class rclone_file {
+    class file {
 
     public:
-        rclone_file(rclone_file *parent, const std::string &name_file, uint64_t size, bool is_dir,
-                    boost::posix_time::ptime mod_time,
-                    const rclone_remote_ptr &remote);
+        file(file *parent, const std::string &name_file, uint64_t size, bool is_dir,
+             boost::posix_time::ptime mod_time,
+             const rclone_remote_ptr &remote);
 
 
-        rclone_file(rclone_file *parent, const std::string &name_file, uint64_t size, bool is_dir,
-                    boost::posix_time::seconds mod_time,
-                    const rclone_remote_ptr &remote);
+        file(file *parent, const std::string &name_file, uint64_t size, bool is_dir,
+             boost::posix_time::seconds mod_time,
+             const rclone_remote_ptr &remote);
 
-        rclone_file(const rclone_file &file) = default;
+        file(const file &file) = default;
 
-        rclone_file(rclone_file &&file) = default;
+        file(file &&file) = default;
 
-        rclone_file &operator=(const rclone_file &file) = default;
+        file &operator=(const file &file) = default;
 
-        rclone_file &operator=(rclone_file &&file) = default;
+        file &operator=(file &&file) = default;
 
-        ~rclone_file() = default;
+        ~file() = default;
 
         [[nodiscard]] std::string name() const
         { return _name; }
@@ -42,7 +42,7 @@ namespace Iridium
         [[nodiscard]] uint64_t size() const
         { return _size; }
 
-        [[nodiscard]] rclone_file *parent()
+        [[nodiscard]] file *parent()
         { return _parent; }
 
         [[nodiscard]] uint32_t nb_chilchren() const
@@ -60,7 +60,7 @@ namespace Iridium
         [[nodiscard]] boost::posix_time::ptime mod_time() const
         { return _mod_time; }
 
-        [[nodiscard]] rclone_file *pointer()
+        [[nodiscard]] file *pointer()
         {
             return this;
         }
@@ -85,44 +85,44 @@ namespace Iridium
             _mod_time = boost::posix_time::from_time_t(mod_time.total_seconds());
         }
 
-        void add_child(std::shared_ptr<rclone_file> child)
+        void add_child(std::shared_ptr<file> child)
         { _children.push_back(std::move(child)); }
 
-        void set_parent(rclone_file *parent)
+        void set_parent(file *parent)
         { _parent = parent; }
 
-        [[nodiscard]] rclone_file *parent() const
+        [[nodiscard]] file *parent() const
         { return _parent; }
 
-        [[nodiscard]] std::vector<std::shared_ptr<rclone_file>> children() const
+        [[nodiscard]] std::vector<std::shared_ptr<file>> children() const
         { return _children; }
 
-        friend std::ostream &operator<<(std::ostream &os, const rclone_file &file);
+        friend std::ostream &operator<<(std::ostream &os, const file &file);
 
-        bool operator==(const rclone_file &rhs) const;
+        bool operator==(const file &rhs) const;
 
-        bool operator!=(const rclone_file &rhs) const;
+        bool operator!=(const file &rhs) const;
 
-        static std::shared_ptr<rclone_file>
-        create_shared_ptr(rclone_file *parent, const std::string &name_file, uint64_t size, bool is_dir,
+        static std::shared_ptr<file>
+        create_shared_ptr(file *parent, const std::string &name_file, uint64_t size, bool is_dir,
                           boost::posix_time::ptime mod_time, const rclone_remote_ptr &remote);
 
-        static std::unique_ptr<rclone_file> from_json(const std::string &json_str, rclone_file *parent);
+        static std::unique_ptr<file> from_json(const std::string &json_str, file *parent);
 
     private:
-        rclone_file() = default;
+        file() = default;
 
         std::string _name{};
         rclone_remote_ptr _remote{};
         uint64_t _size{};
-        rclone_file *_parent{};
-        std::vector<std::shared_ptr<rclone_file>> _children{};
+        file *_parent{};
+        std::vector<std::shared_ptr<file>> _children{};
         bool _is_dir{};
         boost::posix_time::ptime _mod_time{};
 
         friend class rclone;
     };
 
-    typedef std::shared_ptr<rclone_file> rclone_file_ptr;
+    typedef std::shared_ptr<file> rclone_file_ptr;
 
-}
+} // namespace Iridium::rclone

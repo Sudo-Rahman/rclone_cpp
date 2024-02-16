@@ -9,12 +9,13 @@
 using namespace boost::asio;
 using namespace boost::asio;
 using namespace std;
+using namespace Iridium::rclone;
 
 
 int main()
 {
 
-    Iridium::rclone::initialize("/opt/homebrew/bin/rclone");
+    process::initialize("C:/Users/rahman/Documents/rclone-v1.65.2-windows-amd64/rclone.exe");
 
 //    auto rclones = std::vector<Iridium::rclone *>{};
 //    for (int i = 0; i < 1000; ++i)
@@ -29,18 +30,23 @@ int main()
 
 //    for (int i = 0; i < 10000; ++i)
 //    {
-    auto rclone = new Iridium::rclone();
+    auto rclone = new process();
     std::cout << boost::this_thread::get_id() << std::endl << std::endl;
-    auto lst = std::vector<Iridium::rclone_remote>{};
+    auto lst = std::vector<remote>{};
     auto n = new int {0};
-    auto remote = Iridium::rclone_remote::create_shared_ptr("test", Iridium::rclone_remote::remote_type::google_drive, "");
-    auto file = Iridium::rclone_file{nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(), remote};
+    auto remote = remote::create_shared_ptr("test", remote::remote_type::google_drive, "");
+    auto file = Iridium::rclone::file{nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(), remote};
     rclone->
-                    lsjson(file, [&,n](const Iridium::rclone_file &file)
+                    about(*remote, [n](const Iridium::rclone::about &about)
                     {
+                        std::cout << about << std::endl;
                         (*n)++;
-                        std::cout << file << std::endl;
                     })
+//                    lsjson(file, [&,n](const Iridium::rclone::file &file)
+//                    {
+//                        (*n)++;
+//                        std::cout << file << std::endl;
+//                    })
 //            list_remotes(lst)
 //    config()
 //    lsjson(Iridium::rclone_remote("drive", Iridium::rclone_remote::remote_type::google_drive, "/"))

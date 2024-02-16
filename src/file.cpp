@@ -1,13 +1,13 @@
-#include "rclone_file.hpp"
+#include "file.hpp"
 #include <iostream>
 #include <boost/thread.hpp>
 #include <boost/json.hpp>
 #include <regex>
 
-namespace Iridium
+namespace Iridium::rclone
 {
-    rclone_file::rclone_file(rclone_file *parent, const std::string &name_file, uint64_t size, bool is_dir,
-                             boost::posix_time::ptime mod_time, const rclone_remote_ptr &remote)
+    file::file(file *parent, const std::string &name_file, uint64_t size, bool is_dir,
+               boost::posix_time::ptime mod_time, const rclone_remote_ptr &remote)
     {
         _parent = parent;
         _name = name_file;
@@ -17,9 +17,9 @@ namespace Iridium
         _remote = remote;
     }
 
-    rclone_file::rclone_file(rclone_file *parent, const std::string &name_file, uint64_t size, bool is_dir,
-                             boost::posix_time::seconds mod_time,
-                             const rclone_remote_ptr &remote)
+    file::file(file *parent, const std::string &name_file, uint64_t size, bool is_dir,
+               boost::posix_time::seconds mod_time,
+               const rclone_remote_ptr &remote)
     {
         _parent = parent;
         _name = name_file;
@@ -30,7 +30,7 @@ namespace Iridium
 
     }
 
-    std::ostream &operator<<(std::ostream &os, const Iridium::rclone_file &file)
+    std::ostream &operator<<(std::ostream &os, const file &file)
     {
         auto remote = std::string();
         auto string_stream = std::stringstream();
@@ -53,12 +53,12 @@ namespace Iridium
     }
 
 
-    bool rclone_file::operator!=(const rclone_file &rhs) const
+    bool file::operator!=(const file &rhs) const
     {
         return !(rhs == *this);
     }
 
-    bool rclone_file::operator==(const rclone_file &rhs) const
+    bool file::operator==(const file &rhs) const
     {
         return _name == rhs._name &&
                _size == rhs._size &&
@@ -67,15 +67,15 @@ namespace Iridium
                _remote == rhs._remote;
     }
 
-    std::shared_ptr<rclone_file>
-    rclone_file::create_shared_ptr(rclone_file *parent, const std::string &name_file, uint64_t size, bool is_dir,
-                                   boost::posix_time::ptime mod_time, const rclone_remote_ptr &remote)
+    std::shared_ptr<file>
+    file::create_shared_ptr(file *parent, const std::string &name_file, uint64_t size, bool is_dir,
+                            boost::posix_time::ptime mod_time, const rclone_remote_ptr &remote)
     {
-        return std::make_shared<rclone_file>(parent, name_file, size, is_dir, mod_time, remote);
+        return std::make_shared<file>(parent, name_file, size, is_dir, mod_time, remote);
     }
 
 
-    std::string rclone_file::absolute_path() const
+    std::string file::absolute_path() const
     {
         std::string abs_path;
         if (_parent)
@@ -87,7 +87,7 @@ namespace Iridium
         return std::regex_replace(abs_path, regex, "/");
     }
 
-    std::string rclone_file::path() const
+    std::string file::path() const
     {
         std::string path;
         if (_parent)
@@ -98,7 +98,7 @@ namespace Iridium
         return std::regex_replace(path, regex, "/");
     }
 
-    std::unique_ptr<rclone_file> rclone_file::from_json(const std::string &json_str, rclone_file *parent)
+    std::unique_ptr<file> file::from_json(const std::string &json_str, file *parent)
     {
         if (parent == nullptr)
             return nullptr;
@@ -125,13 +125,13 @@ namespace Iridium
                     iss.imbue(std::locale(std::locale::classic(), tif));
                     boost::posix_time::ptime abs_time;
                     iss >> abs_time;
-                    auto f = rclone_file(parent, json.at("Path").as_string().c_str(),
-                                         json.at("Size").as_int64(),
-                                         json.at("IsDir").as_bool(),
-                                         abs_time,
-                                         parent->remote());
-                    parent->add_child(std::make_shared<rclone_file>(f));
-                    return std::move(std::make_unique<rclone_file>(f));
+                    auto f = file(parent, json.at("Path").as_string().c_str(),
+                                  json.at("Size").as_int64(),
+                                  json.at("IsDir").as_bool(),
+                                  abs_time,
+                                  parent->remote());
+                    parent->add_child(std::make_shared<file>(f));
+                    return std::move(std::make_unique<file>(f));
                 }
             } catch (const std::exception &e)
             {

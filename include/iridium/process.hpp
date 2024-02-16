@@ -5,18 +5,19 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <future>
-#include "rclone_file.hpp"
+#include "file.hpp"
+#include "about.hpp"
 #include <boost/signals2.hpp>
 
-namespace Iridium
+namespace Iridium::rclone
 {
-    class rclone {
+    class process {
 
     public:
 
-        rclone();
+        process();
 
-        ~rclone();
+        ~process();
 
         enum class state {
             not_launched,
@@ -28,11 +29,11 @@ namespace Iridium
 
         static void initialize(const std::string &path_rclone);
 
-        rclone &wait_for_start();
+        process &wait_for_start();
 
-        rclone &wait_for_finish();
+        process &wait_for_finish();
 
-        rclone &execute();
+        process &execute();
 
         [[nodiscard]] int exit_code() const;
 
@@ -45,41 +46,41 @@ namespace Iridium
         void stop();
 
         static const std::string endl;
-        rclone &operator<<(const std::string &input);
+        process &operator<<(const std::string &input);
 
         void write_input(const std::string &input);
 
-        rclone &every_line(const std::function<void(const std::string&)> &&callback);
+        process &every_line(const std::function<void(const std::string&)> &&callback);
 
-        rclone &finished(const std::function<void(int)> &&callback);
+        process &finished(const std::function<void(int)> &&callback);
 
-        rclone &version();
+        process &version();
 
-        rclone &list_remotes(std::vector<rclone_remote> &remotes);
+        process &list_remotes(std::vector<remote> &remotes);
 
-        rclone &delete_remote(const rclone_remote &remote);
+        process &delete_remote(const remote &remote);
 
-        rclone &config();
+        process &config();
 
-        rclone &lsjson(const rclone_remote &remote);
+        process &lsjson(const remote &remote);
 
-        rclone &lsjson(rclone_file &file);
+        process &lsjson(file &file);
 
-        rclone &lsjson(rclone_file &file, const std::function<void(rclone_file)> &&callback);
+        process &lsjson(file &file, const std::function<void(Iridium::rclone::file)> &&callback);
 
-        rclone &copy_to(const rclone_file &source, const rclone_file &destination);
+        process &copy_to(const file &source, const file &destination);
 
-        rclone &move_to(const rclone_file &source, const rclone_file &destination);
+        process &move_to(const file &source, const file &destination);
 
-        rclone &delete_file(const rclone_file &file);
+        process &delete_file(const file &file);
 
-        rclone &mkdir(const rclone_file &file);
+        process &mkdir(const file &file);
 
-        rclone &cat(const rclone_file &file);
+        process &cat(const file &file);
 
-        rclone &about(const rclone_remote &remote);
+        process &about(const remote &remote, std::function<void(const Iridium::rclone::about &)> &&callback);
 
-        rclone &size(const rclone_remote &remote);
+        process &size(const remote &remote);
 
 
     private:
@@ -111,5 +112,5 @@ namespace Iridium
         std::unique_ptr<boost::signals2::signal<void(int)>> _signal_finish{};
 
     };
-} // namespace Iridium
+} // namespace Iridium::rclone
 

@@ -1,15 +1,15 @@
-#include "rclone_remote.hpp"
+#include "remote.hpp"
 
 #include <utility>
 
-namespace Iridium
+namespace Iridium::rclone
 {
-    rclone_remote::rclone_remote(std::string name, remote_type type, std::string path) :
+    remote::remote(std::string name, remote_type type, std::string path) :
             _name(std::move(name)), _type(type) {
         set_path(std::move(path));
     }
 
-    std::ostream &operator<<(std::ostream &os, const rclone_remote &remote)
+    std::ostream &operator<<(std::ostream &os, const remote &remote)
     {
         os << "Remote: {" << std::endl <<
            "\tname: " << remote._name << "," << std::endl <<
@@ -18,29 +18,29 @@ namespace Iridium
         return os;
     }
 
-    bool rclone_remote::operator==(const rclone_remote &remote) const
+    bool remote::operator==(const remote &remote) const
     {
         return _name == remote._name &&
                _type == remote._type &&
                _path == remote._path;
     }
 
-    bool rclone_remote::operator!=(const rclone_remote &remote) const
+    bool remote::operator!=(const remote &remote) const
     {
         return !(remote == *this);
     }
 
-    std::shared_ptr<rclone_remote> rclone_remote::create_shared_ptr(std::string name, remote_type type, std::string path)
+    std::shared_ptr<remote> remote::create_shared_ptr(std::string name, remote_type type, std::string path)
     {
-        return std::make_shared<rclone_remote>(std::move(name), type, std::move(path));
+        return std::make_shared<remote>(std::move(name), type, std::move(path));
     }
 
-    std::unique_ptr<rclone_remote> rclone_remote::create_unique_ptr(std::string name, remote_type type, std::string path)
+    std::unique_ptr<remote> remote::create_unique_ptr(std::string name, remote_type type, std::string path)
     {
-        return std::make_unique<rclone_remote>(std::move(name), type, std::move(path));
+        return std::make_unique<remote>(std::move(name), type, std::move(path));
     }
 
-    const std::map<std::string, rclone_remote::remote_type> rclone_remote::string_to_remote_type = {
+    const std::map<std::string, remote::remote_type> remote::string_to_remote_type = {
             {"drive",     remote_type::google_drive},
             {"sftp",      remote_type::sftp},
             {"onedrive",  remote_type::onedrive},

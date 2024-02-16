@@ -5,10 +5,10 @@
 #include <map>
 #include <string>
 
-namespace Iridium
+namespace Iridium::rclone
 {
 
-    class rclone_remote {
+    class remote {
     public:
 
         enum remote_type {
@@ -16,19 +16,19 @@ namespace Iridium
             opendrive, pcloud, box, smb, cmd, none
         };
 
-        rclone_remote() = default;
+        remote() = default;
 
-        rclone_remote(std::string name, remote_type type, std::string path);
+        remote(std::string name, remote_type type, std::string path);
 
-        rclone_remote(const rclone_remote &remote) = default;
+        remote(const remote &remote) = default;
 
-        rclone_remote(rclone_remote &&remote) = default;
+        remote(remote &&remote) = default;
 
-        rclone_remote &operator=(const rclone_remote &remote) = default;
+        remote &operator=(const remote &remote) = default;
 
-        rclone_remote &operator=(rclone_remote &&remote) = default;
+        remote &operator=(remote &&remote) = default;
 
-        ~rclone_remote() = default;
+        ~remote() = default;
 
         [[nodiscard]] std::string name() const
         {
@@ -69,15 +69,15 @@ namespace Iridium
                 _path = _path.substr(0, _path.size() - 1);
         }
 
-        bool operator==(const rclone_remote &remote) const;
+        bool operator==(const remote &remote) const;
 
-        bool operator!=(const rclone_remote &remote) const;
+        bool operator!=(const remote &remote) const;
 
-        friend std::ostream &operator<<(std::ostream &os, const rclone_remote &remote);
+        friend std::ostream &operator<<(std::ostream &os, const remote &remote);
 
-        static std::shared_ptr<rclone_remote> create_shared_ptr(std::string name, remote_type type, std::string path);
+        static std::shared_ptr<remote> create_shared_ptr(std::string name, remote_type type, std::string path);
 
-        static std::unique_ptr<rclone_remote> create_unique_ptr(std::string name, remote_type type, std::string path);
+        static std::unique_ptr<remote> create_unique_ptr(std::string name, remote_type type, std::string path);
 
     private:
         std::string _name{};
@@ -88,6 +88,6 @@ namespace Iridium
         static const std::map<std::string, remote_type> string_to_remote_type;
     };
 
-    typedef std::shared_ptr<rclone_remote> rclone_remote_ptr;
+    typedef std::shared_ptr<remote> rclone_remote_ptr;
 
-} // Iridium
+} // namespace Iridium::rclone
