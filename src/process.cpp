@@ -312,7 +312,7 @@ namespace Iridium::rclone
         return *this;
     }
 
-    process &process::size(const file &file,std::function<void(const Iridium::rclone::size &)> &&callback)
+    process &process::size(const file &file, std::function<void(const Iridium::rclone::size &)> &&callback)
     {
         _args = {"size", file.absolute_path()};
         finished(
@@ -327,5 +327,19 @@ namespace Iridium::rclone
         );
         return *this;
     }
+
+    process &process::tree(const file &file, const std::vector<option::tree> &options)
+    {
+        _args = {"tree", file.absolute_path()};
+
+        for (const auto &option: options)
+        {
+            auto data = option.get();
+            _args.insert(_args.end(), data.begin(), data.end());
+        }
+        return *this;
+    }
+
+
 
 } // namespace Iridium::rclone

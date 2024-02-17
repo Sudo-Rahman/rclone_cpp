@@ -5,12 +5,12 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <future>
-#include "file.hpp"
-#include "entities.hpp"
+#include <file.hpp>
+#include <entities.hpp>
+#include <options.hpp>
 #include <boost/signals2.hpp>
 
-namespace Iridium::rclone
-{
+namespace Iridium::rclone {
     class process {
 
     public:
@@ -46,11 +46,12 @@ namespace Iridium::rclone
         void stop();
 
         static const std::string endl;
+
         process &operator<<(const std::string &input);
 
         void write_input(const std::string &input);
 
-        process &every_line(const std::function<void(const std::string&)> &&callback);
+        process &every_line(const std::function<void(const std::string &)> &&callback);
 
         process &finished(const std::function<void(int)> &&callback);
 
@@ -81,6 +82,8 @@ namespace Iridium::rclone
         process &about(const remote &remote, std::function<void(const Iridium::rclone::about &)> &&callback);
 
         process &size(const file &file, std::function<void(const Iridium::rclone::size &)> &&callback);
+
+        process &tree(const file &file,const std::vector<option::tree> &options= {});
 
 
     private:
