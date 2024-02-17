@@ -1,4 +1,4 @@
-#include "process.hpp"
+#include <process.hpp>
 #include <iostream>
 #include <regex>
 #include <boost/json.hpp>
@@ -312,9 +312,19 @@ namespace Iridium::rclone
         return *this;
     }
 
-    process &process::size(const remote &remote)
+    process &process::size(const file &file,std::function<void(const Iridium::rclone::size &)> &&callback)
     {
-        _args = {"size", remote.root_path()};
+        _args = {"size", file.absolute_path()};
+        finished(
+                [this, callback](int exit_code)
+                {
+                    ba::post(_pool, [this, callback]
+                    {
+                        auto size = Iridium::rclone::size::create(boost::algorithm::join(_output, "\n"));
+                        callback(size);
+                    });
+                }
+        );
         return *this;
     }
 

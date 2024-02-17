@@ -5,7 +5,6 @@
 
 namespace Iridium::rclone
 {
-
     uint64_t convert_to_bytes(const std::string &input)
     {
         std::regex size(R"(([0-9]+)(.[0-9]+)?)");
@@ -72,7 +71,7 @@ namespace Iridium::rclone
 
     std::ostream &operator<<(std::ostream &os, const about &about)
     {
-        os<< "About: {" << std::endl <<
+        os << "About: {" << std::endl <<
            "\ttotal_bytes: " << about.total_bytes << "," << std::endl <<
            "\tused_bytes: " << about.used_bytes << "," << std::endl <<
            "\tfree_bytes: " << about.free_bytes << "," << std::endl <<

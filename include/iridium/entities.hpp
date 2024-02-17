@@ -1,6 +1,7 @@
 #pragma once
 
 #include "about.hpp"
+#include "size.hpp"
 
 #ifdef _WIN32
 #define RCLONE_CPP_EXPORT __declspec(dllexport)
@@ -10,5 +11,6 @@
 
 namespace Iridium::rclone
 {
-    class RCLONE_CPP_EXPORT about;
+    RCLONE_CPP_EXPORT class  about;
+    RCLONE_CPP_EXPORT class size;
 }

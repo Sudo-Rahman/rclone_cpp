@@ -6,7 +6,7 @@
 #include <boost/thread.hpp>
 #include <future>
 #include "file.hpp"
-#include "about.hpp"
+#include "entities.hpp"
 #include <boost/signals2.hpp>
 
 namespace Iridium::rclone
@@ -80,7 +80,7 @@ namespace Iridium::rclone
 
         process &about(const remote &remote, std::function<void(const Iridium::rclone::about &)> &&callback);
 
-        process &size(const remote &remote);
+        process &size(const file &file, std::function<void(const Iridium::rclone::size &)> &&callback);
 
 
     private:

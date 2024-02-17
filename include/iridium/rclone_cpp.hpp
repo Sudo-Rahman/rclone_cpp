@@ -13,7 +13,7 @@
 
 namespace Iridium::rclone
 {
-    class RCLONE_CPP_EXPORT remote;
-    class RCLONE_CPP_EXPORT file;
-    class RCLONE_CPP_EXPORT process;
+    RCLONE_CPP_EXPORT class remote;
+    RCLONE_CPP_EXPORT class file;
+    RCLONE_CPP_EXPORT class process;
 }
