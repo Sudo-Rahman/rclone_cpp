@@ -328,15 +328,13 @@ namespace Iridium::rclone
         return *this;
     }
 
-    process &process::tree(const file &file, const std::vector<option::tree> &options)
+    process &process::tree(const file &file, const std::vector<option::tree> &&options,const std::vector<option::filter> &&filters)
     {
         _args = {"tree", file.absolute_path()};
 
-        for (const auto &option: options)
-        {
-            auto data = option.get();
-            _args.insert(_args.end(), data.begin(), data.end());
-        }
+        option::add_options_to_vector((const std::vector<Iridium::rclone::option> &) options, _args);
+        option::add_options_to_vector((const std::vector<Iridium::rclone::option> &) filters, _args);
+
         return *this;
     }
 

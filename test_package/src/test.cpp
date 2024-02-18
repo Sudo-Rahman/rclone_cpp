@@ -37,7 +37,7 @@ int main()
     auto remote = remote::create_shared_ptr("test", remote::remote_type::google_drive, "");
     auto file = Iridium::rclone::file{nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(), remote};
     rclone->
-    tree(file,{option::tree(option::tree::dirs_only), option::tree(option::tree::sort, "name")})
+    tree(file,{},{{option::filter::include, "*.torrent"}})
 //                    about(*remote, [n](const Iridium::rclone::about &about)
 //                    {
 //                        std::cout << about << std::endl;

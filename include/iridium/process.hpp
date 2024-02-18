@@ -83,7 +83,8 @@ namespace Iridium::rclone {
 
         process &size(const file &file, std::function<void(const Iridium::rclone::size &)> &&callback);
 
-        process &tree(const file &file,const std::vector<option::tree> &options= {});
+        process &tree(const file &file,const std::vector<option::tree> &&options= {}, const std::vector<option::filter> &&filters= {});
+
 
 
     private:
