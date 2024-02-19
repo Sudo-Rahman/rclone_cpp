@@ -10,8 +10,10 @@
 #include <options.hpp>
 #include <boost/signals2.hpp>
 
-namespace Iridium::rclone {
-    class process {
+namespace Iridium::rclone
+{
+    class process
+    {
 
     public:
 
@@ -19,7 +21,8 @@ namespace Iridium::rclone {
 
         ~process();
 
-        enum class state {
+        enum class state
+        {
             not_launched,
             launched,
             stopped,
@@ -27,7 +30,11 @@ namespace Iridium::rclone {
             finished
         };
 
-        static void initialize(const std::string &path_rclone);
+        /**
+         * @brief Initialize the rclone process
+         * @param rclone the path to the rclone executable or if empty the system path will be used
+         */
+        static void initialize(const std::string &path_rclone = "");
 
         process &wait_for_start();
 
@@ -37,11 +44,20 @@ namespace Iridium::rclone {
 
         [[nodiscard]] int exit_code() const;
 
-        [[nodiscard]] state get_state() const { return _state; }
+        [[nodiscard]] state get_state() const
+        { return _state; }
 
-        [[nodiscard]] std::vector<std::string> get_output() const { return _output; }
+        [[nodiscard]] std::vector<std::string> get_output() const
+        { return _output; }
 
-        [[nodiscard]] std::vector<std::string> get_error() const { return _error; }
+        [[nodiscard]] std::vector<std::string> get_error() const
+        { return _error; }
+
+        [[nodiscard]] option::vector get_options() const
+        { return _local_options; }
+
+        [[nodiscard]] static option::vector get_global_options()
+        { return _global_options; }
 
         void stop();
 
@@ -51,9 +67,11 @@ namespace Iridium::rclone {
 
         void write_input(const std::string &input);
 
-        process &every_line(const std::function<void(const std::string &)> &&callback);
+        process &every_line(std::function<void(const std::string &)> &&callback);
 
-        process &finished(const std::function<void(int)> &&callback);
+        process &finished(std::function<void(int)> &&callback);
+
+        process &finished_error(std::function<void()> &&callback);
 
         process &version();
 
@@ -83,13 +101,32 @@ namespace Iridium::rclone {
 
         process &size(const file &file, std::function<void(const Iridium::rclone::size &)> &&callback);
 
-        process &tree(const file &file,const std::vector<option::tree> &&options= {}, const std::vector<option::filter> &&filters= {});
+        process &tree(const file &file);
 
 
+        process &add_option(const option &option);
+
+        template<class ... Args>
+        process &add_option(const option &option1, Args&&... args)
+        {
+            add_option(option1);
+            add_option(std::forward<Args>(args)...);
+            return *this;
+        }
+
+        static void add_global_option(const option &option);
+
+        template<class ... Args>
+        static void add_global_option(const option &option1, Args &&... args)
+        {
+            add_global_option(option1);
+            add_global_option(std::forward<Args>(args)...);
+        }
 
     private:
         static std::string _path_rclone;
         static bool _is_initialized;
+        static option::vector _global_options;
 
         std::mutex _mutex{};
         std::condition_variable _cv{};
@@ -107,6 +144,8 @@ namespace Iridium::rclone {
         std::vector<std::string> _args;
         std::vector<std::string> _output{};
         std::vector<std::string> _error{};
+
+        option::vector _local_options{};
 
         void read_output();
 

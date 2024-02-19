@@ -33,11 +33,30 @@ namespace Iridium::rclone
 
         option &operator=(option &&) = default;
 
-        static void add_options_to_vector(const std::vector <option> &options, std::vector <std::string> &vector);
 
         friend class process;
 
+        struct option_allocator: std::allocator<option>
+        {
+            template< class U, class... Args >
+            void construct( U* p, Args&&... args )
+            {
+                ::new((void *)p) U(std::forward<Args>(args)...);
+            }
+
+            template< class U > struct rebind { typedef option_allocator other; };
+
+        };
+        friend class option_allocator;
+
+        using vector = std::vector<option, option::option_allocator>;
+
+        static void add_option_to_vector(const option &option, std::vector<std::string> &vector);
+
+        static void add_options_to_vector(const vector &options, std::vector<std::string> &vector);
+
     };
+
 
     class option::tree : public option
     {
@@ -69,7 +88,7 @@ namespace Iridium::rclone
             sort,              // Select sort: name, version, size, mtime, ctime
         };
 
-        tree(const flags &option);
+        explicit tree(const flags &option);
 
         tree(const flags_value &option, const std::string &value);
 
@@ -114,7 +133,7 @@ namespace Iridium::rclone
             min_size                            // Only transfer files bigger than this in KiB or suffix B|K|M|G|T|P (default off)
         };
 
-        filter(const flags &option);
+        explicit filter(const flags &option);
 
         filter(const flags_value &option, const std::string &value);
 

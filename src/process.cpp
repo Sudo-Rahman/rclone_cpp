@@ -14,11 +14,18 @@ namespace Iridium::rclone
     std::string process::_path_rclone;
     bool process::_is_initialized = false;
     const std::string process::endl = "\n";
+    option::vector process::_global_options = {};
 
 
     void process::initialize(const std::string &path_rclone)
     {
-        _path_rclone = path_rclone;
+        if (path_rclone == "")
+        {
+            auto path = bp::search_path("rclone");
+            if (path.empty())
+                throw std::runtime_error("rclone not found in the path");
+            _path_rclone = path.string();
+        } else _path_rclone = path_rclone;
         _is_initialized = true;
     }
 
@@ -88,6 +95,9 @@ namespace Iridium::rclone
         if (_state != state::not_launched)
             throw std::runtime_error("process already started");
 
+        option::add_options_to_vector(_global_options, _args);
+        option::add_options_to_vector(_local_options, _args);
+
         try
         {
             _in = std::make_unique<bp::opstream>();
@@ -122,7 +132,9 @@ namespace Iridium::rclone
             _child.wait();
             while (_counter < 2)
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            _state = state::finished;
+            if (_child.exit_code() == 0)
+                _state = state::finished;
+            else _state = state::error;
             if (_signal_finish != nullptr)
                 (*_signal_finish)(_child.exit_code());
             _in.reset();
@@ -160,7 +172,7 @@ namespace Iridium::rclone
 
     }
 
-    process &process::every_line(const std::function<void(const std::string &)> &&callback)
+    process &process::every_line(std::function<void(const std::string &)> &&callback)
     {
 
         _signal_every_line->connect(
@@ -172,7 +184,7 @@ namespace Iridium::rclone
         return *this;
     }
 
-    process &process::finished(const std::function<void(int)> &&callback)
+    process &process::finished(std::function<void(int)> &&callback)
     {
         _signal_finish->connect(
                 [this, callback](const int &exit_code)
@@ -181,6 +193,21 @@ namespace Iridium::rclone
                     {
                         callback(exit_code);
                     });
+                }
+        );
+        return *this;
+    }
+
+    process &process::finished_error(std::function<void()> &&callback)
+    {
+        _signal_finish->connect(
+                [this, callback](const int &exit_code)
+                {
+                    if (exit_code not_eq 0)
+                        ba::post(_pool, [&callback]
+                        {
+                            callback();
+                        });
                 }
         );
         return *this;
@@ -224,7 +251,7 @@ namespace Iridium::rclone
 
     process &process::config()
     {
-        _args = {"config", "show"};
+        _args = {"config"};
         return *this;
     }
 
@@ -328,16 +355,21 @@ namespace Iridium::rclone
         return *this;
     }
 
-    process &process::tree(const file &file, const std::vector<option::tree> &&options,const std::vector<option::filter> &&filters)
+    process &process::tree(const file &file)
     {
         _args = {"tree", file.absolute_path()};
-
-        option::add_options_to_vector((const std::vector<Iridium::rclone::option> &) options, _args);
-        option::add_options_to_vector((const std::vector<Iridium::rclone::option> &) filters, _args);
-
         return *this;
     }
 
+    process &process::add_option(const option &option)
+    {
+        _local_options.push_back(option);
+        return *this;
+    }
 
+    void process::add_global_option(const option &option)
+    {
+        process::_global_options.push_back(option);
+    }
 
 } // namespace Iridium::rclone

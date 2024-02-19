@@ -73,12 +73,12 @@ namespace Iridium::rclone
 
 //    --------------------------------------------------------------------------------------------
 
-    option::filter::filter(const option::filter::flags &option)
+    option::filter::filter(const option::filter::flags &option): Iridium::rclone::option()
     {
         _options.push_back(option::filter::to_string(option));
     }
 
-    option::filter::filter(const option::filter::flags_value &option, const string &value)
+    option::filter::filter(const option::filter::flags_value &option, const string &value) :Iridium::rclone::option()
     {
         _options.push_back(option::filter::to_string(option));
         _options.push_back(value);
@@ -144,11 +144,14 @@ namespace Iridium::rclone
         return "";
     }
 
-    void option::add_options_to_vector(const ::vector <option> &options, ::vector <std::string> &vector)
+    void option::add_option_to_vector(const option &option, std::vector <std::string> &vector)
     {
-       for(auto &opt : options)
-       {
-           vector.insert(vector.end(), opt._options.begin(), opt._options.end());
-       }
+        vector.insert(vector.end(), option._options.begin(), option._options.end());
+    }
+
+    void option::add_options_to_vector(const vector &options, std::vector <std::string> &vector)
+    {
+        for (auto &opt: options)
+            add_option_to_vector(opt, vector);
     }
 }

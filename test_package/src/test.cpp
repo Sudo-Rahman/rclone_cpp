@@ -15,7 +15,7 @@ using namespace Iridium::rclone;
 int main()
 {
 
-    process::initialize("/usr/bin/rclone");
+    process::initialize();
 
 //    auto rclones = std::vector<Iridium::rclone *>{};
 //    for (int i = 0; i < 1000; ++i)
@@ -33,11 +33,31 @@ int main()
     auto rclone = new process();
     std::cout << boost::this_thread::get_id() << std::endl << std::endl;
     auto lst = std::vector<remote>{};
-    auto n = new int {0};
+    auto n = new int{0};
     auto remote = remote::create_shared_ptr("test", remote::remote_type::google_drive, "");
     auto file = Iridium::rclone::file{nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(), remote};
+    process::add_global_option(
+            option::filter(option::filter::include, "*.txt")
+    );
+    auto fun =
+            [&file, rclone](int exit_code)
+            {
+//                          for (auto r: file.children())
+//                          {
+//                              std::cout << r->path() << std::endl;
+//                          }
+                for (const auto line: rclone->get_output())
+                {
+                    std::cout << line << std::endl;
+                }
+//                          std::cout << boost::this_thread::get_id() << std::endl;
+            };
     rclone->
-    tree(file,{},{{option::filter::include, "*.torrent"}})
+            tree(file)
+            .add_option(
+                    option::filter(option::filter::include, "*.txt")
+//            option::tree(option::tree::dirs_only),
+            )
 //                    about(*remote, [n](const Iridium::rclone::about &about)
 //                    {
 //                        std::cout << about << std::endl;
@@ -51,33 +71,28 @@ int main()
 //            list_remotes(lst)
 //    config()
 //    lsjson(Iridium::rclone_remote("drive", Iridium::rclone_remote::remote_type::google_drive, "/"))
-//            .every_line([&](const std::string &line)
-//                        {
-////                *rclone << "q";
-////                    std::cout << line << std::endl;
-////                                std::cout << line << boost::this_thread::get_id() << std::endl << std::endl;
-////                            std::cout << boost::this_thread::get_id() << std::endl;
-//                        })
-            .finished([&file,rclone](int exit_code)
-                      {
-//                          for (auto r: file.children())
-//                          {
-//                              std::cout << r->path() << std::endl;
-//                          }
-                          for (const auto line: rclone->get_output())
-                          {
-                                std::cout << line << std::endl;
-                          }
-//                          std::cout << boost::this_thread::get_id() << std::endl;
-                      })
+            .every_line([&](const std::string &line)
+                        {
+//                *rclone << "q";
+                            std::cout << line << std::endl;
+//                                std::cout << line << boost::this_thread::get_id() << std::endl << std::endl;
+//                            std::cout << boost::this_thread::get_id() << std::endl;
+                        })
+            .finished(fun)
             .execute()
-                .wait_for_start()
-                .wait_for_finish()
+            .wait_for_start()
+//                .wait_for_finish()
 //            .stop()
             ;
 //    options::tree *t = new options::tree{};
-    std::cout << sizeof(bool) << std::endl;
-    boost::this_thread::sleep_for(boost::chrono::microseconds(10000));
+    for (auto &op: rclone->get_options())
+    {
+        for (auto &o: op.get())
+        {
+            std::cout << o << std::endl;
+        }
+    }
+    boost::this_thread::sleep_for(boost::chrono::seconds(1));
 //    rclone->wait_for_finish();
 //    std::cout << "i: " << i << std::endl;
 //    boost::this_thread::sleep_for(boost::chrono::microseconds(100));
