@@ -1,9 +1,9 @@
-#include <about.hpp>
+#include "entities/about.hpp"
 #include <regex>
 #include <iostream>
 
 
-namespace Iridium::rclone
+namespace iridium::rclone
 {
     uint64_t convert_to_bytes(const std::string &input)
     {
@@ -39,7 +39,7 @@ namespace Iridium::rclone
 
     about about::create(const std::string &data)
     {
-        auto about = Iridium::rclone::about();
+        auto about = iridium::rclone::about();
         std::regex total = std::regex("Total:.*\n");
         std::regex used = std::regex("Used:.*\n");
         std::regex free = std::regex("Free:.*\n");

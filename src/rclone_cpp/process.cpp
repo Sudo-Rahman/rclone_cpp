@@ -5,7 +5,7 @@
 #include <boost/algorithm/string/join.hpp>
 
 
-namespace Iridium::rclone
+namespace iridium::rclone
 {
     namespace ba = boost::asio;
     namespace bp = boost::process;
@@ -275,7 +275,7 @@ namespace Iridium::rclone
         return *this;
     }
 
-    process &process::lsjson(file &file, const std::function<void(Iridium::rclone::file)> &&callback)
+    process &process::lsjson(file &file, const std::function<void(iridium::rclone::file)> &&callback)
     {
         _args = {"lsjson", file.absolute_path()};
 
@@ -323,7 +323,7 @@ namespace Iridium::rclone
         return *this;
     }
 
-    process &process::about(const remote &remote, std::function<void(const Iridium::rclone::about &)> &&callback)
+    process &process::about(const remote &remote, std::function<void(const iridium::rclone::about &)> &&callback)
     {
         _args = {"about", remote.root_path()};
         finished(
@@ -331,7 +331,7 @@ namespace Iridium::rclone
                 {
                     ba::post(_pool, [this, callback]
                     {
-                        auto about = Iridium::rclone::about::create(boost::algorithm::join(_output, "\n"));
+                        auto about = iridium::rclone::about::create(boost::algorithm::join(_output, "\n"));
                         callback(about);
                     });
                 }
@@ -339,7 +339,7 @@ namespace Iridium::rclone
         return *this;
     }
 
-    process &process::size(const file &file, std::function<void(const Iridium::rclone::size &)> &&callback)
+    process &process::size(const file &file, std::function<void(const iridium::rclone::size &)> &&callback)
     {
         _args = {"size", file.absolute_path()};
         finished(
@@ -347,7 +347,7 @@ namespace Iridium::rclone
                 {
                     ba::post(_pool, [this, callback]
                     {
-                        auto size = Iridium::rclone::size::create(boost::algorithm::join(_output, "\n"));
+                        auto size = iridium::rclone::size::create(boost::algorithm::join(_output, "\n"));
                         callback(size);
                     });
                 }
@@ -372,4 +372,4 @@ namespace Iridium::rclone
         process::_global_options.push_back(option);
     }
 
-} // namespace Iridium::rclone
+} // namespace iridium::rclone

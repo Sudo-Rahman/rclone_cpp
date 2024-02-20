@@ -2,7 +2,7 @@
 
 using namespace std;
 
-namespace Iridium::rclone
+namespace iridium::rclone
 {
 
 
@@ -73,12 +73,12 @@ namespace Iridium::rclone
 
 //    --------------------------------------------------------------------------------------------
 
-    option::filter::filter(const option::filter::flags &option): Iridium::rclone::option()
+    option::filter::filter(const option::filter::flags &option) : iridium::rclone::option()
     {
         _options.push_back(option::filter::to_string(option));
     }
 
-    option::filter::filter(const option::filter::flags_value &option, const string &value) :Iridium::rclone::option()
+    option::filter::filter(const option::filter::flags_value &option, const string &value) : iridium::rclone::option()
     {
         _options.push_back(option::filter::to_string(option));
         _options.push_back(value);
@@ -144,14 +144,29 @@ namespace Iridium::rclone
         return "";
     }
 
-    void option::add_option_to_vector(const option &option, std::vector <std::string> &vector)
+    void option::add_option_to_vector(const option &option, std::vector<std::string> &vector)
     {
         vector.insert(vector.end(), option._options.begin(), option._options.end());
     }
 
-    void option::add_options_to_vector(const vector &options, std::vector <std::string> &vector)
+    void option::add_options_to_vector(const vector &options, std::vector<std::string> &vector)
     {
         for (auto &opt: options)
             add_option_to_vector(opt, vector);
     }
-}
+
+//    -----------------------------------------------
+
+    option::performance::performance(const std::string &option, const std::string &value) : iridium::rclone::option()
+    {
+        _options.push_back(option);
+        _options.push_back(value);
+    }
+
+    option::listing::listing(const string &option, const string &value)
+    {
+        _options.push_back(option);
+        if(not value.empty())
+            _options.push_back(value);
+    }
+}; // namespace iridium::rclone

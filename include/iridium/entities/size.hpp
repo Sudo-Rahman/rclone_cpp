@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace Iridium::rclone
+namespace iridium::rclone
 {
     class size
     {

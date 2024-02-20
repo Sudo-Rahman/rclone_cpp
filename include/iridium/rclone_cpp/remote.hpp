@@ -5,7 +5,7 @@
 #include <map>
 #include <string>
 
-namespace Iridium::rclone
+namespace iridium::rclone
 {
 
     class remote {
@@ -90,4 +90,4 @@ namespace Iridium::rclone
 
     typedef std::shared_ptr<remote> rclone_remote_ptr;
 
-} // namespace Iridium::rclone
+} // namespace iridium::rclone

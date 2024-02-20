@@ -22,7 +22,11 @@ add_library(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC boost::boost)
-set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${HEADERS}")
-install(TARGETS ${PROJECT_NAME}
+install(
+        DIRECTORY include/iridium
+        DESTINATION include/
+)
+install(
+        TARGETS ${PROJECT_NAME}
         LIBRARY DESTINATION lib
-        PUBLIC_HEADER DESTINATION include)
+)

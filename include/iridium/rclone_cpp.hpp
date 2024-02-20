@@ -1,8 +1,8 @@
 #pragma once
 
-#include "file.hpp"
-#include "remote.hpp"
-#include "process.hpp"
+#include "rclone_cpp/file.hpp"
+#include "rclone_cpp/remote.hpp"
+#include "rclone_cpp/process.hpp"
 
 
 #ifdef _WIN32
@@ -11,7 +11,7 @@
   #define RCLONE_CPP_EXPORT
 #endif
 
-namespace Iridium::rclone
+namespace iridium::rclone
 {
     RCLONE_CPP_EXPORT class remote;
     RCLONE_CPP_EXPORT class file;

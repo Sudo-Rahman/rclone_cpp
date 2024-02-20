@@ -4,7 +4,7 @@
 #include <boost/json.hpp>
 #include <regex>
 
-namespace Iridium::rclone
+namespace iridium::rclone
 {
     file::file(file *parent, const std::string &name_file, uint64_t size, bool is_dir,
                boost::posix_time::ptime mod_time, const rclone_remote_ptr &remote)

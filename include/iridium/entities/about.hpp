@@ -4,7 +4,7 @@
 #include <memory>
 
 
-namespace Iridium::rclone
+namespace iridium::rclone
 {
     class about
     {

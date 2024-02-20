@@ -5,12 +5,12 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <future>
-#include <file.hpp>
-#include <entities.hpp>
-#include <options.hpp>
+#include "file.hpp"
+#include "../entities.hpp"
+#include "../options.hpp"
 #include <boost/signals2.hpp>
 
-namespace Iridium::rclone
+namespace iridium::rclone
 {
     class process
     {
@@ -85,7 +85,7 @@ namespace Iridium::rclone
 
         process &lsjson(file &file);
 
-        process &lsjson(file &file, const std::function<void(Iridium::rclone::file)> &&callback);
+        process &lsjson(file &file, const std::function<void(iridium::rclone::file)> &&callback);
 
         process &copy_to(const file &source, const file &destination);
 
@@ -97,9 +97,9 @@ namespace Iridium::rclone
 
         process &cat(const file &file);
 
-        process &about(const remote &remote, std::function<void(const Iridium::rclone::about &)> &&callback);
+        process &about(const remote &remote, std::function<void(const iridium::rclone::about &)> &&callback);
 
-        process &size(const file &file, std::function<void(const Iridium::rclone::size &)> &&callback);
+        process &size(const file &file, std::function<void(const iridium::rclone::size &)> &&callback);
 
         process &tree(const file &file);
 
@@ -155,5 +155,5 @@ namespace Iridium::rclone
         std::unique_ptr<boost::signals2::signal<void(int)>> _signal_finish{};
 
     };
-} // namespace Iridium::rclone
+} // namespace iridium::rclone
 

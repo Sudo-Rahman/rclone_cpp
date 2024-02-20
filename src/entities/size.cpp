@@ -1,12 +1,12 @@
-#include <size.hpp>
+#include "entities/size.hpp"
 #include <regex>
 #include <iostream>
 
-namespace Iridium::rclone
+namespace iridium::rclone
 {
     size size::create(const std::string &data)
     {
-        auto size = Iridium::rclone::size();
+        auto size = iridium::rclone::size();
         std::regex total = std::regex("[0-9]+\n");
         std::regex size_regex = std::regex("([0-9]+ Byte)");
         std::smatch match;
@@ -30,4 +30,4 @@ namespace Iridium::rclone
     }
 
 
-} // namespace Iridium::rclone
+} // namespace iridium::rclone

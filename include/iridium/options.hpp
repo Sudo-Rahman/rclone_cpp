@@ -3,9 +3,10 @@
 #include <string>
 #include <vector>
 #include <any>
+#include <iostream>
 
 
-namespace Iridium::rclone
+namespace iridium::rclone
 {
     class option
     {
@@ -18,13 +19,16 @@ namespace Iridium::rclone
 
         class tree;
 
+        class performance;
+
+        class listing;
+
     protected:
 
         std::vector<std::string> _options;
 
         option() = default;
 
-    private:
         option(const option &) = default;
 
         option(option &&) = default;
@@ -33,20 +37,23 @@ namespace Iridium::rclone
 
         option &operator=(option &&) = default;
 
-
         friend class process;
 
-        struct option_allocator: std::allocator<option>
+        struct option_allocator : std::allocator<option>
         {
-            template< class U, class... Args >
-            void construct( U* p, Args&&... args )
+            template<class U, class... Args>
+            void construct(U *p, Args &&... args)
             {
-                ::new((void *)p) U(std::forward<Args>(args)...);
+                ::new((void *) p) U(std::forward<Args>(args)...);
             }
 
-            template< class U > struct rebind { typedef option_allocator other; };
-
+            template<class U>
+            struct rebind
+            {
+                typedef option_allocator other;
+            };
         };
+
         friend class option_allocator;
 
         using vector = std::vector<option, option::option_allocator>;
@@ -142,4 +149,48 @@ namespace Iridium::rclone
 
         static std::string to_string(flags_value option);
     };
+
+    class option::performance : public option
+    {
+        performance(const std::string &option, const std::string &value);
+
+    public:
+        ///In memory buffer size when reading files for each --transfer (default 16Mi)
+        static performance buffer_size(const std::string &value)
+        {
+            return option::performance("--buffer-size", value);
+        };
+
+        ///Number of checkers to run in parallel (default 8)
+        static performance checkers(int value)
+        {
+            return option::performance("--checkers", std::to_string(value));
+        };
+
+        ///Number of file transfers to run in parallel (default 4)
+        static performance transfers(int value)
+        {
+            return option::performance("--transfers", std::to_string(value));
+        };
+    };
+
+    class option::listing : public option
+    {
+        listing(const std::string &option, const std::string &value = "");
+
+    public:
+
+        ///Use recursive list if available; uses more memory but fewer transactions
+        static listing fast_list()
+        {
+            return option::listing("--fast-list");
+        }
+
+        ///Time to show if modtime is unknown for files and directories (default 2000-01-01T00:00:00Z)
+        static listing default_time(const std::string &value)
+        {
+            return option::listing("--default-time", value);
+        }
+    };
+
 }

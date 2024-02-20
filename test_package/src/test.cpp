@@ -3,13 +3,13 @@
 //
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
-#include <rclone_cpp.hpp>
+#include <iridium/rclone_cpp.hpp>
 #include <iostream>
 
 using namespace boost::asio;
 using namespace boost::asio;
 using namespace std;
-using namespace Iridium::rclone;
+using namespace iridium::rclone;
 
 
 int main()
@@ -17,10 +17,10 @@ int main()
 
     process::initialize();
 
-//    auto rclones = std::vector<Iridium::rclone *>{};
+//    auto rclones = std::vector<iridium::rclone *>{};
 //    for (int i = 0; i < 1000; ++i)
 //    {
-//        auto rclone = new Iridium::rclone{};
+//        auto rclone = new iridium::rclone{};
 //        rclones.push_back(rclone);
 //        rclone->version().execute();
 ////        delete rclone;
@@ -35,8 +35,9 @@ int main()
     auto lst = std::vector<remote>{};
     auto n = new int{0};
     auto remote = remote::create_shared_ptr("test", remote::remote_type::google_drive, "");
-    auto file = Iridium::rclone::file{nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(), remote};
+    auto file = iridium::rclone::file{nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(), remote};
     process::add_global_option(
+            option::performance::transfers(10),
             option::filter(option::filter::include, "*.txt")
     );
     auto fun =
@@ -46,7 +47,7 @@ int main()
 //                          {
 //                              std::cout << r->path() << std::endl;
 //                          }
-                for (const auto line: rclone->get_output())
+                for (const auto& line: rclone->get_output())
                 {
                     std::cout << line << std::endl;
                 }
@@ -58,19 +59,19 @@ int main()
                     option::filter(option::filter::include, "*.txt")
 //            option::tree(option::tree::dirs_only),
             )
-//                    about(*remote, [n](const Iridium::rclone::about &about)
+//                    about(*remote, [n](const iridium::rclone::about &about)
 //                    {
 //                        std::cout << about << std::endl;
 //                        (*n)++;
 //                    })
-//                    lsjson(file, [&,n](const Iridium::rclone::file &file)
+//                    lsjson(file, [&,n](const iridium::rclone::file &file)
 //                    {
 //                        (*n)++;
 //                        std::cout << file << std::endl;
 //                    })
 //            list_remotes(lst)
 //    config()
-//    lsjson(Iridium::rclone_remote("drive", Iridium::rclone_remote::remote_type::google_drive, "/"))
+//    lsjson(iridium::rclone_remote("drive", iridium::rclone_remote::remote_type::google_drive, "/"))
             .every_line([&](const std::string &line)
                         {
 //                *rclone << "q";

@@ -2,10 +2,10 @@
 
 #include <iostream>
 #include <boost/date_time.hpp>
-#include <remote.hpp>
+#include "remote.hpp"
 #include <utility>
 
-namespace Iridium::rclone
+namespace iridium::rclone
 {
     class file {
 
@@ -125,4 +125,4 @@ namespace Iridium::rclone
 
     typedef std::shared_ptr<file> rclone_file_ptr;
 
-} // namespace Iridium::rclone
+} // namespace iridium::rclone
