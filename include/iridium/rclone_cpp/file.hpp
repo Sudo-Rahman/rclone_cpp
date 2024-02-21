@@ -7,7 +7,8 @@
 
 namespace iridium::rclone
 {
-    class file {
+    class file
+    {
 
     public:
         file(file *parent, const std::string &name_file, uint64_t size, bool is_dir,

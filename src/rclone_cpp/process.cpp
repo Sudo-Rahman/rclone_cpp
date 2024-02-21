@@ -323,7 +323,7 @@ namespace iridium::rclone
         return *this;
     }
 
-    process &process::about(const remote &remote, std::function<void(const iridium::rclone::about &)> &&callback)
+    process &process::about(const remote &remote, std::function<void(const entitie::about &)> &&callback)
     {
         _args = {"about", remote.root_path()};
         finished(
@@ -331,7 +331,7 @@ namespace iridium::rclone
                 {
                     ba::post(_pool, [this, callback]
                     {
-                        auto about = iridium::rclone::about::create(boost::algorithm::join(_output, "\n"));
+                        auto about = entitie::about::create(boost::algorithm::join(_output, "\n"));
                         callback(about);
                     });
                 }
@@ -339,7 +339,7 @@ namespace iridium::rclone
         return *this;
     }
 
-    process &process::size(const file &file, std::function<void(const iridium::rclone::size &)> &&callback)
+    process &process::size(const file &file, std::function<void(const entitie::size &)> &&callback)
     {
         _args = {"size", file.absolute_path()};
         finished(
@@ -347,7 +347,7 @@ namespace iridium::rclone
                 {
                     ba::post(_pool, [this, callback]
                     {
-                        auto size = iridium::rclone::size::create(boost::algorithm::join(_output, "\n"));
+                        auto size = entitie::size::create(boost::algorithm::join(_output, "\n"));
                         callback(size);
                     });
                 }

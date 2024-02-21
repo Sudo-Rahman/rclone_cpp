@@ -4,10 +4,12 @@
 #include <boost/process.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
+#include <functional>
 #include <future>
 #include "file.hpp"
 #include "../entities.hpp"
 #include "../options.hpp"
+#include "../parsers/parser.hpp"
 #include <boost/signals2.hpp>
 
 namespace iridium::rclone
@@ -32,7 +34,7 @@ namespace iridium::rclone
 
         /**
          * @brief Initialize the rclone process
-         * @param rclone the path to the rclone executable or if empty the system path will be used
+         * @param path_rclone the path to the rclone executable or if empty the system path will be used
          */
         static void initialize(const std::string &path_rclone = "");
 
@@ -69,7 +71,27 @@ namespace iridium::rclone
 
         process &every_line(std::function<void(const std::string &)> &&callback);
 
+        template<class T>
+        process &every_line_parser(parser<T> parser)
+        {
+            every_line([this, &parser](const std::string &line)
+                       {
+                           parser.parse(line);
+                       });
+            return *this;
+        }
+
         process &finished(std::function<void(int)> &&callback);
+
+        template<class T>
+        process &finished_parser(parser<T> parser)
+        {
+            finished([this, &parser](int code)
+                     {
+                         parser.parse(boost::algorithm::join(_output, endl));
+                     });
+            return *this;
+        }
 
         process &finished_error(std::function<void()> &&callback);
 
@@ -97,9 +119,9 @@ namespace iridium::rclone
 
         process &cat(const file &file);
 
-        process &about(const remote &remote, std::function<void(const iridium::rclone::about &)> &&callback);
+        process &about(const remote &remote, std::function<void(const entitie::about &)> &&callback);
 
-        process &size(const file &file, std::function<void(const iridium::rclone::size &)> &&callback);
+        process &size(const file &file, std::function<void(const entitie::size &)> &&callback);
 
         process &tree(const file &file);
 
@@ -107,7 +129,7 @@ namespace iridium::rclone
         process &add_option(const option &option);
 
         template<class ... Args>
-        process &add_option(const option &option1, Args&&... args)
+        process &add_option(const option &option1, Args &&... args)
         {
             add_option(option1);
             add_option(std::forward<Args>(args)...);

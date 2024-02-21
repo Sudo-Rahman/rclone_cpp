@@ -8,10 +8,12 @@
 namespace iridium::rclone
 {
 
-    class remote {
+    class remote
+    {
     public:
 
-        enum remote_type {
+        enum remote_type
+        {
             google_drive, sftp, onedrive, dropbox, ftp, mega,
             opendrive, pcloud, box, smb, cmd, none
         };
@@ -65,7 +67,7 @@ namespace iridium::rclone
         void set_path(std::string path)
         {
             _path = std::move(path);
-            if(_path.ends_with("/"))
+            if (_path.ends_with("/"))
                 _path = _path.substr(0, _path.size() - 1);
         }
 

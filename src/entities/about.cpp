@@ -2,7 +2,6 @@
 #include <regex>
 #include <iostream>
 
-
 namespace iridium::rclone
 {
     uint64_t convert_to_bytes(const std::string &input)
@@ -37,13 +36,13 @@ namespace iridium::rclone
         return 0;
     }
 
-    about about::create(const std::string &data)
+    entitie::about entitie::about::create(const std::string &data)
     {
-        auto about = iridium::rclone::about();
+        auto about = entitie::about();
         std::regex total = std::regex("Total:.*\n");
         std::regex used = std::regex("Used:.*\n");
         std::regex free = std::regex("Free:.*\n");
-        std::regex trash = std::regex("Trash:.*\n");
+        std::regex trash = std::regex("Trashed:.*\n");
         std::regex other = std::regex("Other:.*");
         std::smatch match;
         if (std::regex_search(data, match, total))
@@ -69,7 +68,7 @@ namespace iridium::rclone
         return about;
     }
 
-    std::ostream &operator<<(std::ostream &os, const about &about)
+    std::ostream &operator<<(std::ostream &os, const entitie::about &about)
     {
         os << "About: {" << std::endl <<
            "\ttotal_bytes: " << about.total_bytes << "," << std::endl <<
@@ -78,5 +77,11 @@ namespace iridium::rclone
            "\ttrash_size: " << about.trash_size << "," << std::endl <<
            "\tother: " << about.other << std::endl << "}";
         return os;
+    }
+
+    entitie::about &entitie::about::parse(const std::string &data)
+    {
+        *this = create(data);
+        return *this;
     }
 }

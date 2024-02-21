@@ -4,11 +4,11 @@
 
 namespace iridium::rclone
 {
-    size size::create(const std::string &data)
+    entitie::size entitie::size::create(const std::string &data)
     {
-        auto size = iridium::rclone::size();
-        std::regex total = std::regex("[0-9]+\n");
-        std::regex size_regex = std::regex("([0-9]+ Byte)");
+        auto size = entitie::size();
+        std::regex total = std::regex(R"(([0-9]+))");
+        std::regex size_regex = std::regex(R"(([0-9]+ Byte))");
         std::smatch match;
         if (std::regex_search(data, match, total))
         {
@@ -21,12 +21,18 @@ namespace iridium::rclone
         return size;
     }
 
-    std::ostream &operator<<(std::ostream &os, const size &size)
+    std::ostream &operator<<(std::ostream &os, const entitie::size &size)
     {
         os << "RcloneSize: {" << std::endl <<
            "\ttotal_objects: " << size.total_objects << "," << std::endl <<
            "\ttotal_size: " << size.total_size << std::endl << "}";
         return os;
+    }
+
+    entitie::size &entitie::size::parse(const std::string &data)
+    {
+        *this = create(data);
+        return *this;
     }
 
 

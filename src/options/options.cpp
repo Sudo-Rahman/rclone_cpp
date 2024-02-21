@@ -166,7 +166,7 @@ namespace iridium::rclone
     option::listing::listing(const string &option, const string &value)
     {
         _options.push_back(option);
-        if(not value.empty())
+        if (not value.empty())
             _options.push_back(value);
     }
 }; // namespace iridium::rclone

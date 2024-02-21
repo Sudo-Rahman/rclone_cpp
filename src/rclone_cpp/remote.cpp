@@ -5,7 +5,8 @@
 namespace iridium::rclone
 {
     remote::remote(std::string name, remote_type type, std::string path) :
-            _name(std::move(name)), _type(type) {
+            _name(std::move(name)), _type(type)
+    {
         set_path(std::move(path));
     }
 
