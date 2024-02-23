@@ -1,7 +1,6 @@
 #pragma once
 
-#include "rclone_cpp/file.hpp"
-#include "rclone_cpp/remote.hpp"
+
 #include "rclone_cpp/process.hpp"
 
 
@@ -13,9 +12,6 @@
 
 namespace iridium::rclone
 {
-    RCLONE_CPP_EXPORT class remote;
-
-    RCLONE_CPP_EXPORT class file;
 
     RCLONE_CPP_EXPORT class process;
 }

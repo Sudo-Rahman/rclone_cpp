@@ -1,39 +1,36 @@
 #pragma once
 
-
 #include "../entities/entitie.hpp"
+#include <functional>
 
 namespace iridium::rclone
 {
-    template<class Type, class BaseClass>
-    concept CheckType = std::is_base_of<BaseClass, Type>::value;
+  template<class Type, class BaseClass>
+  concept CheckType = std::is_base_of_v<BaseClass, Type>;
 
-    template<class T> requires CheckType<T, entitie>
-    class parser
-    {
-        void (*_callback)(const T &);
+  template<class T>
+    requires CheckType<T, entitie>
+  class parser
+  {
+    std::function<void(const T&)> _callback;
 
-    public:
+  protected:
+    explicit parser(std::function<void(const T&)> callback)
+      : _callback(std::move(callback)) {}
 
-        explicit parser(void (*callback)(const T &)) : _callback(callback)
-        {}
+    void callback(const T& data) { _callback(data); }
 
+  public:
+    virtual void parse(const std::string& data) = 0;
 
-        parser(const parser &) = default;
+    virtual ~parser() = default;
 
-        parser(parser &&) = default;
+    parser(const parser&) = delete;
 
-        parser &operator=(const parser &) = default;
+    auto operator=(const parser&) -> parser& = delete;
 
-        parser &operator=(parser &&) = default;
+    parser(parser&&) = delete;
 
-        virtual ~parser() = default;
-
-        void parse(const std::string &data)
-        {
-            _callback(std::move(T().parse(data)));
-        }
-
-    };
-
-} // namespace Iridium::process
+    auto operator=(parser&&) -> parser& = delete;
+  };
+} // namespace iridium::rclone

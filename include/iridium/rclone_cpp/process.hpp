@@ -3,22 +3,18 @@
 #include <string>
 #include <boost/process.hpp>
 #include <boost/asio.hpp>
-#include <boost/thread.hpp>
 #include <functional>
-#include <future>
-#include "file.hpp"
 #include "../entities.hpp"
 #include "../options.hpp"
 #include "../parsers/parser.hpp"
+#include "../parsers/file_parser.hpp"
 #include <boost/signals2.hpp>
 
 namespace iridium::rclone
 {
     class process
     {
-
     public:
-
         process();
 
         ~process();
@@ -36,110 +32,105 @@ namespace iridium::rclone
          * @brief Initialize the rclone process
          * @param path_rclone the path to the rclone executable or if empty the system path will be used
          */
-        static void initialize(const std::string &path_rclone = "");
+        static void initialize(const std::string& path_rclone = "");
 
-        process &wait_for_start();
+        process& wait_for_start();
 
-        process &wait_for_finish();
+        process& wait_for_finish();
 
-        process &execute();
+        process& execute();
 
         [[nodiscard]] int exit_code() const;
 
-        [[nodiscard]] state get_state() const
-        { return _state; }
+        [[nodiscard]] state get_state() const { return _state; }
 
-        [[nodiscard]] std::vector<std::string> get_output() const
-        { return _output; }
+        [[nodiscard]] std::vector<std::string> get_output() const { return _output; }
 
-        [[nodiscard]] std::vector<std::string> get_error() const
-        { return _error; }
+        [[nodiscard]] std::vector<std::string> get_error() const { return _error; }
 
-        [[nodiscard]] option::vector get_options() const
-        { return _local_options; }
+        [[nodiscard]] option::vector get_options() const { return _local_options; }
 
-        [[nodiscard]] static option::vector get_global_options()
-        { return _global_options; }
+        [[nodiscard]] static option::vector get_global_options() { return _global_options; }
 
         void stop();
 
         static const std::string endl;
 
-        process &operator<<(const std::string &input);
+        process& operator<<(const std::string& input);
 
-        void write_input(const std::string &input);
+        void write_input(const std::string& input);
 
-        process &every_line(std::function<void(const std::string &)> &&callback);
+        process& every_line(std::function<void(const std::string&)>&& callback);
 
         template<class T>
-        process &every_line_parser(parser<T> parser)
+        auto every_line_parser(parser<T>&& parser) -> process&
         {
-            every_line([this, &parser](const std::string &line)
-                       {
-                           parser.parse(line);
-                       });
+            every_line([this, &parser](const std::string& line) { parser.parse(line); });
             return *this;
         }
 
-        process &finished(std::function<void(int)> &&callback);
-
         template<class T>
-        process &finished_parser(parser<T> parser)
+        auto every_line_parser(parser<T>& parser) -> process&
         {
-            finished([this, &parser](int code)
-                     {
-                         parser.parse(boost::algorithm::join(_output, endl));
-                     });
+            every_line([this, &parser](const std::string& line) { parser.parse(line); });
             return *this;
         }
 
-        process &finished_error(std::function<void()> &&callback);
 
-        process &version();
+        process& finished(std::function<void(int)>&& callback);
 
-        process &list_remotes(std::vector<remote> &remotes);
+        template<class T>
+        process& finished_parser(parser<T> parser)
+        {
+            finished([this, &parser](int code) { parser.parse(boost::algorithm::join(_output, endl)); });
+            return *this;
+        }
 
-        process &delete_remote(const remote &remote);
+        process& finished_error(std::function<void()>&& callback);
 
-        process &config();
+        process& version();
 
-        process &lsjson(const remote &remote);
+        process& list_remotes(void (*callback)(const std::vector<remote_ptr>&));
 
-        process &lsjson(file &file);
+        process& delete_remote(const entitie::remote& remote);
 
-        process &lsjson(file &file, const std::function<void(iridium::rclone::file)> &&callback);
+        process& config();
 
-        process &copy_to(const file &source, const file &destination);
+        process& lsjson(const entitie::remote& remote);
 
-        process &move_to(const file &source, const file &destination);
+        process& lsjson(entitie::file& file);
 
-        process &delete_file(const file &file);
+        process& copy_to(const entitie::file& source, const entitie::file& destination);
 
-        process &mkdir(const file &file);
+        process& move_to(const entitie::file& source, const entitie::file& destination);
 
-        process &cat(const file &file);
+        process& delete_file(const entitie::file& file);
 
-        process &about(const remote &remote, std::function<void(const entitie::about &)> &&callback);
+        process& mkdir(const entitie::file& file);
 
-        process &size(const file &file, std::function<void(const entitie::size &)> &&callback);
+        process& cat(const entitie::file& file);
 
-        process &tree(const file &file);
+        process& about(const entitie::remote& remote, std::function<void(const entitie::about&)>&& callback);
+
+        process& size(const entitie::file& file, std::function<void(const entitie::size&)>&& callback);
+
+        process& tree(const entitie::file& file);
 
 
-        process &add_option(const option &option);
+        process& add_option(const option& option);
 
-        template<class ... Args>
-        process &add_option(const option &option1, Args &&... args)
+        template<class... Args>
+        process& add_option(const option& option1, Args&&... args)
         {
             add_option(option1);
             add_option(std::forward<Args>(args)...);
             return *this;
         }
 
-        static void add_global_option(const option &option);
+        static void add_global_option(const option& option);
 
-        template<class ... Args>
-        static void add_global_option(const option &option1, Args &&... args)
+        template<class... Args>
+        static void add_global_option(const option& option1, Args&&... args)
         {
             add_global_option(option1);
             add_global_option(std::forward<Args>(args)...);
@@ -173,9 +164,7 @@ namespace iridium::rclone
 
         void read_error();
 
-        std::unique_ptr<boost::signals2::signal<void(const std::string &line)>> _signal_every_line{};
+        std::unique_ptr<boost::signals2::signal<void(const std::string& line)>> _signal_every_line{};
         std::unique_ptr<boost::signals2::signal<void(int)>> _signal_finish{};
-
     };
 } // namespace iridium::rclone
-

@@ -13,8 +13,6 @@ namespace iridium::rclone
 
         static size create(const std::string &);
 
-        size &parse(const std::string &);
-
         friend std::ostream &operator<<(std::ostream &os, const size &size);
 
     };

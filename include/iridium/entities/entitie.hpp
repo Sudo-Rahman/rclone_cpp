@@ -11,12 +11,13 @@ namespace iridium::rclone
 
     public:
 
-        virtual entitie &parse(const std::string &json) = 0;
-
         class about;
 
         class size;
 
-    };
+        class file;
 
-}
+        class remote;
+
+    };
+} // namespace Iridium

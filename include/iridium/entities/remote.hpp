@@ -4,11 +4,13 @@
 #include <memory>
 #include <map>
 #include <string>
+#include "entitie.hpp"
+
 
 namespace iridium::rclone
 {
 
-    class remote
+    class entitie::remote : public entitie
     {
     public:
 
@@ -90,6 +92,6 @@ namespace iridium::rclone
         static const std::map<std::string, remote_type> string_to_remote_type;
     };
 
-    typedef std::shared_ptr<remote> rclone_remote_ptr;
+    typedef std::shared_ptr<entitie::remote> remote_ptr;
 
 } // namespace iridium::rclone

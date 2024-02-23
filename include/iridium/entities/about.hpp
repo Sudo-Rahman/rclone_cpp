@@ -18,8 +18,6 @@ namespace iridium::rclone
 
         static about create(const std::string &);
 
-        about &parse(const std::string &) override;
-
         friend std::ostream &operator<<(std::ostream &os, const about &about);
 
     };

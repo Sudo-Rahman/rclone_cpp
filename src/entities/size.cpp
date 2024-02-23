@@ -29,11 +29,4 @@ namespace iridium::rclone
         return os;
     }
 
-    entitie::size &entitie::size::parse(const std::string &data)
-    {
-        *this = create(data);
-        return *this;
-    }
-
-
 } // namespace iridium::rclone

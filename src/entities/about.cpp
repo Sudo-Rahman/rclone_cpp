@@ -79,9 +79,4 @@ namespace iridium::rclone
         return os;
     }
 
-    entitie::about &entitie::about::parse(const std::string &data)
-    {
-        *this = create(data);
-        return *this;
-    }
 }
