@@ -11,8 +11,6 @@ namespace iridium::rclone
         uint64_t total_objects{};
         uint64_t total_size{};
 
-        static size create(const std::string &);
-
         friend std::ostream &operator<<(std::ostream &os, const size &size);
 
     };

@@ -13,6 +13,7 @@ include_directories(
         include/iridium
         include/iridium/rclone_cpp
         include/iridium/entities
+        include/iridium/parsers
 )
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")

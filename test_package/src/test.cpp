@@ -33,7 +33,7 @@ int main()
     auto lst = std::vector<entitie::remote>{};
     auto n = new int{0};
     auto remote = entitie::remote::create_shared_ptr(
-        "test", entitie::remote::remote_type::google_drive, "/TP3_HTML");
+        "drive", entitie::remote::remote_type::google_drive, "");
     auto file = entitie::file{
                     nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(),
                     remote
@@ -50,18 +50,12 @@ int main()
     auto ser = parser::file_parser(&file,
                            [](entitie::file file)
                            {
+                                 std::cout << file << std::endl;
                            });
     rclone->
-                    list_remotes(fn)
-//    lsjson(file)
+//                    list_remotes(fn)
+    lsjson(file)
 //            .every_line_parser(ser)
-            //            .every_line_parser(
-            //                    file_parser(&file, [n](const entitie::file &file)
-            //                    {
-            //                        (*n)++;
-            //                        std::cout << file << std::endl;
-            //                    })
-            //            )
             //            .about(*remote, [n](const entitie::about &about)
             //            {
             //                std::cout << about << std::endl;
@@ -87,36 +81,29 @@ int main()
             //    config()
             //    lsjson(iridium::rclone_remote("drive",
             //    iridium::rclone_remote::remote_type::google_drive, "/"))
-            .every_line([&](const std::string&line)
-            {
-                //                *rclone << "q";
-                 std::cout << line << std::endl;
-                //                                std::cout << line <<
-                //                                boost::this_thread::get_id() <<
-                //                                std::endl << std::endl;
-                //                            std::cout << boost::this_thread::get_id()
-                //                            << std::endl;
-            })
+//            .every_line([&](const std::string&line)
+//            {
+//                //                *rclone << "q";
+////                 std::cout << line << std::endl;
+//                //                                std::cout << line <<
+//                //                                boost::this_thread::get_id() <<
+//                //                                std::endl << std::endl;
+//                //                            std::cout << boost::this_thread::get_id()
+//                //                            << std::endl;
+//            })
+.every_line_parser(parser::file_parser(&file,
+                                       [&ser](entitie::file file)
+                                       {
+                                            process().lsjson(file).every_line_parser(ser).execute().wait_for_finish();
+                                       }))
             .execute()
             .wait_for_start()
             .wait_for_finish()
-//                        .stop()
+//            .stop()
             ;
-    for (auto &remote: remotes)
-    {
-        std::cout << remote.use_count() << std::endl;
-    }
-//    boost::this_thread::sleep_for(boost::chrono::seconds(10));
-    //    rclone->wait_for_finish();
-    //    std::cout << "i: " << i << std::endl;
-    //    boost::this_thread::sleep_for(boost::chrono::microseconds(100));
-    // rclone->stop();
-    //    std::cout << "exit code: " << rclone->exit_code() << std::endl;
 
-    //        delete rclone;
-    //    }
-    //    boost::this_thread::sleep_for(boost::chrono::seconds(100));
 
+    delete rclone;
     delete n;
     return 0;
 }

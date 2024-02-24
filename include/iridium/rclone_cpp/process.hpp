@@ -38,6 +38,12 @@ namespace iridium::rclone
 
         process& wait_for_finish();
 
+        auto close_input_pipe() -> process&;
+
+        auto close_output_pipe() -> process&;
+
+        auto close_error_pipe() -> process&;
+
         process& execute();
 
         [[nodiscard]] int exit_code() const;
@@ -65,24 +71,30 @@ namespace iridium::rclone
         template<class T>
         auto every_line_parser(parser::basic_parser<T>&& parser) -> process&
         {
-            every_line([this, &parser](const std::string& line) { parser.parse(line); });
+            _signal_every_line->connect([this, &parser](const std::string& line) { parser.parse(line); });
             return *this;
         }
 
         template<class T>
         auto every_line_parser(parser::basic_parser<T>& parser) -> process&
         {
-            every_line([this, &parser](const std::string& line) { parser.parse(line); });
+            _signal_every_line->connect([this, &parser](const std::string& line) { parser.parse(line); });
             return *this;
         }
-
 
         process& finished(std::function<void(int)>&& callback);
 
         template<class T>
-        process& finished_parser(parser::basic_parser<T> parser)
+        process& finished_parser(parser::basic_parser<T>& parser)
         {
-            finished([this, &parser](int code) { parser.parse(boost::algorithm::join(_output, endl)); });
+            _signal_finish->connect([this, &parser](int code) { parser.parse(boost::algorithm::join(_output, endl)); });
+            return *this;
+        }
+
+        template<class T>
+        process& finished_parser(parser::basic_parser<T>&& parser)
+        {
+            _signal_finish->connect([this, &parser](int code) { parser.parse(boost::algorithm::join(_output, endl)); });
             return *this;
         }
 
@@ -90,7 +102,7 @@ namespace iridium::rclone
 
         process& version();
 
-        process& list_remotes(std::function<void(const std::vector<remote_ptr> &)> &&callback);
+        process& list_remotes(std::function<void(const std::vector<remote_ptr> &)> &&);
 
         process& delete_remote(const entitie::remote& remote);
 
@@ -110,12 +122,11 @@ namespace iridium::rclone
 
         process& cat(const entitie::file& file);
 
-        process& about(const entitie::remote& remote, std::function<void(const entitie::about&)>&& callback);
+        process& about(const entitie::remote& remote);
 
-        process& size(const entitie::file& file, std::function<void(const entitie::size&)>&& callback);
+        process& size(const entitie::file& file);
 
         process& tree(const entitie::file& file);
-
 
         process& add_option(const option& option);
 
@@ -152,13 +163,14 @@ namespace iridium::rclone
         std::unique_ptr<boost::process::opstream> _in{};
 
         boost::asio::thread_pool _pool{5};
-        std::atomic_int_fast8_t _counter{0};
 
         std::vector<std::string> _args;
         std::vector<std::string> _output{};
         std::vector<std::string> _error{};
 
         option::vector _local_options{};
+
+        std::vector<parser::basic_parser<entitie>> _parsers{};
 
         void read_output();
 

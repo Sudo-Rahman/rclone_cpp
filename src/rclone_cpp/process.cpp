@@ -51,6 +51,27 @@ namespace iridium::rclone
         return *this;
     }
 
+    auto process::close_input_pipe() -> process &
+    {
+        if (_in->pipe().is_open())
+            _in->pipe().close();
+        return *this;
+    }
+
+    auto process::close_output_pipe() -> process &
+    {
+        if (_out->pipe().is_open())
+            _out->pipe().close();
+        return *this;
+    }
+
+    auto process::close_error_pipe() -> process &
+    {
+        if (_err->pipe().is_open())
+            _err->pipe().close();
+        return *this;
+    }
+
     int process::exit_code() const { return _child.exit_code(); }
 
     void process::write_input(const std::string &input)
@@ -111,12 +132,10 @@ namespace iridium::rclone
         ba::post(_pool, [this]
         {
             read_output();
-            _counter++;
         });
         ba::post(_pool, [this]
         {
             read_error();
-            _counter++;
         });
 
         ba::post(_pool, [this]
@@ -127,7 +146,6 @@ namespace iridium::rclone
             else _state = state::error;
             if (_signal_finish != nullptr)
                 (*_signal_finish)(_child.exit_code());
-            _in.reset();
             _cv.notify_all();
         });
 
@@ -136,7 +154,7 @@ namespace iridium::rclone
 
     void process::stop()
     {
-        _in.reset();
+        close_input_pipe();
         _pool.stop();
         _child.terminate();
         _state = state::stopped;
@@ -152,8 +170,7 @@ namespace iridium::rclone
     process::~process()
     {
         if (_state == state::launched) {
-            //            if the child waiting for an input, close it
-            _in->pipe().close();
+            process::stop();
             std::cerr << "process are destroyed without being stopped" << std::endl;
         }
     }
@@ -161,7 +178,10 @@ namespace iridium::rclone
     process &process::every_line(std::function<void(const std::string &)> &&callback)
     {
         _signal_every_line->connect(
-                [this, callback](const std::string &line) { ba::post(_pool, [callback, line] { callback(line); }); }
+                [this, callback](const std::string &line)
+                {
+                    ba::post(_pool, [callback, line] { callback(line); });
+                }
         );
         return *this;
     }
@@ -171,7 +191,7 @@ namespace iridium::rclone
         _signal_finish->connect(
                 [this, callback](const int &exit_code)
                 {
-                    ba::post(_pool, [&callback, exit_code] { callback(exit_code); });
+                    ba::post(_pool, [callback, exit_code] { callback(exit_code); });
                 }
         );
         return *this;
@@ -238,13 +258,8 @@ namespace iridium::rclone
         if (not file.is_dir()) throw std::runtime_error("file is not a directory");
         _args = {"lsjson", file.absolute_path()};
 
-        every_line(
-                [&file](const std::string &line)
-                {
-                    auto parser = parser::file_parser(&file, [](const entitie::file &) {});
-                    parser.parse(line);
-                }
-        );
+//        auto parser = new parser::file_parser(&file, [](const entitie::file &) {});
+//        every_line_parser(*parser);
 
         return *this;
     }
@@ -280,36 +295,36 @@ namespace iridium::rclone
         return *this;
     }
 
-    process &process::about(const entitie::remote &remote, std::function<void(const entitie::about &)> &&callback)
+    process &process::about(const entitie::remote &remote)
     {
-        _args = {"about", remote.root_path()};
-        finished(
-                [this, callback](int exit_code)
-                {
-                    ba::post(_pool, [this, callback]
-                    {
-                        auto about = entitie::about::create(boost::algorithm::join(_output, "\n"));
-                        callback(about);
-                    });
-                }
-        );
-        return *this;
+//        _args = {"about", remote.root_path()};
+//        finished(
+//                [this, callback](int exit_code)
+//                {
+//                    ba::post(_pool, [this, callback]
+//                    {
+//                        auto about = entitie::about::create(boost::algorithm::join(_output, "\n"));
+//                        callback(about);
+//                    });
+//                }
+//        );
+//        return *this;
     }
 
-    process &process::size(const entitie::file &file, std::function<void(const entitie::size &)> &&callback)
+    process &process::size(const entitie::file &file)
     {
-        _args = {"size", file.absolute_path()};
-        finished(
-                [this, callback](int exit_code)
-                {
-                    ba::post(_pool, [this, callback]
-                    {
-                        auto size = entitie::size::create(boost::algorithm::join(_output, "\n"));
-                        callback(size);
-                    });
-                }
-        );
-        return *this;
+//        _args = {"size", file.absolute_path()};
+//        finished(
+//                [this, callback](int exit_code)
+//                {
+//                    ba::post(_pool, [this, callback]
+//                    {
+//                        auto size = entitie::size::create(boost::algorithm::join(_output, "\n"));
+//                        callback(size);
+//                    });
+//                }
+//        );
+//        return *this;
     }
 
     process &process::tree(const entitie::file &file)
@@ -325,4 +340,5 @@ namespace iridium::rclone
     }
 
     void process::add_global_option(const option &option) { process::_global_options.push_back(option); }
+
 } // namespace iridium::rclone
