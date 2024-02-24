@@ -30,3 +30,5 @@ install(
         TARGETS ${PROJECT_NAME}
         LIBRARY DESTINATION lib
 )
+
+#add_subdirectory(tests)
