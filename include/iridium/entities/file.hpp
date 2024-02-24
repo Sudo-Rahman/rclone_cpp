@@ -75,8 +75,6 @@ namespace iridium::rclone
         create_shared_ptr(file * parent, const std::string& name_file, uint64_t size, bool is_dir,
                           boost::posix_time::ptime mod_time, const remote_ptr& remote);
 
-        static std::unique_ptr<file> from_json(const std::string& json_str, file * parent);
-
         file() = default;
 
     private:
@@ -87,9 +85,5 @@ namespace iridium::rclone
         std::vector<std::shared_ptr<file>> _children{};
         bool _is_dir{};
         boost::posix_time::ptime _mod_time{};
-
-        friend class rclone;
     };
-
-    typedef std::shared_ptr<entitie::file> rclone_file_ptr;
 } // namespace iridium::rclone

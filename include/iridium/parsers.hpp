@@ -1,0 +1,22 @@
+#pragma once
+
+#include "parsers/basic_parser.hpp"
+#include "parsers/file_parser.hpp"
+#include "parsers/remote_parser.hpp"
+
+#ifdef _WIN32
+#define RCLONE_CPP_EXPORT __declspec(dllexport)
+#else
+#define RCLONE_CPP_EXPORT
+#endif
+
+
+namespace iridium::rclone::parser
+{
+
+    class RCLONE_CPP_EXPORT file_parser;
+
+    class RCLONE_CPP_EXPORT remote_parser;
+
+
+} // namespace Iridium

@@ -3,19 +3,19 @@
 #include "../entities/entitie.hpp"
 #include <functional>
 
-namespace iridium::rclone
+namespace iridium::rclone::parser
 {
   template<class Type, class BaseClass>
   concept CheckType = std::is_base_of_v<BaseClass, Type>;
 
   template<class T>
     requires CheckType<T, entitie>
-  class parser
+  class basic_parser
   {
     std::function<void(const T&)> _callback;
 
   protected:
-    explicit parser(std::function<void(const T&)> callback)
+    explicit basic_parser(std::function<void(const T&)> callback)
       : _callback(std::move(callback)) {}
 
     void callback(const T& data) { _callback(data); }
@@ -23,14 +23,14 @@ namespace iridium::rclone
   public:
     virtual void parse(const std::string& data) = 0;
 
-    virtual ~parser() = default;
+    virtual ~basic_parser() = default;
 
-    parser(const parser&) = delete;
+      basic_parser(const basic_parser&) = delete;
 
-    auto operator=(const parser&) -> parser& = delete;
+    auto operator=(const basic_parser&) -> basic_parser& = delete;
 
-    parser(parser&&) = delete;
+      basic_parser(basic_parser&&) = delete;
 
-    auto operator=(parser&&) -> parser& = delete;
+    auto operator=(basic_parser&&) -> basic_parser& = delete;
   };
 } // namespace iridium::rclone

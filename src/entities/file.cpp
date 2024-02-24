@@ -92,48 +92,4 @@ namespace iridium::rclone
         auto regex = std::regex(R"([/]{2,})");
         return std::regex_replace(path, regex, "/");
     }
-
-
-    std::unique_ptr<entitie::file> entitie::file::from_json(const std::string& json_str, file * parent)
-    {
-        //        if (parent == nullptr)
-        //            return nullptr;
-        //        auto regex = std::regex(R"(\{.*\})");
-        //        std::smatch match;
-        //        if (std::regex_search(json_str, match, regex))
-        //        {
-        //            try
-        //            {
-        //                auto json = boost::json::parse(match[0].str());
-        //                if (json.is_object())
-        //                {
-        //                    if (
-        //                            not(json.as_object().contains("Name") &&
-        //                                json.as_object().contains("Size") &&
-        //                                json.as_object().contains("IsDir") &&
-        //                                json.as_object().contains("ModTime"))
-        //                            )
-        //                        return nullptr;
-        ////                                    modtime 2022-04-30T11:20:02.000Z
-        //                    auto *tif = new boost::posix_time::time_input_facet;
-        //                    tif->set_iso_extended_format();
-        //                    std::istringstream iss(json.at("ModTime").as_string().c_str());
-        //                    iss.imbue(std::locale(std::locale::classic(), tif));
-        //                    boost::posix_time::ptime abs_time;
-        //                    iss >> abs_time;
-        //                    auto f = file(parent, json.at("Path").as_string().c_str(),
-        //                                  json.at("Size").as_int64(),
-        //                                  json.at("IsDir").as_bool(),
-        //                                  abs_time,
-        //                                  parent->remote());
-        //                    parent->add_child(std::make_shared<file>(f));
-        //                    return std::move(std::make_unique<file>(f));
-        //                }
-        //            } catch (const std::exception &e)
-        //            {
-        //                std::cerr << "Error: " << e.what() << std::endl;
-        //            }
-        //        }
-        //        return nullptr;
-    }
-} // Iridium
+} // Iridium::rclone

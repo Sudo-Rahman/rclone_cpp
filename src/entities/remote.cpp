@@ -1,7 +1,6 @@
 #include <remote.hpp>
 
 #include <utility>
-#include <regex>
 #include <boost/algorithm/string/split.hpp>
 
 
@@ -18,7 +17,7 @@ namespace iridium::rclone
         os << "Remote: {" << std::endl <<
            "\tname: " << remote._name << "," << std::endl <<
            "\ttype: " << remote._type << "," << std::endl <<
-           "\tpath: " << remote._path << std::endl << "}";
+           "\tfull_path: " << remote.full_path() << std::endl << "}";
         return os;
     }
 

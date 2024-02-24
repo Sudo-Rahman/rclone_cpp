@@ -1,22 +1,22 @@
 #pragma once
 
 #include "../entities/file.hpp"
-#include "parser.hpp"
+#include "basic_parser.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/json.hpp>
 #include <iostream>
 #include <regex>
 
-namespace iridium::rclone
+namespace iridium::rclone::parser
 {
-    class file_parser : public parser<entitie::file>
+    class file_parser : public basic_parser<entitie::file>
     {
         entitie::file * _parent;
 
     public:
         explicit file_parser(entitie::file * parent,
                              std::function<void(const entitie::file&)> callback)
-            : parser(std::move(callback)), _parent(parent) {}
+            : basic_parser(std::move(callback)), _parent(parent) {}
 
         void parse(const std::string& data) override
         {

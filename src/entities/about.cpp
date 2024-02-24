@@ -78,5 +78,4 @@ namespace iridium::rclone
            "\tother: " << about.other << std::endl << "}";
         return os;
     }
-
 }

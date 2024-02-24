@@ -33,31 +33,28 @@ int main()
     auto lst = std::vector<entitie::remote>{};
     auto n = new int{0};
     auto remote = entitie::remote::create_shared_ptr(
-        "drive", entitie::remote::remote_type::google_drive, "");
+        "test", entitie::remote::remote_type::google_drive, "/TP3_HTML");
     auto file = entitie::file{
                     nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(),
                     remote
             };
     process::add_global_option(
         option::performance::transfers(10)
-        //            option::filter(option::filter::include, "*.txt")
+    //            option::filter(option::filter::include, "*.txt")
     );
-    auto ser = file_parser(&file,
+    std::vector<std::shared_ptr<entitie::remote>> remotes;
+    auto fn = [&remotes](const std::vector<std::shared_ptr<entitie::remote>> &val)
+    {
+        remotes = val;
+    };
+    auto ser = parser::file_parser(&file,
                            [](entitie::file file)
                            {
-                               std::cout << file << std::endl;
-
-                               // auto rclone = new process();
-                               // rclone->lsjson(file)
-                               //         .every_line_parser(file_parser(&file, [](const entitie::file&file)
-                               //         {
-                               //             std::cout << file << std::endl;
-                               //         }))
-                               //         .execute()
-                               //         .wait_for_finish();
                            });
-    rclone->lsjson(file)
-            .every_line_parser(ser)
+    rclone->
+                    list_remotes(fn)
+//    lsjson(file)
+//            .every_line_parser(ser)
             //            .every_line_parser(
             //                    file_parser(&file, [n](const entitie::file &file)
             //                    {
@@ -93,7 +90,7 @@ int main()
             .every_line([&](const std::string&line)
             {
                 //                *rclone << "q";
-                // std::cout << line << std::endl;
+                 std::cout << line << std::endl;
                 //                                std::cout << line <<
                 //                                boost::this_thread::get_id() <<
                 //                                std::endl << std::endl;
@@ -103,9 +100,13 @@ int main()
             .execute()
             .wait_for_start()
             .wait_for_finish()
-            //            .stop()
+//                        .stop()
             ;
-    boost::this_thread::sleep_for(boost::chrono::seconds(10));
+    for (auto &remote: remotes)
+    {
+        std::cout << remote.use_count() << std::endl;
+    }
+//    boost::this_thread::sleep_for(boost::chrono::seconds(10));
     //    rclone->wait_for_finish();
     //    std::cout << "i: " << i << std::endl;
     //    boost::this_thread::sleep_for(boost::chrono::microseconds(100));

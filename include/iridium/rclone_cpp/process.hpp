@@ -6,7 +6,7 @@
 #include <functional>
 #include "../entities.hpp"
 #include "../options.hpp"
-#include "../parsers/parser.hpp"
+#include "../parsers/basic_parser.hpp"
 #include "../parsers/file_parser.hpp"
 #include <boost/signals2.hpp>
 
@@ -63,14 +63,14 @@ namespace iridium::rclone
         process& every_line(std::function<void(const std::string&)>&& callback);
 
         template<class T>
-        auto every_line_parser(parser<T>&& parser) -> process&
+        auto every_line_parser(parser::basic_parser<T>&& parser) -> process&
         {
             every_line([this, &parser](const std::string& line) { parser.parse(line); });
             return *this;
         }
 
         template<class T>
-        auto every_line_parser(parser<T>& parser) -> process&
+        auto every_line_parser(parser::basic_parser<T>& parser) -> process&
         {
             every_line([this, &parser](const std::string& line) { parser.parse(line); });
             return *this;
@@ -80,7 +80,7 @@ namespace iridium::rclone
         process& finished(std::function<void(int)>&& callback);
 
         template<class T>
-        process& finished_parser(parser<T> parser)
+        process& finished_parser(parser::basic_parser<T> parser)
         {
             finished([this, &parser](int code) { parser.parse(boost::algorithm::join(_output, endl)); });
             return *this;
@@ -90,7 +90,7 @@ namespace iridium::rclone
 
         process& version();
 
-        process& list_remotes(void (*callback)(const std::vector<remote_ptr>&));
+        process& list_remotes(std::function<void(const std::vector<remote_ptr> &)> &&callback);
 
         process& delete_remote(const entitie::remote& remote);
 
