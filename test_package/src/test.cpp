@@ -33,7 +33,7 @@ int main()
     auto lst = std::vector<entitie::remote>{};
     auto n = new int{0};
     auto remote = entitie::remote::create_shared_ptr(
-        "drive", entitie::remote::remote_type::google_drive, "");
+        "test", entitie::remote::remote_type::google_drive, "");
     auto file = entitie::file{
                     nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(),
                     remote
@@ -53,8 +53,8 @@ int main()
                                  std::cout << file << std::endl;
                            });
     rclone->
-//                    list_remotes(fn)
-    lsjson(file)
+                    list_remotes(fn)
+//    lsjson(file)
 //            .every_line_parser(ser)
             //            .about(*remote, [n](const entitie::about &about)
             //            {

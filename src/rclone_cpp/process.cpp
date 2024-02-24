@@ -234,6 +234,12 @@ namespace iridium::rclone
         return *this;
     }
 
+    process &process::list_remotes()
+    {
+        _args = {"listremotes", "--long"};
+        return *this;
+    }
+
     process &process::delete_remote(const entitie::remote &remote)
     {
         _args = {"config", "delete", remote.name()};
@@ -257,9 +263,6 @@ namespace iridium::rclone
     {
         if (not file.is_dir()) throw std::runtime_error("file is not a directory");
         _args = {"lsjson", file.absolute_path()};
-
-//        auto parser = new parser::file_parser(&file, [](const entitie::file &) {});
-//        every_line_parser(*parser);
 
         return *this;
     }
@@ -297,34 +300,14 @@ namespace iridium::rclone
 
     process &process::about(const entitie::remote &remote)
     {
-//        _args = {"about", remote.root_path()};
-//        finished(
-//                [this, callback](int exit_code)
-//                {
-//                    ba::post(_pool, [this, callback]
-//                    {
-//                        auto about = entitie::about::create(boost::algorithm::join(_output, "\n"));
-//                        callback(about);
-//                    });
-//                }
-//        );
-//        return *this;
+        _args = {"about", remote.root_path()};
+        return *this;
     }
 
     process &process::size(const entitie::file &file)
     {
-//        _args = {"size", file.absolute_path()};
-//        finished(
-//                [this, callback](int exit_code)
-//                {
-//                    ba::post(_pool, [this, callback]
-//                    {
-//                        auto size = entitie::size::create(boost::algorithm::join(_output, "\n"));
-//                        callback(size);
-//                    });
-//                }
-//        );
-//        return *this;
+        _args = {"size", file.absolute_path()};
+        return *this;
     }
 
     process &process::tree(const entitie::file &file)

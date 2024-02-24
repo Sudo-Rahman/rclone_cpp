@@ -104,6 +104,8 @@ namespace iridium::rclone
 
         process& list_remotes(std::function<void(const std::vector<remote_ptr> &)> &&);
 
+        process& list_remotes();
+
         process& delete_remote(const entitie::remote& remote);
 
         process& config();
