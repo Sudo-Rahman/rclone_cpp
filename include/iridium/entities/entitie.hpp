@@ -2,22 +2,19 @@
 
 namespace iridium::rclone
 {
-    class entitie
-    {
-    private:
-        entitie() = default;
+	class entitie
+	{
+		entitie() = default;
 
-        friend class process;
+		friend class process;
 
-    public:
+	public:
+		class about;
 
-        class about;
+		class size;
 
-        class size;
+		class file;
 
-        class file;
-
-        class remote;
-
-    };
+		class remote;
+	};
 } // namespace Iridium

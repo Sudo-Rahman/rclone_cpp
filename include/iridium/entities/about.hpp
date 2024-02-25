@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <memory>
 #include "entitie.hpp"
 
 
@@ -16,10 +15,7 @@ namespace iridium::rclone
         uint64_t trash_size{};
         uint64_t other{};
 
-        static about create(const std::string &);
-
-        friend std::ostream &operator<<(std::ostream &os, const about &about);
-
+        friend auto operator<<(std::ostream &os, const about &about) -> std::ostream &;
     };
 
 } // namespace Iridium::process

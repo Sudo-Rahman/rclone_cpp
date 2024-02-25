@@ -10,8 +10,8 @@ using namespace std;
 BOOST_AUTO_TEST_SUITE(Suite)
 
 BOOST_AUTO_TEST_CASE(testRcloneFileEquality) {
-        auto r_ptr = entitie::entitie::remote::create_shared_ptr("TestRemote", entitie::entitie::remote::google_drive, "/tests/path");
-        auto r_ptr2 = entitie::entitie::remote::create_shared_ptr("AnotherRemote", entitie::entitie::remote::sftp, "/another/path");
+        auto r_ptr = entitie::remote::create_shared_ptr("TestRemote", entitie::entitie::remote::google_drive, "/tests/path");
+        auto r_ptr2 = entitie::remote::create_shared_ptr("AnotherRemote", entitie::entitie::remote::sftp, "/another/path");
 
         entitie::file file1(nullptr,"path", 100, false, boost::posix_time::second_clock::local_time(), r_ptr);
         entitie::file file2(nullptr,"path", 100, false, boost::posix_time::second_clock::local_time(), r_ptr);
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(testRcloneFileOutputOperator) {
 }
 
 BOOST_AUTO_TEST_CASE(testRcloneFileSetters) {
-        auto r_ptr = entitie::entitie::remote::create_shared_ptr("TestRemote", entitie::entitie::remote::google_drive, "/tests/path");
+        auto r_ptr = entitie::remote::create_shared_ptr("TestRemote", entitie::entitie::remote::google_drive, "/tests/path");
 
         entitie::file file(nullptr,"path", 100, false, boost::posix_time::second_clock::local_time(), r_ptr);
 

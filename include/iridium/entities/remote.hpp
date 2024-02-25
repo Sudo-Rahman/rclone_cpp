@@ -9,89 +9,79 @@
 
 namespace iridium::rclone
 {
+	class entitie::remote : public entitie
+	{
+	public:
+		enum remote_type
+		{
+			google_drive, sftp, onedrive, dropbox, ftp, mega,
+			opendrive, pcloud, box, smb, cmd, none
+		};
 
-    class entitie::remote : public entitie
-    {
-    public:
+		remote() = default;
 
-        enum remote_type
-        {
-            google_drive, sftp, onedrive, dropbox, ftp, mega,
-            opendrive, pcloud, box, smb, cmd, none
-        };
+		remote(std::string name, remote_type type, std::string path);
 
-        remote() = default;
+		remote(const remote& remote) = default;
 
-        remote(std::string name, remote_type type, std::string path);
+		remote(remote&& remote) = default;
 
-        remote(const remote &remote) = default;
+		auto operator=(const remote& remote) -> entitie::remote& = default;
 
-        remote(remote &&remote) = default;
+		auto operator=(remote&& remote) -> entitie::remote& = default;
 
-        remote &operator=(const remote &remote) = default;
+		~remote() = default;
 
-        remote &operator=(remote &&remote) = default;
+		[[nodiscard]] auto name() const -> std::string
+		{
+			if (_name.ends_with(":"))
+				return _name.substr(0, _name.size() - 1);
+			return _name;
+		}
 
-        ~remote() = default;
+		[[nodiscard]] auto root_path() const -> std::string
+		{
+			if (not _name.ends_with(":"))
+				return _name + ":";
+			return _name;
+		}
 
-        [[nodiscard]] std::string name() const
-        {
-            if (_name.ends_with(":"))
-                return _name.substr(0, _name.size() - 1);
-            return _name;
-        }
+		[[nodiscard]] auto type() const -> remote_type { return _type; }
 
-        [[nodiscard]] std::string root_path() const
-        {
-            if (not _name.ends_with(":"))
-                return _name + ":";
-            return _name;
-        }
+		[[nodiscard]] auto path() const -> std::string { return _path; }
 
-        [[nodiscard]] remote_type type() const
-        { return _type; }
-
-        [[nodiscard]] std::string path() const
-        { return _path; }
-
-        [[nodiscard]] std::string full_path() const
-        {
-            return name() + ":" + path();
-        }
+		[[nodiscard]] auto full_path() const -> std::string { return name() + ":" + path(); }
 
 
-        void set_name(std::string name)
-        { _name = std::move(name); }
+		void set_name(std::string name) { _name = std::move(name); }
 
-        void set_type(remote_type type)
-        { _type = type; }
+		void set_type(remote_type type) { _type = type; }
 
-        void set_path(std::string path)
-        {
-            _path = std::move(path);
-            if (_path.ends_with("/"))
-                _path = _path.substr(0, _path.size() - 1);
-        }
+		void set_path(std::string path)
+		{
+			_path = std::move(path);
+			if (_path.ends_with("/"))
+				_path = _path.substr(0, _path.size() - 1);
+		}
 
-        bool operator==(const remote &remote) const;
+		auto operator==(const remote& remote) const -> bool;
 
-        bool operator!=(const remote &remote) const;
+		auto operator!=(const remote& remote) const -> bool;
 
-        friend std::ostream &operator<<(std::ostream &os, const remote &remote);
+		friend auto operator<<(std::ostream& os, const remote& remote) -> std::ostream&;
 
-        static std::shared_ptr<remote> create_shared_ptr(std::string name, remote_type type, std::string path);
+		static auto create_shared_ptr(std::string name, remote_type type, std::string path) -> std::shared_ptr<remote>;
 
-        static std::unique_ptr<remote> create_unique_ptr(std::string name, remote_type type, std::string path);
+		static auto create_unique_ptr(std::string name, remote_type type, std::string path) -> std::unique_ptr<remote>;
 
-    private:
-        std::string _name{};
-        remote_type _type{none};
-        std::string _path{};
+	private:
+		std::string _name;
+		remote_type _type{none};
+		std::string _path;
 
-    public:
-        static const std::map<std::string, remote_type> string_to_remote_type;
-    };
+	public:
+		static const std::map<std::string, remote_type> string_to_remote_type;
+	};
 
-    typedef std::shared_ptr<entitie::remote> remote_ptr;
-
+	using remote_ptr = std::shared_ptr<entitie::remote>;
 } // namespace iridium::rclone

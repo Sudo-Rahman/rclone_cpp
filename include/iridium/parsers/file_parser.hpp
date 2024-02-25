@@ -18,6 +18,6 @@ namespace iridium::rclone::parser
                              std::function<void(const entitie::file&)> callback)
             : basic_parser(std::move(callback)), _parent(parent) {}
 
-        void  parse(const std::string& data) const override;
+        void parse(const std::string& data) const override;
     };
 } // namespace iridium::rclone

@@ -12,173 +12,171 @@
 
 namespace iridium::rclone
 {
-    class process
-    {
-    public:
-        process();
+	class process
+	{
+	public:
+		process();
 
-        ~process();
+		~process();
 
-        enum class state
-        {
-            not_launched,
-            launched,
-            stopped,
-            error,
-            finished
-        };
+		enum class state
+		{
+			not_launched,
+			launched,
+			stopped,
+			error,
+			finished
+		};
 
-        /**
-         * @brief Initialize the rclone process
-         * @param path_rclone the path to the rclone executable or if empty the system path will be used
-         */
-        static void initialize(const std::string& path_rclone = "");
+		/**
+		 * @brief Initialize the rclone process
+		 * @param path_rclone the path to the rclone executable or if empty the system path will be used
+		 */
+		static auto initialize(const std::string& path_rclone = "") -> void;
 
-        process& wait_for_start();
+		auto wait_for_start() -> process&;
 
-        process& wait_for_finish();
+		auto wait_for_finish() -> process&;
 
-        auto close_input_pipe() -> process&;
+		auto close_input_pipe() -> process&;
 
-        auto close_output_pipe() -> process&;
+		auto close_output_pipe() -> process&;
 
-        auto close_error_pipe() -> process&;
+		auto close_error_pipe() -> process&;
 
-        process& execute();
+		auto execute() -> process&;
 
-        [[nodiscard]] int exit_code() const;
+		[[nodiscard]] auto exit_code() const -> int;
 
-        [[nodiscard]] state get_state() const { return _state; }
+		[[nodiscard]] auto get_state() const -> state { return _state; }
 
-        [[nodiscard]] std::vector<std::string> get_output() const { return _output; }
+		[[nodiscard]] auto get_output() const -> std::vector<std::string> { return _output; }
 
-        [[nodiscard]] std::vector<std::string> get_error() const { return _error; }
+		[[nodiscard]] auto get_error() const -> std::vector<std::string> { return _error; }
 
-        [[nodiscard]] option::vector get_options() const { return _local_options; }
+		[[nodiscard]] auto get_options() const -> option::vector { return _local_options; }
 
-        [[nodiscard]] static option::vector get_global_options() { return _global_options; }
+		[[nodiscard]] static auto get_global_options() -> option::vector { return _global_options; }
 
-        void stop();
+		auto stop() -> void;
 
-        static const std::string endl;
+		static const std::string endl;
 
-        process& operator<<(const std::string& input);
+		auto operator<<(const std::string& input) -> process&;
 
-        void write_input(const std::string& input);
+		auto write_input(const std::string& input) const -> void;
 
-        process& every_line(std::function<void(const std::string&)>&& callback);
+		auto every_line(std::function<void(const std::string&)>&& callback) -> process&;
 
-        template<class T>
-        auto every_line_parser(parser::basic_parser<T>&& parser) -> process&
-        {
-            _signal_every_line->connect([this, &parser](const std::string& line) { parser.parse(line); });
-            return *this;
-        }
+		template<class T>
+		auto every_line_parser(parser::basic_parser<T>&& parser) -> process&
+		{
+			_signal_every_line->connect([this, &parser](const std::string& line) { parser.parse(line); });
+			return *this;
+		}
 
-        template<class T>
-        auto every_line_parser(parser::basic_parser<T>& parser) -> process&
-        {
-            _signal_every_line->connect([this, &parser](const std::string& line) { parser.parse(line); });
-            return *this;
-        }
+		template<class T>
+		auto every_line_parser(parser::basic_parser<T>& parser) -> process&
+		{
+			_signal_every_line->connect([this, &parser](const std::string& line) { parser.parse(line); });
+			return *this;
+		}
 
-        process& finished(std::function<void(int)>&& callback);
+		auto finished(std::function<void(int)>&& callback) -> process&;
 
-        template<class T>
-        process& finished_parser(parser::basic_parser<T>& parser)
-        {
-            _signal_finish->connect([this, &parser](int code) { parser.parse(boost::algorithm::join(_output, endl)); });
-            return *this;
-        }
+		template<class T>
+		auto finished_parser(parser::basic_parser<T>& parser) -> process&
+		{
+			_signal_finish->connect([this, &parser](int) { parser.parse(boost::algorithm::join(_output, endl)); });
+			return *this;
+		}
 
-        template<class T>
-        process& finished_parser(parser::basic_parser<T>&& parser)
-        {
-            _signal_finish->connect([this, &parser](int code) { parser.parse(boost::algorithm::join(_output, endl)); });
-            return *this;
-        }
+		template<class T>
+		auto finished_parser(parser::basic_parser<T>&& parser) -> process&
+		{
+			_signal_finish->connect([this, &parser](int) { parser.parse(boost::algorithm::join(_output, endl)); });
+			return *this;
+		}
 
-        process& finished_error(std::function<void()>&& callback);
+		auto finished_error(std::function<void()>&& callback) -> process&;
 
-        process& version();
+		auto version() -> process&;
 
-        process& list_remotes(std::function<void(const std::vector<remote_ptr> &)> &&);
+		auto list_remotes(std::function<void(const std::vector<remote_ptr>&)>&&) -> process&;
 
-        process& list_remotes();
+		auto list_remotes() -> process&;
 
-        process& delete_remote(const entitie::remote& remote);
+		auto delete_remote(const entitie::remote& remote) -> process&;
 
-        process& config();
+		auto config() -> process&;
 
-        process& lsjson(const entitie::remote& remote);
+		auto lsjson(const entitie::remote& remote) -> process&;
 
-        process& lsjson(entitie::file& file);
+		auto lsjson(const entitie::file& file) -> process&;
 
-        process& copy_to(const entitie::file& source, const entitie::file& destination);
+		auto copy_to(const entitie::file& source, const entitie::file& destination) -> process&;
 
-        process& move_to(const entitie::file& source, const entitie::file& destination);
+		auto move_to(const entitie::file& source, const entitie::file& destination) -> process&;
 
-        process& delete_file(const entitie::file& file);
+		auto delete_file(const entitie::file& file) -> process&;
 
-        process& mkdir(const entitie::file& file);
+		auto mkdir(const entitie::file& file) -> process&;
 
-        process& cat(const entitie::file& file);
+		auto cat(const entitie::file& file) -> process&;
 
-        process& about(const entitie::remote& remote);
+		auto about(const entitie::remote& remote) -> process&;
 
-        process& size(const entitie::file& file);
+		auto size(const entitie::file& file) -> process&;
 
-        process& tree(const entitie::file& file);
+		auto tree(const entitie::file& file) -> process&;
 
-        process& add_option(const option& option);
+		auto add_option(const option& option) -> process&;
 
-        template<class... Args>
-        process& add_option(const option& option1, Args&&... args)
-        {
-            add_option(option1);
-            add_option(std::forward<Args>(args)...);
-            return *this;
-        }
+		template<class... Args>
+		auto add_option(const option& option1, Args&&... args) -> process&
+		{
+			add_option(option1);
+			add_option(std::forward<Args>(args)...);
+			return *this;
+		}
 
-        static void add_global_option(const option& option);
+		static void add_global_option(const option& option);
 
-        template<class... Args>
-        static void add_global_option(const option& option1, Args&&... args)
-        {
-            add_global_option(option1);
-            add_global_option(std::forward<Args>(args)...);
-        }
+		template<class... Args>
+		static void add_global_option(const option& option1, Args&&... args)
+		{
+			add_global_option(option1);
+			add_global_option(std::forward<Args>(args)...);
+		}
 
-    private:
-        static std::string _path_rclone;
-        static bool _is_initialized;
-        static option::vector _global_options;
+	private:
+		static std::string _path_rclone;
+		static bool _is_initialized;
+		static option::vector _global_options;
 
-        std::mutex _mutex{};
-        std::condition_variable _cv{};
+		std::mutex _mutex;
+		std::condition_variable _cv;
 
-        state _state{state::not_launched};
+		state _state{state::not_launched};
 
-        boost::process::child _child{};
-        std::unique_ptr<boost::process::ipstream> _out{};
-        std::unique_ptr<boost::process::ipstream> _err{};
-        std::unique_ptr<boost::process::opstream> _in{};
+		boost::process::child _child;
+		std::unique_ptr<boost::process::ipstream> _out;
+		std::unique_ptr<boost::process::ipstream> _err;
+		std::unique_ptr<boost::process::opstream> _in;
 
-        boost::asio::thread_pool _pool{5};
+		boost::asio::thread_pool _pool{5};
 
-        std::vector<std::string> _args;
-        std::vector<std::string> _output{};
-        std::vector<std::string> _error{};
+		std::vector<std::string> _args;
+		std::vector<std::string> _output;
+		std::vector<std::string> _error;
 
-        option::vector _local_options{};
+		option::vector _local_options;
 
-        std::vector<parser::basic_parser<entitie>> _parsers{};
+		auto read_output() -> void;
 
-        void read_output();
+		auto read_error() -> void;
 
-        void read_error();
-
-        std::unique_ptr<boost::signals2::signal<void(const std::string& line)>> _signal_every_line{};
-        std::unique_ptr<boost::signals2::signal<void(int)>> _signal_finish{};
-    };
+		std::unique_ptr<boost::signals2::signal<void(const std::string& line)>> _signal_every_line;
+		std::unique_ptr<boost::signals2::signal<void(int)>> _signal_finish;
+	};
 } // namespace iridium::rclone

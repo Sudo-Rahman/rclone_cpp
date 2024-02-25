@@ -11,7 +11,7 @@ namespace iridium::rclone
         uint64_t total_objects{};
         uint64_t total_size{};
 
-        friend std::ostream &operator<<(std::ostream &os, const size &size);
+        friend auto operator<<(std::ostream &os, const size &size) -> std::ostream &;
 
     };
 }

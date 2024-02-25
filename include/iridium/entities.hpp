@@ -14,15 +14,13 @@
 
 namespace iridium::rclone
 {
+	class RCLONE_CPP_EXPORT entitie;
 
-    class RCLONE_CPP_EXPORT entitie;
+	class RCLONE_CPP_EXPORT remote;
 
-    class RCLONE_CPP_EXPORT remote;
+	class RCLONE_CPP_EXPORT file;
 
-    class RCLONE_CPP_EXPORT file;
+	class RCLONE_CPP_EXPORT about;
 
-    class RCLONE_CPP_EXPORT about;
-
-    class RCLONE_CPP_EXPORT size;
-
+	class RCLONE_CPP_EXPORT size;
 }

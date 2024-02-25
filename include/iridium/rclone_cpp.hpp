@@ -12,6 +12,5 @@
 
 namespace iridium::rclone
 {
-
-    class RCLONE_CPP_EXPORT process;
+	class RCLONE_CPP_EXPORT process;
 }
