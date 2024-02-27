@@ -5,26 +5,33 @@
 
 namespace iridium::rclone
 {
-	entitie::file::file(file * parent, const std::string& name_file, uint64_t size, bool is_dir,
+	entitie::file::file(file * parent, const std::string& file_name, uint64_t size, bool is_dir,
 	                    const boost::posix_time::ptime& mod_time, const remote_ptr& remote)
 	{
 		_parent = parent;
-		_name = name_file;
+		set_name(file_name);
 		_size = size;
 		_is_dir = is_dir;
 		_mod_time = mod_time;
 		_remote = remote;
 	}
 
-	entitie::file::file(file * parent, const std::string& name_file, uint64_t size, bool is_dir,
+	entitie::file::file(file * parent, const std::string& file_name, uint64_t size, bool is_dir,
 	                    const boost::posix_time::seconds& mod_time,
 	                    const remote_ptr& remote)
 	{
 		_parent = parent;
-		_name = name_file;
+		set_name(file_name);
 		_size = size;
 		_is_dir = is_dir;
 		_mod_time = boost::posix_time::from_time_t(mod_time.total_seconds());
+		_remote = remote;
+	}
+
+	entitie::file::file(file * parent, const std::string & file_name, const remote_ptr & remote)
+	{
+		_parent = parent;
+		set_name(file_name);
 		_remote = remote;
 	}
 
@@ -75,8 +82,9 @@ namespace iridium::rclone
 	{
 		std::string abs_path;
 		if (_parent)
-			abs_path = (_parent->absolute_path() + "/" + _name);
-		else abs_path = _remote->full_path() + "/" + _name;
+			abs_path = _parent->absolute_path() + "/" + _name;
+		else if (_remote) abs_path = _remote->full_path() + "/" + _name;
+		else abs_path = _name;
 
 		//        remove double slashes or more and replace with single slash
 		auto regex = std::regex(R"([/]{2,})");
@@ -92,5 +100,11 @@ namespace iridium::rclone
 
 		auto regex = std::regex(R"([/]{2,})");
 		return std::regex_replace(path, regex, "/");
+	}
+
+	void entitie::file::set_name(const std::string& path)
+	{
+		auto regex = std::regex(R"([/]{2,})");
+		_name = std::regex_replace(path, regex, "/");
 	}
 } // Iridium::rclone

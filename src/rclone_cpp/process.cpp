@@ -256,7 +256,34 @@ namespace iridium::rclone
 	{
 		if (not file.is_dir()) throw std::runtime_error("file is not a directory");
 		_args = {"lsjson", file.absolute_path()};
+		return *this;
+	}
 
+	auto process::ls(const entitie::file& file) -> process&
+	{
+		if (not file.is_dir()) throw std::runtime_error("file is not a directory");
+		_args = {"ls", file.absolute_path()};
+		return *this;
+	}
+
+	auto process::lsl(const entitie::file& file) -> process&
+	{
+		if (not file.is_dir()) throw std::runtime_error("file is not a directory");
+		_args = {"lsl", file.absolute_path()};
+		return *this;
+	}
+
+	auto process::lsd(const entitie::file& file) -> process&
+	{
+		if (not file.is_dir()) throw std::runtime_error("file is not a directory");
+		_args = {"lsd", file.absolute_path()};
+		return *this;
+	}
+
+	auto process::lsf(const entitie::file& file) -> process&
+	{
+		if (not file.is_dir()) throw std::runtime_error("file is not a directory");
+		_args = {"lsf", file.absolute_path()};
 		return *this;
 	}
 
@@ -306,6 +333,30 @@ namespace iridium::rclone
 	auto process::tree(const entitie::file& file) -> process&
 	{
 		_args = {"tree", file.absolute_path()};
+		return *this;
+	}
+
+	auto process::bi_sync(const entitie::file& source, const entitie::file& destination) -> process&
+	{
+		_args = {"bisync", source.absolute_path(), destination.absolute_path()};
+		return *this;
+	}
+
+	auto process::clean_up(const entitie::remote& remote) -> process&
+	{
+		_args = {"cleanup", remote.root_path()};
+		return *this;
+	}
+	auto process::copy_url(const std::string& url, const entitie::file& destination) -> process&
+	{
+		_args = {"copyurl", url, destination.absolute_path()};
+		return *this;
+	}
+
+	auto process::check(const entitie::file & source, const entitie::file & destination) -> process &
+	{
+		if(not source.is_dir() or not destination.is_dir()) throw std::runtime_error("source or destination is not a directory");
+		_args = {"check", source.absolute_path(), destination.absolute_path()};
 		return *this;
 	}
 

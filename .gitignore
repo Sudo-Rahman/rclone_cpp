@@ -4,3 +4,5 @@ CMakeUserPresets.json
 conan_provider.cmake
 cmake-build-debug/
 build/
+
+.DS_Store

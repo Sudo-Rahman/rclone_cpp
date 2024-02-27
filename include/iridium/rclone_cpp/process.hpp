@@ -114,6 +114,19 @@ namespace iridium::rclone
 
 		auto lsjson(const entitie::file& file) -> process&;
 
+		/**
+		 * \brief Lists the objects in the source path to standard output in a human readable format with size and path. Recurses by default.
+		 * \param file
+		 * \return
+		 */
+		auto ls(const entitie::file& file) -> process&;
+
+		auto lsl(const entitie::file& file) -> process&;
+
+		auto lsd(const entitie::file& file) -> process&;
+
+		auto lsf(const entitie::file& file) -> process&;
+
 		auto copy_to(const entitie::file& source, const entitie::file& destination) -> process&;
 
 		auto move_to(const entitie::file& source, const entitie::file& destination) -> process&;
@@ -129,6 +142,14 @@ namespace iridium::rclone
 		auto size(const entitie::file& file) -> process&;
 
 		auto tree(const entitie::file& file) -> process&;
+
+		auto bi_sync(const entitie::file& source, const entitie::file& destination) -> process&;
+
+		auto clean_up(const entitie::remote& remote) -> process&;
+
+		auto copy_url(const std::string &url, const entitie::file& destination) -> process&;
+
+		auto check(const entitie::file& source, const entitie::file& destination) -> process&;
 
 		auto add_option(const option& option) -> process&;
 

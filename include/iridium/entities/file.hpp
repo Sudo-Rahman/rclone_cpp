@@ -9,14 +9,16 @@ namespace iridium::rclone
 	class entitie::file : public entitie
 	{
 	public:
-		file(file * parent, const std::string& name_file, uint64_t size, bool is_dir,
+		file(file * parent, const std::string& file_name, uint64_t size, bool is_dir,
 		     const boost::posix_time::ptime& mod_time,
-		     const remote_ptr& remote);
+		     const remote_ptr& remote = nullptr);
 
 
-		file(file * parent, const std::string& name_file, uint64_t size, bool is_dir,
+		file(file * parent, const std::string& file_name, uint64_t size, bool is_dir,
 		     const boost::posix_time::seconds& mod_time,
-		     const remote_ptr& remote);
+		     const remote_ptr& remote = nullptr);
+
+		file(file * parent, const std::string& file_name,const remote_ptr& remote = nullptr);
 
 		[[nodiscard]] auto name() const -> std::string { return _name; }
 
@@ -42,22 +44,22 @@ namespace iridium::rclone
 
 		[[nodiscard]] auto pointer() -> file* { return this; }
 
-		void set_name(std::string path) { _name = std::move(path); }
+		void set_name(const std::string& path);
 
-		void set_remote(remote_ptr remote) { _remote = std::move(remote); }
+		void set_remote(const remote_ptr& remote) { _remote = remote; }
 
-		void set_size(uint64_t size) { _size = size; }
+		void set_size(const uint64_t& size) { _size = size; }
 
-		void set_is_dir(bool isDir) { _is_dir = isDir; }
+		void set_is_dir(const bool& isDir) { _is_dir = isDir; }
 
-		void set_mod_time(boost::posix_time::ptime mod_time) { _mod_time = mod_time; }
+		void set_mod_time(const boost::posix_time::ptime& mod_time) { _mod_time = mod_time; }
 
-		void se_mod_time(boost::posix_time::seconds mod_time)
+		void se_mod_time(const boost::posix_time::seconds& mod_time)
 		{
 			_mod_time = boost::posix_time::from_time_t(mod_time.total_seconds());
 		}
 
-		void add_child(std::shared_ptr<file> child) { _children.push_back(std::move(child)); }
+		void add_child(const std::shared_ptr<file>& child) { _children.push_back(child); }
 
 		void set_parent(file * parent) { _parent = parent; }
 
