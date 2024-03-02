@@ -19,13 +19,13 @@ namespace iridium::rclone
 
 		~process();
 
-		enum class state
+		enum class state : uint8_t
 		{
 			not_launched,
-			launched,
-			stopped,
-			error,
-			finished
+            running,
+            finished,
+            stopped = finished,
+            error = finished
 		};
 
 		/**
@@ -49,6 +49,8 @@ namespace iridium::rclone
 		[[nodiscard]] auto exit_code() const -> int;
 
 		[[nodiscard]] auto get_state() const -> state { return _state; }
+
+        [[nodiscard]] auto is_running() -> bool { return _child.running(); }
 
 		[[nodiscard]] auto get_output() const -> std::vector<std::string> { return _output; }
 
@@ -82,23 +84,23 @@ namespace iridium::rclone
 			return *this;
 		}
 
-		auto finished(std::function<void(int)>&& callback) -> process&;
+		auto on_finish(std::function<void(int)>&& callback) -> process&;
 
 		template<class T>
-		auto finished_parser(parser::basic_parser<T>& parser) -> process&
+		auto on_finish_parser(parser::basic_parser<T>& parser) -> process&
 		{
 			_signal_finish->connect([this, &parser](int) { parser.parse(boost::algorithm::join(_output, endl)); });
 			return *this;
 		}
 
 		template<class T>
-		auto finished_parser(parser::basic_parser<T>&& parser) -> process&
+		auto on_finish_parser(parser::basic_parser<T>&& parser) -> process&
 		{
 			_signal_finish->connect([this, &parser](int) { parser.parse(boost::algorithm::join(_output, endl)); });
 			return *this;
 		}
 
-		auto finished_error(std::function<void()>&& callback) -> process&;
+		auto on_finish_error(std::function<void()>&& callback) -> process&;
 
 		auto version() -> process&;
 
@@ -199,5 +201,5 @@ namespace iridium::rclone
 
 		std::unique_ptr<boost::signals2::signal<void(const std::string& line)>> _signal_every_line;
 		std::unique_ptr<boost::signals2::signal<void(int)>> _signal_finish;
-	};
+    };
 } // namespace iridium::rclone

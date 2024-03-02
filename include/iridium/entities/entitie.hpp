@@ -16,5 +16,7 @@ namespace iridium::rclone
 		class file;
 
 		class remote;
+
+        class json_log;
 	};
 } // namespace Iridium

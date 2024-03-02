@@ -5,7 +5,7 @@
 #include <iostream>
 #include <iridium/entities.hpp>
 #include <iridium/parsers/file_parser.hpp>
-#include <iridium/rclone_cpp.hpp>
+#include <iridium/process.hpp>
 
 using namespace boost::asio;
 using namespace std;
@@ -42,8 +42,13 @@ auto main() -> int
 		option::performance::transfers(10)
 		//            option::filter(option::filter::include, "*.txt")
 	);
+
 	std::vector<std::shared_ptr<entitie::remote>> remotes;
-	auto fn = [&remotes](const std::vector<std::shared_ptr<entitie::remote>>& val) { remotes = val; };
+    std::mutex m;
+	auto fn = [&](const std::vector<std::shared_ptr<entitie::remote>>& val) {
+//        std::lock_guard<std::mutex> lock(m);
+//        remotes = val;
+    };
 	auto ser = parser::file_parser(&file,
 	                               [](const entitie::file&)
 	                               {
@@ -52,7 +57,7 @@ auto main() -> int
 	rclone->
 			list_remotes(fn)
 			// lsjson(file)
-			// .every_line_parser(ser)
+//			 .every_line_parser(ser)
 			//            .about(*remote, [n](const entitie::about &about)
 			//            {
 			//                std::cout << about << std::endl;
@@ -97,7 +102,7 @@ auto main() -> int
 			.execute()
 			.wait_for_start()
 			.wait_for_finish()
-			//            .stop()
+//			            .stop()
 			;
 
 	std::function<void(entitie::file&)> print;
@@ -107,7 +112,6 @@ auto main() -> int
 		std::cout << file << std::endl;
 		if (file.nb_chilchren() > 0) { for (const auto& f: file.children()) { print(*f); } }
 	};
-
 	for (const auto &remote : remotes)
 	{
 		cout << *remote << endl;
@@ -115,6 +119,18 @@ auto main() -> int
 
 	print(file);
 
+    process_pool pool{10};
+
+    for (int i = 0; i < 100; ++i)
+    {
+        auto proc = new process();
+        proc->list_remotes().every_line([&](const std::string& line) { std::cout << line << std::endl; });
+        pool.add_process(std::unique_ptr<process>(proc));
+    }
+
+    std::cout << "stop" << std::endl;
+
+    pool.wait();
 
 	delete rclone;
 	delete n;

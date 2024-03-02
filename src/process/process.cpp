@@ -39,36 +39,39 @@ namespace iridium::rclone
 	auto process::wait_for_start() -> process&
 	{
 		std::unique_lock lock(_mutex);
-		_cv.wait(lock, [this] { return _state == state::launched; });
+		_cv.wait(lock, [this] { return _state == state::running; });
 		return *this;
 	}
 
 	auto process::wait_for_finish() -> process&
 	{
 		std::unique_lock lock(_mutex);
-		_cv.wait(lock, [this] { return _state == state::finished or _state == state::error; });
+		_cv.wait(lock, [this] { return _state == state::finished; });
 		_pool.join();
 		return *this;
 	}
 
 	auto process::close_input_pipe() -> process&
 	{
-		if (_in->pipe().is_open())
-			_in->pipe().close();
+        if (_in and _in->pipe().is_open())
+            _in->pipe().close();
+        else  std::cerr << "input pipe is not open or nullptr" << std::endl;
 		return *this;
 	}
 
 	auto process::close_output_pipe() -> process&
 	{
-		if (_out->pipe().is_open())
-			_out->pipe().close();
+		if (_out and _out->pipe().is_open())
+            _out->pipe().close();
+        else std::cerr << "output pipe is not open or nullptr" << std::endl;
 		return *this;
 	}
 
 	auto process::close_error_pipe() -> process&
 	{
-		if (_err->pipe().is_open())
-			_err->pipe().close(); // NOLINT(*-braces-around-statements)
+		if (_err and _err->pipe().is_open())
+            _err->pipe().close();
+        else std::cerr << "error pipe is not open or nullptr" << std::endl;
 		return *this;
 	}
 
@@ -76,7 +79,7 @@ namespace iridium::rclone
 
 	auto process::write_input(const std::string& input) const -> void
 	{
-		if (_state != state::launched)
+		if (_state != state::running)
 			throw std::runtime_error("process not started");
 
 		if (_in->pipe().is_open())
@@ -130,7 +133,7 @@ namespace iridium::rclone
 			exit(1);
 		}
 
-		_state = state::launched;
+		_state = state::running;
 		_cv.notify_all();
 
 		ba::post(_pool, [this] { read_output(); });
@@ -138,7 +141,8 @@ namespace iridium::rclone
 
 		ba::post(_pool, [this]
 		{
-			_child.wait();
+            if (_child.running())
+                _child.wait();
 			if (_child.exit_code() == 0)
 				_state = state::finished;
 			else _state = state::error;
@@ -152,10 +156,14 @@ namespace iridium::rclone
 
 	auto process::stop() -> void
 	{
+        std::cout << _child.running() << " " << (_state == state::running) << std::endl;
+        if (not is_running()) throw std::runtime_error("process not started");
 		close_input_pipe();
-		_pool.stop();
-		_child.terminate();
-		_state = state::stopped;
+        _pool.stop();
+        _pool.join();
+        _child.terminate();
+        _state = state::stopped;
+        _cv.notify_all();
 	}
 
 	auto process::operator<<(const std::string& input) -> process&
@@ -167,10 +175,11 @@ namespace iridium::rclone
 
 	process::~process()
 	{
-		if (_state == state::launched)
+		if (_state == state::running)
 		{
-			process::stop();
-			std::cerr << "process are destroyed without being stopped" << std::endl;
+
+            std::cerr << "process are destroyed without being stopped" << std::endl;
+            process::stop();
 		}
 	}
 
@@ -182,7 +191,7 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	auto process::finished(std::function<void(int)>&& callback) -> process&
+	auto process::on_finish(std::function<void(int)>&& callback) -> process&
 	{
 		_signal_finish->connect(
 			[this, callback](const int& exit_code) { ba::post(_pool, [callback, exit_code] { callback(exit_code); }); }
@@ -190,7 +199,7 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	auto process::finished_error(std::function<void()>&& callback) -> process&
+	auto process::on_finish_error(std::function<void()>&& callback) -> process&
 	{
 		_signal_finish->connect(
 			[this, callback](const int& exit_code)
@@ -211,7 +220,7 @@ namespace iridium::rclone
 	auto process::list_remotes(std::function<void(const std::vector<remote_ptr>&)>&& callback) -> process&
 	{
 		_args = {"listremotes", "--long"};
-		finished([this, callback](int exit_code)
+        on_finish([this, callback](int exit_code)
 		{
 			if (exit_code not_eq 0) throw std::runtime_error("error in listremotes");
 			auto remotes = std::vector<remote_ptr>();

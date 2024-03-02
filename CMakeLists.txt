@@ -11,7 +11,7 @@ endif ()
 
 include_directories(
         include/iridium
-        include/iridium/rclone_cpp
+        include/iridium/process
         include/iridium/entities
         include/iridium/parsers
 )

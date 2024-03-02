@@ -24,13 +24,5 @@ namespace iridium::rclone::parser
 		virtual void parse(const std::string& data) const = 0;
 
 		virtual ~basic_parser() = default;
-
-		//        basic_parser(const basic_parser &) = delete;
-		//
-		//        auto operator=(const basic_parser &) -> basic_parser & = delete;
-		//
-		//        basic_parser(basic_parser &&) = delete;
-		//
-		//        auto operator=(basic_parser &&) -> basic_parser & = delete;
 	};
 } // namespace iridium::rclone
