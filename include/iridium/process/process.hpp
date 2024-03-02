@@ -50,7 +50,7 @@ namespace iridium::rclone
 
 		[[nodiscard]] auto get_state() const -> state { return _state; }
 
-        [[nodiscard]] auto is_running() -> bool { return _child.running(); }
+        [[nodiscard]] auto is_running() -> bool { return _state == state::running;}
 
 		[[nodiscard]] auto get_output() const -> std::vector<std::string> { return _output; }
 
@@ -71,32 +71,18 @@ namespace iridium::rclone
 		auto every_line(std::function<void(const std::string&)>&& callback) -> process&;
 
 		template<class T>
-		auto every_line_parser(parser::basic_parser<T>&& parser) -> process&
+		auto every_line_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process&
 		{
-			_signal_every_line->connect([this, &parser](const std::string& line) { parser.parse(line); });
-			return *this;
-		}
-
-		template<class T>
-		auto every_line_parser(parser::basic_parser<T>& parser) -> process&
-		{
-			_signal_every_line->connect([this, &parser](const std::string& line) { parser.parse(line); });
+			_signal_every_line->connect([this, parser = std::move(parser)](const std::string& line) {parser->parse(line); });
 			return *this;
 		}
 
 		auto on_finish(std::function<void(int)>&& callback) -> process&;
 
 		template<class T>
-		auto on_finish_parser(parser::basic_parser<T>& parser) -> process&
+		auto on_finish_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process&
 		{
-			_signal_finish->connect([this, &parser](int) { parser.parse(boost::algorithm::join(_output, endl)); });
-			return *this;
-		}
-
-		template<class T>
-		auto on_finish_parser(parser::basic_parser<T>&& parser) -> process&
-		{
-			_signal_finish->connect([this, &parser](int) { parser.parse(boost::algorithm::join(_output, endl)); });
+			_signal_finish->connect([this, parser = std::move(parser)](int) { parser.parse(boost::algorithm::join(_output, endl)); });
 			return *this;
 		}
 

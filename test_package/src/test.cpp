@@ -49,13 +49,18 @@ auto main() -> int
 //        std::lock_guard<std::mutex> lock(m);
 //        remotes = val;
     };
-	auto ser = parser::file_parser(&file,
-	                               [](const entitie::file&)
-	                               {
-		                               // std::cout << file << std::endl;
-	                               });
+
+
+
+    auto ser = parser::file_parser::create(new parser::file_parser(&file,
+                                                    [](const entitie::file&file)
+                                                    {
+                                                         std::cout << file << std::endl;
+                                                    }));
+
 	rclone->
-			list_remotes(fn)
+    list_remotes()
+//			lsjson(file)
 			// lsjson(file)
 //			 .every_line_parser(ser)
 			//            .about(*remote, [n](const entitie::about &about)
@@ -93,15 +98,17 @@ auto main() -> int
 			//                //                            std::cout << boost::this_thread::get_id()
 			//                //                            << std::endl;
 			//            })
-			.every_line_parser(parser::file_parser(&file,
-			                                       [&ser](const entitie::file& file)
-			                                       {
-				                                       process().lsjson(file).every_line_parser(ser).execute().
-						                                       wait_for_finish();
-			                                       }))
+			.every_line_parser(
+                    parser::file_parser::create(
+                            new parser::file_parser(&file,
+                                                                                   [&ser](const entitie::file& file)
+                                                                                   {
+                                process().lsjson(file).every_line_parser(ser).execute().wait_for_finish();
+                                            // std::cout << file << std::endl;
+                                                                                   })))
 			.execute()
 			.wait_for_start()
-			.wait_for_finish()
+//			.wait_for_finish()
 //			            .stop()
 			;
 
@@ -124,13 +131,16 @@ auto main() -> int
     for (int i = 0; i < 100; ++i)
     {
         auto proc = new process();
-        proc->list_remotes().every_line([&](const std::string& line) { std::cout << line << std::endl; });
+        proc->list_remotes()
+        .every_line([&](const std::string& line) { std::cout << line << std::endl; });
         pool.add_process(std::unique_ptr<process>(proc));
     }
 
     std::cout << "stop" << std::endl;
 
-    pool.wait();
+    this_thread::sleep_for(std::chrono::milliseconds (100));
+
+//    pool.stop();
 
 	delete rclone;
 	delete n;

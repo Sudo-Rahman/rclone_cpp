@@ -15,7 +15,7 @@ namespace iridium::rclone::parser
 
     public:
         explicit file_parser(entitie::file * parent,
-                             std::function<void(const entitie::file&)> callback)
+                             std::function<void(entitie::file)> callback)
             : basic_parser(std::move(callback)), _parent(parent) {}
 
         void parse(const std::string& data) const override;

@@ -8,8 +8,9 @@ namespace iridium::rclone
 {
     class process_pool {
         std::vector<std::unique_ptr<process>> _processes;
-        size_t _simultaneous_processes{};
-        std::atomic<size_t> _running_processes = 0;
+        uint16_t _simultaneous_processes{};
+        std::atomic<uint16_t> _running_processes = 0;
+        std::atomic<uint16_t> _executed_processes = 0;
 
 
         boost::thread _thread;
@@ -18,6 +19,9 @@ namespace iridium::rclone
 
         std::mutex _mutex;
         std::condition_variable _cv;
+
+        std::mutex _wait_mutex;
+        std::condition_variable _cv_wait;
 
         process_pool() = default;
 
@@ -58,7 +62,7 @@ namespace iridium::rclone
         void clear_pool();
 
         /// @brief Get the number of processes in the pool
-        [[nodiscard]] std::size_t size() const;
+        [[nodiscard]] uint16_t size() const;
 
         /// @brief Check if the pool is empty
         [[nodiscard]] bool empty() const;

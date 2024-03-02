@@ -3,6 +3,8 @@
 #include "../entities/entitie.hpp"
 #include <functional>
 #include <string>
+#include <iostream>
+#include <memory>
 
 namespace iridium::rclone::parser
 {
@@ -16,13 +18,20 @@ namespace iridium::rclone::parser
 
 	protected:
 		explicit basic_parser(std::function<void(const T&)> callback)
-			: _callback(std::move(callback)) {}
+			: _callback(std::move(callback)) {
+            std::cout << "basic parser" << std::endl;
+        }
 
-		void callback(const T& data) const { _callback(data); }
+		void callback(const T& data) const { _callback(std::move(data)); }
 
 	public:
 		virtual void parse(const std::string& data) const = 0;
 
 		virtual ~basic_parser() = default;
+
+        static std::shared_ptr<basic_parser<T>> create(basic_parser<T>* parser)
+        {
+            return std::move(std::shared_ptr<basic_parser<T>>(parser));
+        }
 	};
 } // namespace iridium::rclone

@@ -16,23 +16,22 @@ namespace iridium::rclone
                                         {
                                             boost::this_thread::interruption_point();
                                             return _running_processes < _simultaneous_processes
-                                                   and executed_processes() < _processes.size();
+                                                   and not _processes.empty() and _executed_processes < _processes.size();
                                         });
                                         boost::this_thread::interruption_point();
-                                        process_pool::lock();
                                         auto process = get_process();
                                         if (process == nullptr) {
-                                            process_pool::unlock();
                                             continue;
                                         }
                                         process->on_finish([this](int)
                                                            {
                                                                _running_processes--;
+                                                               _executed_processes++;
                                                                _cv_process.notify_one();
+
                                                            });
                                         process->execute();
                                         _running_processes++;
-                                        process_pool::unlock();
                                     }
                                 });
     }
@@ -60,11 +59,11 @@ namespace iridium::rclone
 
     void process_pool::wait()
     {
-        lock();
-        for (auto &process: _processes)
-            if (process->is_running())
-                process->wait_for_finish();
-        unlock();
+        std::unique_lock<std::mutex> lock(_mutex);
+        _cv.wait(lock, [this]
+        {
+            return _executed_processes == _processes.size();
+        });
     }
 
     bool process_pool::empty() const
@@ -72,7 +71,7 @@ namespace iridium::rclone
         return _processes.empty();
     }
 
-    std::size_t process_pool::size() const
+    uint16_t process_pool::size() const
     {
         return _processes.size();
     }
@@ -93,7 +92,6 @@ namespace iridium::rclone
     process_pool::~process_pool()
     {
         stop();
-        wait();
     }
 
     void process_pool::lock()
@@ -111,18 +109,23 @@ namespace iridium::rclone
 
     auto process_pool::get_process() -> process *
     {
+        process_pool::lock();
+        process *result = nullptr;
         for (auto &process: _processes)
             if (process->get_state() == process::state::not_launched)
-                return process.get();
-        return nullptr;
+                result = process.get();
+        process_pool::unlock();
+        return result;
     }
 
     auto process_pool::executed_processes() -> size_t
     {
+        process_pool::lock();
         size_t count = 0;
         for (auto &process: _processes)
-            if (not process->is_running() and process->get_state() not_eq process::state::not_launched)
+            if (process->get_state() == process::state::finished)
                 count++;
+        process_pool::unlock();
         return count;
     }
 
