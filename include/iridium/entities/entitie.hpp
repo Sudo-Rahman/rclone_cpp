@@ -19,4 +19,4 @@ namespace iridium::rclone
 
         class json_log;
 	};
-} // namespace Iridium
+} // namespace iridium::rclone

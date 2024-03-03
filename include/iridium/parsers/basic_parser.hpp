@@ -18,9 +18,7 @@ namespace iridium::rclone::parser
 
 	protected:
 		explicit basic_parser(std::function<void(const T&)> callback)
-			: _callback(std::move(callback)) {
-            std::cout << "basic parser" << std::endl;
-        }
+			: _callback(std::move(callback)) {}
 
 		void callback(const T& data) const { _callback(std::move(data)); }
 

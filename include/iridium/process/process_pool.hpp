@@ -20,9 +20,6 @@ namespace iridium::rclone
         std::mutex _mutex;
         std::condition_variable _cv;
 
-        std::mutex _wait_mutex;
-        std::condition_variable _cv_wait;
-
         process_pool() = default;
 
         enum class operation : uint8_t
@@ -38,15 +35,12 @@ namespace iridium::rclone
 
         auto get_process() -> process *;
 
-        auto executed_processes() -> size_t;
-
     public:
 
         /// @brief Construct a process pool with a maximum number of simultaneous processes
         explicit process_pool(size_t simultaneous_processes);
 
         ~process_pool();
-
 
         process_pool(const process_pool &) = delete;
 
@@ -59,6 +53,7 @@ namespace iridium::rclone
         /// @brief Add a process to the pool
         auto add_process(std::unique_ptr<process> &&process) -> void;
 
+        /// @brief Clear all processes from the pool
         void clear_pool();
 
         /// @brief Get the number of processes in the pool

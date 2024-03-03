@@ -118,15 +118,4 @@ namespace iridium::rclone
         return result;
     }
 
-    auto process_pool::executed_processes() -> size_t
-    {
-        process_pool::lock();
-        size_t count = 0;
-        for (auto &process: _processes)
-            if (process->get_state() == process::state::finished)
-                count++;
-        process_pool::unlock();
-        return count;
-    }
-
 }; // namespace iridium::rclone

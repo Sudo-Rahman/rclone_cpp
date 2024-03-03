@@ -2,6 +2,7 @@
 #include <iostream>
 #include <boost/json.hpp>
 #include <parsers.hpp>
+#include "process.hpp"
 
 
 namespace iridium::rclone
@@ -98,7 +99,9 @@ namespace iridium::rclone
         std::string line;
         while (std::getline(*_err, line)) {
             _error.emplace_back(line);
-            std::cerr << line << std::endl;
+            _output.emplace_back(line);
+            if (_signal_every_line != nullptr)
+                (*_signal_every_line)(line);
         }
         _err.reset();
     }
@@ -184,7 +187,7 @@ namespace iridium::rclone
     auto process::on_finish(std::function<void(int)> &&callback) -> process &
     {
         _signal_finish->connect(
-                [this, callback](const int &exit_code)
+                [this, callback = std::move(callback)](const int &exit_code)
                 {
                     ba::post(_pool, [callback, exit_code] { callback(exit_code); });
                 }
@@ -195,7 +198,7 @@ namespace iridium::rclone
     auto process::on_finish_error(std::function<void()> &&callback) -> process &
     {
         _signal_finish->connect(
-                [this, callback](const int &exit_code)
+                [this, callback =  std::move(callback)](const int &exit_code)
                 {
                     if (exit_code not_eq 0)
                         ba::post(_pool, [&callback] { callback(); });
@@ -213,7 +216,7 @@ namespace iridium::rclone
     auto process::list_remotes(std::function<void(const std::vector<remote_ptr> &)> &&callback) -> process &
     {
         _args = {"listremotes", "--long"};
-        on_finish([this, callback](int exit_code)
+        on_finish([this, callback = std::move(callback)](int exit_code)
                   {
                       if (exit_code not_eq 0) throw std::runtime_error("error in listremotes");
                       auto remotes = std::vector<remote_ptr>();
@@ -360,7 +363,7 @@ namespace iridium::rclone
     {
         if (not source.is_dir() or not destination.is_dir())
             throw std::runtime_error("source or destination is not a directory");
-        _args = {"check", source.absolute_path(), destination.absolute_path()};
+        _args = {"check", source.absolute_path(), destination.absolute_path(), "--use-json-log", "--log-level", "INFO"};
         return *this;
     }
 
@@ -371,4 +374,5 @@ namespace iridium::rclone
     }
 
     void process::add_global_option(const option &option) { process::_global_options.push_back(option); }
+
 } // namespace iridium::rclone

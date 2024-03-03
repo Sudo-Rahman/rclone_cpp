@@ -137,6 +137,10 @@ namespace iridium::rclone
 
 		auto copy_url(const std::string &url, const entitie::file& destination) -> process&;
 
+
+        /**
+         * @brief Compare the source and destination and check if the files are the same
+         */
 		auto check(const entitie::file& source, const entitie::file& destination) -> process&;
 
 		auto add_option(const option& option) -> process&;

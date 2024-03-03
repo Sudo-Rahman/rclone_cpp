@@ -6,11 +6,16 @@
 
 namespace iridium::rclone
 {
+    namespace parser
+    {
+        class json_log_parser;
+    };
+
     class entitie::json_log : public entitie {
 
     public:
 
-        enum class log_level {
+        enum class log_level : uint8_t {
             info,
             warning,
             error,
@@ -22,45 +27,56 @@ namespace iridium::rclone
 
         virtual ~json_log();
 
-
         [[nodiscard]] auto level() const -> log_level { return _level; }
 
         [[nodiscard]] auto message() const -> std::string { return _message; }
 
+        [[nodiscard]] auto source() const -> std::string { return _source; }
+
         [[nodiscard]] auto time() const -> boost::posix_time::ptime { return _time; }
 
-        [[nodiscard]] const struct json_log::stats* stats() const { return _stats; }
+        [[nodiscard]] const struct json_log::stats *get_stats() const { return _stats; }
 
-        friend class json_log_parser;
+        static auto string_to_level(const std::string &level) -> log_level;
+
+        static auto level_to_string(const log_level &level) -> std::string;
+
+        friend auto operator<<(std::ostream &os, const json_log &log) -> std::ostream &;
+
+        friend class parser::json_log_parser;
 
     protected:
 
         log_level _level{};
         std::string _message;
+        std::string _source;
         boost::posix_time::ptime _time;
         struct stats *_stats{};
 
     private:
-        static auto parse_stats(const std::string &data) -> struct stats;
-        [[nodiscard]] struct json_log::stats create_stats() const;
+        [[nodiscard]] static struct json_log::stats create_stats();
     };
 
     struct entitie::json_log::stats {
-        uint64_t bytes;
-        uint64_t checks;
-        uint64_t deletes;
-        double_t elapsed_time;
-        uint64_t errors;
-        bool fatal_error;
-        uint64_t renames;
-        bool retry_error;
-        double_t speed;
-        double_t transfer_time;
-        uint64_t transfers;
+        uint64_t bytes{};
+        uint64_t checks{};
+        uint64_t deletes{};
+        double_t elapsed_time{};
+        uint64_t errors{};
+        bool fatal_error{};
+        std::string last_error;
+        uint64_t renames{};
+        bool retry_error{};
+        double_t speed{};
+        double_t transfer_time{};
+        uint64_t transfers{};
+
+        friend auto operator<<(std::ostream &os, const stats &stats) -> std::ostream &;
+
+        friend class json_log;
+
     private:
         stats() = default;
-        friend class json_log;
     };
-
 
 } // namespace iridium::rclone::entitie

@@ -4,7 +4,7 @@
 #include <boost/thread.hpp>
 #include <iostream>
 #include <iridium/entities.hpp>
-#include <iridium/parsers/file_parser.hpp>
+#include <iridium/parsers.hpp>
 #include <iridium/process.hpp>
 
 using namespace boost::asio;
@@ -29,7 +29,6 @@ auto main() -> int
 	//    for (int i = 0; i < 10000; ++i)
 	//    {
 	auto rclone = new process();
-	std::cout << boost::this_thread::get_id() << std::endl << std::endl;
 	auto lst = std::vector<entitie::remote>{};
 	auto n = new int{0};
 	auto remote = entitie::remote::create_shared_ptr(
@@ -44,10 +43,9 @@ auto main() -> int
 	);
 
 	std::vector<std::shared_ptr<entitie::remote>> remotes;
-    std::mutex m;
-	auto fn = [&](const std::vector<std::shared_ptr<entitie::remote>>& val) {
-//        std::lock_guard<std::mutex> lock(m);
-//        remotes = val;
+	auto fn = [&](const std::vector<std::shared_ptr<entitie::remote>>& val) -> void{
+        remotes = val;
+        std::cout << "remotes = " << remotes.size() << std::endl;
     };
 
 
@@ -58,8 +56,15 @@ auto main() -> int
                                                          std::cout << file << std::endl;
                                                     }));
 
+    auto bureau = entitie::file(nullptr,"/home/rahman/Bureau/", 0, true, boost::posix_time::second_clock::local_time(), nullptr);
+
+    auto parser = parser::json_log_parser::create(new parser::json_log_parser([](const entitie::json_log&log ){
+        std::cout << log << std::endl;
+    }));
+
+
 	rclone->
-    list_remotes()
+                    check(bureau,file)
 //			lsjson(file)
 			// lsjson(file)
 //			 .every_line_parser(ser)
@@ -88,27 +93,22 @@ auto main() -> int
 			//    config()
 			//    lsjson(iridium::rclone_remote("drive",
 			//    iridium::rclone_remote::remote_type::google_drive, "/"))
-			//            .every_line([&](const std::string&line)
-			//            {
-			//                //                *rclone << "q";
-			////                 std::cout << line << std::endl;
-			//                //                                std::cout << line <<
-			//                //                                boost::this_thread::get_id() <<
-			//                //                                std::endl << std::endl;
-			//                //                            std::cout << boost::this_thread::get_id()
-			//                //                            << std::endl;
-			//            })
-			.every_line_parser(
-                    parser::file_parser::create(
-                            new parser::file_parser(&file,
-                                                                                   [&ser](const entitie::file& file)
-                                                                                   {
-                                process().lsjson(file).every_line_parser(ser).execute().wait_for_finish();
-                                            // std::cout << file << std::endl;
-                                                                                   })))
+			            .every_line([&](const std::string&line)
+			            {
+			                //                *rclone << "q";
+//			                 std::cout << line << std::endl;
+			                //                                std::cout << line <<
+			                //                                boost::this_thread::get_id() <<
+			                //                                std::endl << std::endl;
+			                //                            std::cout << boost::this_thread::get_id()
+			                //                            << std::endl;
+			            })
+			.every_line_parser(parser)
+
+
 			.execute()
 			.wait_for_start()
-//			.wait_for_finish()
+			.wait_for_finish()
 //			            .stop()
 			;
 
@@ -128,19 +128,22 @@ auto main() -> int
 
     process_pool pool{10};
 
-    for (int i = 0; i < 100; ++i)
-    {
-        auto proc = new process();
-        proc->list_remotes()
-        .every_line([&](const std::string& line) { std::cout << line << std::endl; });
-        pool.add_process(std::unique_ptr<process>(proc));
-    }
 
-    std::cout << "stop" << std::endl;
+//    for (int i = 0; i < 100; ++i)
+//    {
+//        auto counter = int{0};
+//        auto proc = new process();
+//        proc->list_remotes()
+//        .on_finish([&](int exit) {
+//            std::cout << counter++ << std::endl;
+//        })
+//        ;
+//        pool.add_process(std::unique_ptr<process>(proc));
+//    }
 
-    this_thread::sleep_for(std::chrono::milliseconds (100));
+//    this_thread::sleep_for(std::chrono::milliseconds (1000));
 
-//    pool.stop();
+    pool.wait();
 
 	delete rclone;
 	delete n;
