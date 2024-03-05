@@ -22,4 +22,4 @@ namespace iridium::rclone::parser
 	class RCLONE_CPP_EXPORT about_parser;
 
     class RCLONE_CPP_EXPORT json_log_parser;
-} // namespace iridium::rclone
+} // namespace iridium::rclone::parser

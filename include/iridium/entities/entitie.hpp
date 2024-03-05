@@ -5,7 +5,7 @@ namespace iridium::rclone
 	class entitie
 	{
 		entitie() = default;
-
+		
 		friend class process;
 
 	public:

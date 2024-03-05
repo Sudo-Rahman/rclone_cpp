@@ -13,7 +13,7 @@ namespace iridium::rclone
     std::string process::_path_rclone;
     bool process::_is_initialized = false;
     const std::string process::endl = "\n";
-    option::vector process::_global_options = {};
+    option::basic_option::vector process::_global_options = {};
 
 
     auto process::initialize(const std::string &path_rclone) -> void
@@ -111,8 +111,8 @@ namespace iridium::rclone
         if (_state != state::not_launched)
             throw std::runtime_error("process already started");
 
-        option::add_options_to_vector(_global_options, _args);
-        option::add_options_to_vector(_local_options, _args);
+        option::basic_option::add_options_to_vector(_global_options, _args);
+        option::basic_option::add_options_to_vector(_local_options, _args);
 
         try {
             _in = std::make_unique<bp::opstream>();
@@ -367,12 +367,12 @@ namespace iridium::rclone
         return *this;
     }
 
-    auto process::add_option(const option &option) -> process &
+    auto process::add_option(const option::basic_option &option) -> process &
     {
         _local_options.push_back(option);
         return *this;
     }
 
-    void process::add_global_option(const option &option) { process::_global_options.push_back(option); }
+    void process::add_global_option(const option::basic_option &option) { process::_global_options.push_back(option); }
 
 } // namespace iridium::rclone

@@ -7,7 +7,7 @@
 #include "../entities.hpp"
 #include "../options.hpp"
 #include "../parsers/basic_parser.hpp"
-#include "../parsers/file_parser.hpp"
+#include "../parsers.hpp"
 #include <boost/signals2.hpp>
 
 namespace iridium::rclone
@@ -56,9 +56,9 @@ namespace iridium::rclone
 
 		[[nodiscard]] auto get_error() const -> std::vector<std::string> { return _error; }
 
-		[[nodiscard]] auto get_options() const -> option::vector { return _local_options; }
+		[[nodiscard]] auto get_options() const -> option::basic_option::vector { return _local_options; }
 
-		[[nodiscard]] static auto get_global_options() -> option::vector { return _global_options; }
+		[[nodiscard]] static auto get_global_options() -> option::basic_option::vector { return _global_options; }
 
 		auto stop() -> void;
 
@@ -143,20 +143,20 @@ namespace iridium::rclone
          */
 		auto check(const entitie::file& source, const entitie::file& destination) -> process&;
 
-		auto add_option(const option& option) -> process&;
+		auto add_option(const option::basic_option& option) -> process&;
 
 		template<class... Args>
-		auto add_option(const option& option1, Args&&... args) -> process&
+		auto add_option(const option::basic_option& option1, Args&&... args) -> process&
 		{
 			add_option(option1);
 			add_option(std::forward<Args>(args)...);
 			return *this;
 		}
 
-		static void add_global_option(const option& option);
+		static void add_global_option(const option::basic_option& option);
 
 		template<class... Args>
-		static void add_global_option(const option& option1, Args&&... args)
+		static void add_global_option(const option::basic_option& option1, Args&&... args)
 		{
 			add_global_option(option1);
 			add_global_option(std::forward<Args>(args)...);
@@ -165,7 +165,7 @@ namespace iridium::rclone
 	private:
 		static std::string _path_rclone;
 		static bool _is_initialized;
-		static option::vector _global_options;
+		static option::basic_option::vector _global_options;
 
 		std::mutex _mutex;
 		std::condition_variable _cv;
@@ -183,7 +183,7 @@ namespace iridium::rclone
 		std::vector<std::string> _output;
 		std::vector<std::string> _error;
 
-		option::vector _local_options;
+		option::basic_option::vector _local_options;
 
 		auto read_output() -> void;
 
