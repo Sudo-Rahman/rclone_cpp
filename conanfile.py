@@ -3,7 +3,7 @@ from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 
 
 class rclone_cppRecipe(ConanFile):
-    name = "process"
+    name = "rclone_cpp"
     version = "0.1"
     package_type = "library"
 
@@ -49,7 +49,7 @@ class rclone_cppRecipe(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["process"]
+        self.cpp_info.libs = ["rclone_cpp"]
 
     def requirements(self):
         self.requires("boost/[>=1.80.0]")

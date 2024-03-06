@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entities/json_log.hpp"
+#include "../entities/json_log.hpp"
 #include "basic_parser.hpp"
 #include <boost/json.hpp>
 

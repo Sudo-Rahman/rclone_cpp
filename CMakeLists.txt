@@ -14,15 +14,16 @@ include_directories(
         include/iridium/process
         include/iridium/entities
         include/iridium/parsers
+        include/iridium/options
 )
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 file(GLOB_RECURSE HEADERS "include/*.hpp")
 
 add_library(${PROJECT_NAME} ${SOURCES})
-target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_include_directories(${PROJECT_NAME} PRIVATE include)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC boost::boost)
+target_link_libraries(${PROJECT_NAME} PRIVATE boost::boost)
 install(
         DIRECTORY include/iridium
         DESTINATION include/

@@ -32,37 +32,22 @@ namespace iridium::rclone
 
 		~remote() = default;
 
-		[[nodiscard]] auto name() const -> std::string
-		{
-			if (_name.ends_with(":"))
-				return _name.substr(0, _name.size() - 1);
-			return _name;
-		}
+		[[nodiscard]] auto name() const -> std::string;
 
-		[[nodiscard]] auto root_path() const -> std::string
-		{
-			if (not _name.ends_with(":"))
-				return _name + ":";
-			return _name;
-		}
+		[[nodiscard]] auto root_path() const -> std::string;
 
 		[[nodiscard]] auto type() const -> remote_type { return _type; }
 
 		[[nodiscard]] auto path() const -> std::string { return _path; }
 
-		[[nodiscard]] auto full_path() const -> std::string { return name() + ":" + path(); }
+		[[nodiscard]] auto full_path() const -> std::string;
 
 
 		void set_name(std::string name) { _name = std::move(name); }
 
 		void set_type(remote_type type) { _type = type; }
 
-		void set_path(std::string path)
-		{
-			_path = std::move(path);
-			if (_path.ends_with("/"))
-				_path = _path.substr(0, _path.size() - 1);
-		}
+		void set_path(std::string path);
 
 		auto operator==(const remote& remote) const -> bool;
 

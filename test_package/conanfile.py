@@ -11,7 +11,7 @@ class rclone_cppTestConan(ConanFile):
 
     def requirements(self):
         self.requires("boost/[>=1.80.0]")
-        self.requires("process/0.1")
+        self.requires("rclone_cpp/0.1")
 
     def build(self):
         cmake = CMake(self)

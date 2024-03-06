@@ -44,13 +44,13 @@ namespace iridium::rclone::parser
             if (obj.contains("stats"))
                 log._stats = new entitie::json_log::stats(parse_stats(obj.at("stats").as_object()));
 
+            callback(log);
         }catch (const std::exception &e) {
-            std::cerr << "Error parsing json log: " << data << std::endl;
+            std::cerr << "Error parsing json log: " << e.what() << " "<< data << std::endl;
         }
-        callback(log);
     }
 
-    struct entitie::json_log::stats json_log_parser::parse_stats(const boost::json::object &obj)
+    auto json_log_parser::parse_stats(const boost::json::object &obj) -> entitie::json_log::stats
     {
         auto stats = entitie::json_log::create_stats();
 

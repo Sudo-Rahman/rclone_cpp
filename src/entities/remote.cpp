@@ -11,6 +11,22 @@ namespace iridium::rclone
 		set_path(std::move(path));
 	}
 
+	auto entitie::remote::name() const -> std::string
+	{
+		if (_name.ends_with(":"))
+			return _name.substr(0, _name.size() - 1);
+		return _name;
+	}
+
+	auto entitie::remote::root_path() const -> std::string
+	{
+		if (not _name.ends_with(":"))
+			return _name + ":";
+		return _name;
+	}
+
+	auto entitie::remote::full_path() const -> std::string { return name() + ":" + path(); }
+
 	auto operator<<(std::ostream& os, const entitie::remote& remote) -> std::ostream&
 	{
 		os << "Remote: {" << std::endl <<
@@ -18,6 +34,13 @@ namespace iridium::rclone
 				"\ttype: " << remote._type << "," << std::endl <<
 				"\tfull_path: " << remote.full_path() << std::endl << "}";
 		return os;
+	}
+
+	void entitie::remote::set_path(std::string path)
+	{
+		_path = std::move(path);
+		if (_path.ends_with("/"))
+			_path = _path.substr(0, _path.size() - 1);
 	}
 
 	auto entitie::remote::operator==(const remote& remote) const -> bool
