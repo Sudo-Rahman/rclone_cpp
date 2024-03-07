@@ -68,6 +68,9 @@ namespace iridium::rclone
         uint64_t renames{};
         bool retry_error{};
         double_t speed{};
+        double_t total_bytes{};
+        uint64_t total_checks{};
+        uint64_t total_transfers{};
         double_t transfer_time{};
         uint64_t transfers{};
 

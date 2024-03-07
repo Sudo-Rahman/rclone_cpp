@@ -5,6 +5,7 @@
 #include "entities/entitie.hpp"
 #include "entities/file.hpp"
 #include "entities/remote.hpp"
+#include "entities/version.hpp"
 
 #ifdef _WIN32
 #define RCLONE_CPP_EXPORT __declspec(dllexport)
@@ -23,4 +24,6 @@ namespace iridium::rclone
 	class RCLONE_CPP_EXPORT about;
 
 	class RCLONE_CPP_EXPORT size;
+
+	class RCLONE_CPP_EXPORT version;
 }

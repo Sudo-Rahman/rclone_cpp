@@ -1,20 +1,10 @@
 #include <json_log_parser.hpp>
 #include <boost/json.hpp>
 #include <regex>
+#include "utils.cpp"
 
 namespace iridium::rclone::parser
 {
-
-
-    template<class T>
-    auto get_from_obj(const boost::json::object &obj, const std::string &key) -> T
-    {
-        auto it = obj.if_contains(key);
-        if (it)
-            return boost::json::value_to<T>(*it);
-        return T();
-    }
-
 
     auto json_log_parser::parse(const std::string &data) const -> void
     {
@@ -65,6 +55,9 @@ namespace iridium::rclone::parser
             stats.renames = get_from_obj<uint64_t>(obj, "renames");
             stats.retry_error = get_from_obj<bool>(obj, "retryError");
             stats.speed = get_from_obj<double_t>(obj, "speed");
+            stats.total_bytes = get_from_obj<double_t>(obj, "totalBytes");
+            stats.total_checks = get_from_obj<uint64_t>(obj, "totalChecks");
+            stats.total_transfers = get_from_obj<uint64_t>(obj, "totalTransfers");
             stats.transfer_time = get_from_obj<double_t>(obj, "transferTime");
             stats.transfers = get_from_obj<uint64_t>(obj, "transfers");
         } catch (const std::exception &e) {

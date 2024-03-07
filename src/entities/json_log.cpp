@@ -72,6 +72,9 @@ namespace iridium::rclone
            "\trenames : " << stats.renames << std::endl <<
            "\tretry_error : " << boost::lexical_cast<std::string>(stats.retry_error) << std::endl <<
            "\tspeed : " << stats.speed << std::endl <<
+           "\ttotal_bytes : " << stats.total_bytes << std::endl <<
+           "\ttotal_checks : " << stats.total_checks << std::endl <<
+           "\ttotal_transfers : " << stats.total_transfers << std::endl <<
            "\ttransfer_time : " << stats.transfer_time << std::endl <<
            "\ttransfers : " << stats.transfers << std::endl <<
            "}";

@@ -82,7 +82,7 @@ namespace iridium::rclone
 		template<class T>
 		auto on_finish_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process&
 		{
-			_signal_finish->connect([this, parser = std::move(parser)](int) { parser.parse(boost::algorithm::join(_output, endl)); });
+			_signal_finish->connect([this, parser = std::move(parser)](int) { parser->parse(boost::algorithm::join(_output, endl)); });
 			return *this;
 		}
 
