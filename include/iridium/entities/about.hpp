@@ -1,12 +1,12 @@
 #pragma once
 
 #include <string>
-#include "entitie.hpp"
+#include "entity.hpp"
 
 
 namespace iridium::rclone
 {
-    class entitie::about : public entitie
+    class entity::about : public entity
     {
     public:
         uint64_t total_bytes{};

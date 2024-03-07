@@ -1,11 +1,11 @@
 #pragma once
 
-#include "entitie.hpp"
+#include "entity.hpp"
 #include <string>
 
 namespace iridium::rclone
 {
-	struct entitie::version : public entitie
+	struct entity::version : public entity
 	{
         std::string version;
 		std::string os_version;

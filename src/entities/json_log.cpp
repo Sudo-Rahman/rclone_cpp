@@ -3,28 +3,28 @@
 
 namespace iridium::rclone
 {
-    entitie::json_log::~json_log()
+    entity::json_log::~json_log()
     {
         delete _stats;
     }
 
-    struct entitie::json_log::stats entitie::json_log::create_stats()
+    struct entity::json_log::stats entity::json_log::create_stats()
     {
         return {};
     }
 
-    auto entitie::json_log::string_to_level(const std::string &level) -> entitie::json_log::log_level
+    auto entity::json_log::string_to_level(const std::string &level) -> entity::json_log::log_level
     {
         if (level == "info")
-            return entitie::json_log::log_level::info;
+            return entity::json_log::log_level::info;
         if (level == "warning")
-            return entitie::json_log::log_level::warning;
+            return entity::json_log::log_level::warning;
         if (level == "error")
-            return entitie::json_log::log_level::error;
-        return entitie::json_log::log_level::info;
+            return entity::json_log::log_level::error;
+        return entity::json_log::log_level::info;
     }
 
-    auto operator<<(std::ostream &os, const entitie::json_log &log) -> std::ostream &
+    auto operator<<(std::ostream &os, const entity::json_log &log) -> std::ostream &
     {
         auto stats = std::string{};
         auto buffer = std::stringstream{};
@@ -37,7 +37,7 @@ namespace iridium::rclone
 
         os << "json_log" << std::endl <<
            "{" << std::endl <<
-           "\tlevel : " << entitie::json_log::level_to_string(log._level) << ", " << std::endl <<
+           "\tlevel : " << entity::json_log::level_to_string(log._level) << ", " << std::endl <<
            "\tmessage : " << log.message() << ", " << std::endl <<
            "\tsource : " << log.source() << ", " << std::endl <<
            "\ttime : " << log.time() << ", " << std::endl <<
@@ -46,20 +46,20 @@ namespace iridium::rclone
         return os;
     }
 
-    auto entitie::json_log::level_to_string(const entitie::json_log::log_level &level) -> std::string
+    auto entity::json_log::level_to_string(const entity::json_log::log_level &level) -> std::string
     {
         switch (level) {
-            case entitie::json_log::log_level::info:
+            case entity::json_log::log_level::info:
                 return "info";
-            case entitie::json_log::log_level::warning:
+            case entity::json_log::log_level::warning:
                 return "warning";
-            case entitie::json_log::log_level::error:
+            case entity::json_log::log_level::error:
                 return "error";
         }
         return "info";
     }
 
-    auto operator<<(std::ostream &os, const entitie::json_log::stats &stats) -> std::ostream &
+    auto operator<<(std::ostream &os, const entity::json_log::stats &stats) -> std::ostream &
     {
         os << "stats : {" << std::endl <<
            "\tbytes : " << stats.bytes << ", " << std::endl <<

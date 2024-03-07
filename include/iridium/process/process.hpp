@@ -94,54 +94,54 @@ namespace iridium::rclone
 
 		auto list_remotes() -> process&;
 
-		auto delete_remote(const entitie::remote& remote) -> process&;
+		auto delete_remote(const entity::remote& remote) -> process&;
 
 		auto config() -> process&;
 
-		auto lsjson(const entitie::remote& remote) -> process&;
+		auto lsjson(const entity::remote& remote) -> process&;
 
-		auto lsjson(const entitie::file& file) -> process&;
+		auto lsjson(const entity::file& file) -> process&;
 
 		/**
 		 * \brief Lists the objects in the source path to standard output in a human readable format with size and path. Recurses by default.
 		 * \param file
 		 * \return
 		 */
-		auto ls(const entitie::file& file) -> process&;
+		auto ls(const entity::file& file) -> process&;
 
-		auto lsl(const entitie::file& file) -> process&;
+		auto lsl(const entity::file& file) -> process&;
 
-		auto lsd(const entitie::file& file) -> process&;
+		auto lsd(const entity::file& file) -> process&;
 
-		auto lsf(const entitie::file& file) -> process&;
+		auto lsf(const entity::file& file) -> process&;
 
-		auto copy_to(const entitie::file& source, const entitie::file& destination) -> process&;
+		auto copy_to(const entity::file& source, const entity::file& destination) -> process&;
 
-		auto move_to(const entitie::file& source, const entitie::file& destination) -> process&;
+		auto move_to(const entity::file& source, const entity::file& destination) -> process&;
 
-		auto delete_file(const entitie::file& file) -> process&;
+		auto delete_file(const entity::file& file) -> process&;
 
-		auto mkdir(const entitie::file& file) -> process&;
+		auto mkdir(const entity::file& file) -> process&;
 
-		auto cat(const entitie::file& file) -> process&;
+		auto cat(const entity::file& file) -> process&;
 
-		auto about(const entitie::remote& remote) -> process&;
+		auto about(const entity::remote& remote) -> process&;
 
-		auto size(const entitie::file& file) -> process&;
+		auto size(const entity::file& file) -> process&;
 
-		auto tree(const entitie::file& file) -> process&;
+		auto tree(const entity::file& file) -> process&;
 
-		auto bi_sync(const entitie::file& source, const entitie::file& destination) -> process&;
+		auto bi_sync(const entity::file& source, const entity::file& destination) -> process&;
 
-		auto clean_up(const entitie::remote& remote) -> process&;
+		auto clean_up(const entity::remote& remote) -> process&;
 
-		auto copy_url(const std::string &url, const entitie::file& destination) -> process&;
+		auto copy_url(const std::string &url, const entity::file& destination) -> process&;
 
 
         /**
          * @brief Compare the source and destination and check if the files are the same
          */
-		auto check(const entitie::file& source, const entitie::file& destination) -> process&;
+		auto check(const entity::file& source, const entity::file& destination) -> process&;
 
 		auto add_option(const option::basic_option& option) -> process&;
 

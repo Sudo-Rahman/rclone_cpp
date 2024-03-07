@@ -97,9 +97,9 @@ auto main() -> int
 
     auto rclone = new process();
 	
-    auto remote = entitie::remote::create_shared_ptr(
-		"test", entitie::remote::remote_type::google_drive, "");
-	auto root_file = entitie::file{
+    auto remote = entity::remote::create_shared_ptr(
+		"test", entity::remote::remote_type::google_drive, "");
+	auto root_file = entity::file{
 					nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(),
 					remote
 			};
@@ -109,7 +109,7 @@ auto main() -> int
 
 	auto f_parser = parser::file_parser::create(
 	new parser::file_parser(&root_file,
-                [](const entitie::file&file)
+                [](const entity::file&file)
                 {
                      std::cout << file << std::endl;
                 }));

@@ -1,7 +1,6 @@
 //
 // Created by sr-71 on 05/02/2024.
 //
-#include <boost/thread.hpp>
 #include <iostream>
 #include <iridium/entities.hpp>
 #include <iridium/parsers.hpp>
@@ -13,118 +12,131 @@ using namespace iridium::rclone;
 
 auto main() -> int
 {
-	process::initialize();
+    process::initialize();
 
-	//    auto rclones = std::vector<iridium::rclone *>{};
-	//    for (int i = 0; i < 1000; ++i)
-	//    {
-	//        auto rclone = new iridium::rclone{};
-	//        rclones.push_back(rclone);
-	//        rclone->version().execute();
-	////        delete rclone;
-	//        rclone->stop();
-	//        std::cout << "i = " << i << std::endl;
-	//    }
+    //    auto rclones = std::vector<iridium::rclone *>{};
+    //    for (int i = 0; i < 1000; ++i)
+    //    {
+    //        auto rclone = new iridium::rclone{};
+    //        rclones.push_back(rclone);
+    //        rclone->version().execute();
+    ////        delete rclone;
+    //        rclone->stop();
+    //        std::cout << "i = " << i << std::endl;
+    //    }
 
-	//    for (int i = 0; i < 10000; ++i)
-	//    {
-	auto rclone = new process();
-	auto lst = std::vector<entitie::remote>{};
-	auto n = new int{0};
-	auto remote = entitie::remote::create_shared_ptr(
-		"test", entitie::remote::remote_type::google_drive, "");
-	auto file = entitie::file{
-					nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(),
-					remote
-			};
-	process::add_global_option(
-		option::performance::transfers(10)
-		//            option::filter(option::filter::include, "*.txt")
-	);
+    //    for (int i = 0; i < 10000; ++i)
+    //    {
+    auto rclone = new process();
+    auto lst = std::vector<entity::remote>{};
+    auto n = new int{0};
+    auto remote = entity::remote::create_shared_ptr(
+            "test", entity::remote::remote_type::google_drive, "");
+    auto file = entity::file{
+            nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(),
+            remote
+    };
+    process::add_global_option(
+            option::listing::fast_list(),
+            option::logging::log_level("INFO")
+//        option::logging::progress(),
+//        option::logging::use_json_log(),
+//        option::logging::verbose()
+            //            option::filter(option::filter::include, "*.txt")
+    );
 
-	std::vector<std::shared_ptr<entitie::remote>> remotes;
-	auto fn = [&](const std::vector<std::shared_ptr<entitie::remote>>& val) -> void{
+    std::vector<std::shared_ptr<entity::remote>> remotes;
+    auto fn = [&](const std::vector<std::shared_ptr<entity::remote>> &val) -> void
+    {
         remotes = val;
         std::cout << "remotes = " << remotes.size() << std::endl;
     };
 
 
+    auto bureau = entity::file(nullptr, "/Users/sr-71/Documents", 0, true,
+                               boost::posix_time::second_clock::local_time(), nullptr);
 
-    auto ser = parser::file_parser::create(new parser::file_parser(&file,
-                                                    [](const entitie::file&file)
-                                                    {
-                                                         std::cout << file << std::endl;
-                                                    }));
+    auto ser = parser::file_parser::create(new parser::file_parser(&bureau,
+                                                                   [](const entity::file &file)
+                                                                   {
+                                                                       std::cout << file << std::endl;
+                                                                   }));
 
-    auto bureau = entitie::file(nullptr,"/home/rahman/Bureau/", 0, true, boost::posix_time::second_clock::local_time(), nullptr);
+    auto parser = parser::json_log_parser::create(new parser::json_log_parser([](const entity::json_log &log)
+                                                                              {
+                                                                                  std::cout << log << std::endl;
+                                                                              }));
 
-    auto parser = parser::json_log_parser::create(new parser::json_log_parser([](const entitie::json_log&log ){
-        std::cout << log << std::endl;
-    }));
+    auto parserr = parser::version_parser::create(new parser::version_parser([](const entity::version &version)
+                                                                             {
+                                                                                 std::cout << version << std::endl;
+                                                                             }));
 
 
-	rclone->
-                    check(bureau,file)
-//			lsjson(file)
-			// lsjson(file)
+    rclone->
+//    version()
+                    check(bureau, file)
+//                    copy_to(bureau, file)
+//			lsjson(bureau)
+                    // lsjson(file)
 //			 .every_line_parser(ser)
-			//            .about(*remote, [n](const entitie::about &about)
-			//            {
-			//                std::cout << about << std::endl;
-			//
-			//            })
-			//            .add_option(
-			//                    option::filter(option::filter::include, "*.txt")
-			////            option::tree(option::tree::dirs_only),
-			//            )
-			//                    about(*remote, [n](const iridium::rclone::about
-			//                    &about)
-			//                    {
-			//                        std::cout << about << std::endl;
-			//                        (*n)++;
-			//                    })
-			//                    lsjson(file, [&,n](const iridium::rclone::file
-			//                    &file)
-			//                    {
-			//                        (*n)++;
-			//                        std::cout << file << std::endl;
-			//                    })
-			//            list_remotes(lst)
-			//    config()
-			//    lsjson(iridium::rclone_remote("drive",
-			//    iridium::rclone_remote::remote_type::google_drive, "/"))
-			            .every_line([&](const std::string&line)
-			            {
-			                //                *rclone << "q";
-//			                 std::cout << line << std::endl;
-			                //                                std::cout << line <<
-			                //                                boost::this_thread::get_id() <<
-			                //                                std::endl << std::endl;
-			                //                            std::cout << boost::this_thread::get_id()
-			                //                            << std::endl;
-			            })
-			.every_line_parser(parser)
+                    //            .about(*remote, [n](const entity::about &about)
+                    //            {
+                    //                std::cout << about << std::endl;
+                    //
+                    //            })
+                    //            .add_option(
+                    //                    option::filter(option::filter::include, "*.txt")
+                    ////            option::tree(option::tree::dirs_only),
+                    //            )
+                    //                    about(*remote, [n](const iridium::rclone::about
+                    //                    &about)
+                    //                    {
+                    //                        std::cout << about << std::endl;
+                    //                        (*n)++;
+                    //                    })
+                    //                    lsjson(file, [&,n](const iridium::rclone::file
+                    //                    &file)
+                    //                    {
+                    //                        (*n)++;
+                    //                        std::cout << file << std::endl;
+                    //                    })
+                    //            list_remotes(lst)
+                    //    config()
+                    //    lsjson(iridium::rclone_remote("drive",
+                    //    iridium::rclone_remote::remote_type::google_drive, "/"))
+            .every_line([&](const std::string &line)
+                        {
+                            //                *rclone << "q";
+                            std::cout << line << std::endl;
+                            //                                std::cout << line <<
+                            //                                boost::this_thread::get_id() <<
+                            //                                std::endl << std::endl;
+                            //                            std::cout << boost::this_thread::get_id()
+                            //                            << std::endl;
+                        })
+            .every_line_parser(parser)
+//			.every_line_parser(ser)
+//            .on_finish_parser(parserr)
 
-
-			.execute()
-			.wait_for_start()
-			.wait_for_finish()
+            .execute()
+            .wait_for_start()
+            .wait_for_finish()
 //			            .stop()
-			;
+            ;
 
-	std::function<void(entitie::file&)> print;
+    std::function<void(entity::file &)> print;
 
-	print = [&print](entitie::file& file)
-	{
-		std::cout << file << std::endl;
-		if (file.nb_chilchren() > 0) { for (const auto& f: file.children()) { print(*f); } }
-	};
-	for (const auto &remote : remotes)
-	{
-		cout << *remote << endl;
-	}
+    print = [&print](entity::file &file)
+    {
+        std::cout << file << std::endl;
+        if (file.nb_chilchren() > 0) { for (const auto &f: file.children()) { print(*f); }}
+    };
+    for (const auto &remote: remotes) {
+        cout << *remote << endl;
+    }
 
-	print(file);
+    print(file);
 
     process_pool pool{10};
 
@@ -145,7 +157,7 @@ auto main() -> int
 
     pool.wait();
 
-	delete rclone;
-	delete n;
-	return 0;
+    delete rclone;
+    delete n;
+    return 0;
 }

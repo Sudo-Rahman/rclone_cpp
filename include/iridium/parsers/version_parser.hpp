@@ -5,10 +5,10 @@
 
 namespace iridium::rclone::parser
 {
-    class version_parser : public basic_parser<entitie::version> {
+    class version_parser : public basic_parser<entity::version> {
 
     public :
-        version_parser(std::function<void(entitie::version)> callback)
+        version_parser(std::function<void(entity::version)> callback)
                 : basic_parser(std::move(callback)) {}
 
         void parse(const std::string &data) const override;

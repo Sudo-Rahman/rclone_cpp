@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../entities/entitie.hpp"
+#include "../entities/entity.hpp"
 #include <functional>
 #include <string>
 
@@ -9,7 +9,7 @@ namespace iridium::rclone::parser
 	template<class Type, class BaseClass>
 	concept CheckType = std::is_base_of_v<BaseClass, Type>;
 
-	template<class T> requires CheckType<T, entitie>
+	template<class T> requires CheckType<T, entity>
 	class basic_parser
 	{
 		std::function<void(const T&)> _callback;

@@ -4,12 +4,12 @@
 #include <memory>
 #include <map>
 #include <string>
-#include "entitie.hpp"
+#include "entity.hpp"
 
 
 namespace iridium::rclone
 {
-	class entitie::remote : public entitie
+	class entity::remote : public entity
 	{
 	public:
 		enum remote_type
@@ -26,9 +26,9 @@ namespace iridium::rclone
 
 		remote(remote&& remote) = default;
 
-		auto operator=(const remote& remote) -> entitie::remote& = default;
+		auto operator=(const remote& remote) -> entity::remote& = default;
 
-		auto operator=(remote&& remote) -> entitie::remote& = default;
+		auto operator=(remote&& remote) -> entity::remote& = default;
 
 		~remote() = default;
 
@@ -68,5 +68,5 @@ namespace iridium::rclone
 		static const std::map<std::string, remote_type> string_to_remote_type;
 	};
 
-	using remote_ptr = std::shared_ptr<entitie::remote>;
+	using remote_ptr = std::shared_ptr<entity::remote>;
 } // namespace iridium::rclone

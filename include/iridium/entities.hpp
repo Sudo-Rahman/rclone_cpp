@@ -2,7 +2,7 @@
 
 #include "entities/about.hpp"
 #include "entities/size.hpp"
-#include "entities/entitie.hpp"
+#include "entities/entity.hpp"
 #include "entities/file.hpp"
 #include "entities/remote.hpp"
 #include "entities/version.hpp"
@@ -15,7 +15,7 @@
 
 namespace iridium::rclone
 {
-	class RCLONE_CPP_EXPORT entitie;
+	class RCLONE_CPP_EXPORT entity;
 
 	class RCLONE_CPP_EXPORT remote;
 

@@ -5,8 +5,8 @@
 
 namespace iridium::rclone
 {
-	entitie::file::file(file * parent, const std::string& file_name, uint64_t size, bool is_dir,
-	                    const boost::posix_time::ptime& mod_time, const remote_ptr& remote)
+	entity::file::file(file * parent, const std::string& file_name, uint64_t size, bool is_dir,
+                       const boost::posix_time::ptime& mod_time, const remote_ptr& remote)
 	{
 		_parent = parent;
 		set_name(file_name);
@@ -16,9 +16,9 @@ namespace iridium::rclone
 		_remote = remote;
 	}
 
-	entitie::file::file(file * parent, const std::string& file_name, uint64_t size, bool is_dir,
-	                    const boost::posix_time::seconds& mod_time,
-	                    const remote_ptr& remote)
+	entity::file::file(file * parent, const std::string& file_name, uint64_t size, bool is_dir,
+                       const boost::posix_time::seconds& mod_time,
+                       const remote_ptr& remote)
 	{
 		_parent = parent;
 		set_name(file_name);
@@ -28,14 +28,14 @@ namespace iridium::rclone
 		_remote = remote;
 	}
 
-	entitie::file::file(file * parent, const std::string & file_name, const remote_ptr & remote)
+	entity::file::file(file * parent, const std::string & file_name, const remote_ptr & remote)
 	{
 		_parent = parent;
 		set_name(file_name);
 		_remote = remote;
 	}
 
-	auto operator<<(std::ostream& os, const entitie::file& file) -> std::ostream&
+	auto operator<<(std::ostream& os, const entity::file& file) -> std::ostream&
 	{
 		auto remote = std::string();
 		auto string_stream = std::stringstream();
@@ -58,9 +58,9 @@ namespace iridium::rclone
 	}
 
 
-	auto entitie::file::operator!=(const file& rhs) const -> bool { return !(rhs == *this); }
+	auto entity::file::operator!=(const file& rhs) const -> bool { return !(rhs == *this); }
 
-	auto entitie::file::operator==(const file& rhs) const -> bool
+	auto entity::file::operator==(const file& rhs) const -> bool
 	{
 		return _name == rhs._name &&
 		       _size == rhs._size &&
@@ -70,15 +70,15 @@ namespace iridium::rclone
 	}
 
 	auto
-	entitie::file::create_shared_ptr(file * parent, const std::string& name_file, uint64_t size, bool is_dir,
-	                                 boost::posix_time::ptime mod_time,
-	                                 const remote_ptr& remote) -> std::shared_ptr<file>
+	entity::file::create_shared_ptr(file * parent, const std::string& name_file, uint64_t size, bool is_dir,
+                                    boost::posix_time::ptime mod_time,
+                                    const remote_ptr& remote) -> std::shared_ptr<file>
 	{
 		return std::make_shared<file>(parent, name_file, size, is_dir, mod_time, remote);
 	}
 
 
-	auto entitie::file::absolute_path() const -> std::string
+	auto entity::file::absolute_path() const -> std::string
 	{
 		std::string abs_path;
 		if (_parent)
@@ -91,7 +91,7 @@ namespace iridium::rclone
 		return std::regex_replace(abs_path, regex, "/");
 	}
 
-	auto entitie::file::path() const -> std::string
+	auto entity::file::path() const -> std::string
 	{
 		std::string path;
 		if (_parent)
@@ -102,7 +102,7 @@ namespace iridium::rclone
 		return std::regex_replace(path, regex, "/");
 	}
 
-	void entitie::file::set_name(const std::string& path)
+	void entity::file::set_name(const std::string& path)
 	{
 		auto regex = std::regex(R"([/]{2,})");
 		_name = std::regex_replace(path, regex, "/");

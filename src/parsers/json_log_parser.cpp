@@ -8,7 +8,7 @@ namespace iridium::rclone::parser
 
     auto json_log_parser::parse(const std::string &data) const -> void
     {
-        auto log = entitie::json_log();
+        auto log = entity::json_log();
 
         auto regex = std::regex(R"(\{.*\})");
         std::smatch match;
@@ -19,7 +19,7 @@ namespace iridium::rclone::parser
 
         try{
             boost::json::object obj = boost::json::parse(data).as_object();
-            log._level = entitie::json_log::string_to_level(get_from_obj<std::string>(obj, "level"));
+            log._level = entity::json_log::string_to_level(get_from_obj<std::string>(obj, "level"));
             log._message = get_from_obj<std::string>(obj, "msg");
             log._source = get_from_obj<std::string>(obj, "source");
 
@@ -32,7 +32,7 @@ namespace iridium::rclone::parser
             iss >> abs_time;
             log._time = abs_time;
             if (obj.contains("stats"))
-                log._stats = new entitie::json_log::stats(parse_stats(obj.at("stats").as_object()));
+                log._stats = new entity::json_log::stats(parse_stats(obj.at("stats").as_object()));
 
             callback(log);
         }catch (const std::exception &e) {
@@ -40,9 +40,9 @@ namespace iridium::rclone::parser
         }
     }
 
-    auto json_log_parser::parse_stats(const boost::json::object &obj) -> entitie::json_log::stats
+    auto json_log_parser::parse_stats(const boost::json::object &obj) -> entity::json_log::stats
     {
-        auto stats = entitie::json_log::create_stats();
+        auto stats = entity::json_log::create_stats();
 
         try {
             stats.bytes = get_from_obj<uint64_t>(obj, "bytes");

@@ -27,11 +27,11 @@ namespace iridium::rclone::parser
 
 					boost::posix_time::ptime abs_time;
 					iss >> abs_time;
-					entitie::file file = entitie::file(_parent, json.at("Path").as_string().c_str(),
-					                                   json.at("Size").as_int64(),
-					                                   json.at("IsDir").as_bool(), abs_time,
-					                                   _parent->remote());
-					_parent->add_child(std::make_shared<entitie::file>(file));
+					entity::file file = entity::file(_parent, json.at("Path").as_string().c_str(),
+                                                     json.at("Size").as_int64(),
+                                                     json.at("IsDir").as_bool(), abs_time,
+                                                     _parent->remote());
+					_parent->add_child(std::make_shared<entity::file>(file));
 					callback(file);
 				}
 			}

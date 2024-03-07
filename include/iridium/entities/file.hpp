@@ -6,7 +6,7 @@
 
 namespace iridium::rclone
 {
-	class entitie::file : public entitie
+	class entity::file : public entity
 	{
 	public:
 		file(file * parent, const std::string& file_name, uint64_t size, bool is_dir,

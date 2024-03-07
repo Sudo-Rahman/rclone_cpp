@@ -2,9 +2,9 @@
 
 namespace iridium::rclone
 {
-	class entitie
+	class entity
 	{
-		entitie() = default;
+		entity() = default;
 
 		friend class process;
 

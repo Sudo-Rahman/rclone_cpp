@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entitie.hpp"
+#include "entity.hpp"
 #include <iostream>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -11,7 +11,7 @@ namespace iridium::rclone
         class json_log_parser;
     };
 
-    class entitie::json_log : public entitie {
+    class entity::json_log : public entity {
 
     public:
 
@@ -57,7 +57,7 @@ namespace iridium::rclone
         [[nodiscard]] static struct json_log::stats create_stats();
     };
 
-    struct entitie::json_log::stats {
+    struct entity::json_log::stats {
         uint64_t bytes{};
         uint64_t checks{};
         uint64_t deletes{};
@@ -82,4 +82,4 @@ namespace iridium::rclone
         stats() = default;
     };
 
-} // namespace iridium::rclone::entitie
+} // namespace iridium::rclone::entity
