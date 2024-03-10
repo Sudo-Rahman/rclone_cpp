@@ -86,7 +86,6 @@ target_link_libraries(your_target PRIVATE rclone_cpp::rclone_cpp boost::boost)
 #include <iridium/parsers.hpp>
 #include <iridium/process.hpp>
 
-using namespace boost::asio;
 using namespace std;
 using namespace iridium::rclone;
 
@@ -94,31 +93,27 @@ auto main() -> int
 {
 	process::initialize();
 
-    auto rclone = new process();
-	
-    auto remote = entity::remote::create_shared_ptr(
-		"test", entity::remote::remote_type::google_drive, "");
+	auto rclone = new process();
+
+	auto remote = entity::remote::create_shared_ptr("test", entity::remote::remote_type::google_drive, "");
 	auto root_file = entity::file{
 					nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(),
 					remote
 			};
-			
+
 	process::add_global_option(option::listing::fast_list());
 
 
 	auto f_parser = parser::file_parser::create(
-	new parser::file_parser(&root_file,
-                [](const entity::file&file)
-                {
-                     std::cout << file << std::endl;
-                }));
+		new parser::file_parser(&root_file,[](const entity::file& file) { std::cout << file << std::endl; })
+	);
 
-    rclone->lsjson(file)
-    .every_line_parser(f_parser)
-    .execute()
-    .wait_for_start()
-    .wait_for_finish();
+	rclone->lsjson(root_file)
+			.every_line_parser(f_parser)
+			.execute()
+			.wait_for_start()
+			.wait_for_finish();
 
-    return 0;
+	return 0;
 }
 ```
