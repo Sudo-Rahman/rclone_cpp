@@ -113,6 +113,8 @@ auto main() -> int
 			.execute()
 			.wait_for_start()
 			.wait_for_finish();
+			
+	delete rclone;
 
 	return 0;
 }
