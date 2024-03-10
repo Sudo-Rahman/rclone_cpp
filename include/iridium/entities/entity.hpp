@@ -19,6 +19,6 @@ namespace iridium::rclone
 
         class json_log;
 
-		class version;
+		struct  version;
 	};
 } // namespace iridium::rclone

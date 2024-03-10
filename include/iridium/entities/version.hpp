@@ -5,9 +5,9 @@
 
 namespace iridium::rclone
 {
-	struct entity::version : public entity
+	struct entity::version : entity
 	{
-        std::string version;
+        std::string rclone_version;
 		std::string os_version;
 		std::string os_kernel;
 		std::string os_type;
@@ -16,6 +16,6 @@ namespace iridium::rclone
 		std::string go_linking;
 		std::string go_tags;
 
-        friend auto operator<<(std::ostream &os, const struct version &version) -> std::ostream &;
+        friend auto operator<<(std::ostream &os, const version &version) -> std::ostream &;
 	};
 } // namespace iridium::rclone

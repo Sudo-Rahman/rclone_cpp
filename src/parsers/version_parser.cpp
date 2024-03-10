@@ -12,7 +12,7 @@ namespace iridium::rclone::parser
         {
             if (line.find("rclone v") != std::string::npos)
             {
-                version.version = line;
+                version.rclone_version = line;
             }
             else if (line.find("os/version") != std::string::npos)
             {

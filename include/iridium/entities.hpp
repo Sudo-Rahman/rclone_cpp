@@ -25,5 +25,5 @@ namespace iridium::rclone
 
 	class RCLONE_CPP_EXPORT size;
 
-	class RCLONE_CPP_EXPORT version;
+	struct  RCLONE_CPP_EXPORT version;
 }

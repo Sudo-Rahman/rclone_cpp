@@ -2,8 +2,8 @@
 #include <iostream>
 
 namespace iridium::rclone{
-    auto operator<<(std::ostream &os, const struct entity::version &version) -> std::ostream & {
-        os<< version.version << std::endl;
+    auto operator<<(std::ostream &os, const entity::version &version) -> std::ostream & {
+        os<< version.rclone_version << std::endl;
         os<< version.os_version << std::endl;
         os<< version.os_kernel << std::endl;
         os<< version.os_type << std::endl;

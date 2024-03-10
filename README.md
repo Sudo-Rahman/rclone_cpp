@@ -32,8 +32,8 @@ Most of commands of rclone are supported.
 
 ## How to it works
 
-"process" class contains all function for execute, get output string, exit code, etc.
-You can add options to the command using the "option" class. or create your own option class by inheriting from the "
+"process" class contains all functions for execute command, get output string, exit code, etc.
+You can add options to the command using the "basic_option" class. or create your own option class by inheriting from the "
 basic_option" class.
 If you want to transform the output of command on object, "parsers" contains many parser for parse the output of
 command, but if you want to create your own parser, you can do it by inheriting from the "basic_parser" class.
@@ -42,7 +42,6 @@ command, but if you want to create your own parser, you can do it by inheriting 
 
 ### Dependencies
 
-- [rclone](https://rclone.org/downloads/)
 - [conan](https://conan.io/)
 - [cmake](https://cmake.org/)
 
