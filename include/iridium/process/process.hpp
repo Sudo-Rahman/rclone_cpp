@@ -12,6 +12,8 @@
 
 namespace iridium::rclone
 {
+	class config_create;
+
 	class process
 	{
 	public:
@@ -79,6 +81,8 @@ namespace iridium::rclone
 
 		auto on_finish(std::function<void(int)>&& callback) -> process&;
 
+		auto on_start(std::function<void()>&& callback) -> process&;
+
 		template<class T>
 		auto on_finish_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process&
 		{
@@ -97,6 +101,9 @@ namespace iridium::rclone
 		auto delete_remote(const entity::remote& remote) -> process&;
 
 		auto config() -> process&;
+
+		auto config_create() -> config_create;
+		friend class config_create;
 
 		auto lsjson(const entity::remote& remote) -> process&;
 
@@ -162,6 +169,8 @@ namespace iridium::rclone
 			add_global_option(std::forward<Args>(args)...);
 		}
 
+		static auto create_unique_ptr() -> std::unique_ptr<process>;
+
 	private:
 		static std::string _path_rclone;
 		static bool _is_initialized;
@@ -177,6 +186,8 @@ namespace iridium::rclone
 		std::unique_ptr<boost::process::ipstream> _err;
 		std::unique_ptr<boost::process::opstream> _in;
 
+		/// 1 thread for wait child, 1 thread for reading output,
+		/// 1 thread for reading error and 2 last threads computing the signals for every line and finish
 		boost::asio::thread_pool _pool{5};
 
 		std::vector<std::string> _args;
@@ -191,5 +202,6 @@ namespace iridium::rclone
 
 		std::unique_ptr<boost::signals2::signal<void(const std::string& line)>> _signal_every_line;
 		std::unique_ptr<boost::signals2::signal<void(int)>> _signal_finish;
+		std::unique_ptr<boost::signals2::signal<void()>> _signal_start;
     };
 } // namespace iridium::rclone

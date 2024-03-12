@@ -1,0 +1,45 @@
+#include "process/config_create.hpp"
+#include <string>
+#include <vector>
+#include <process/process.hpp>
+
+using namespace std;
+
+namespace iridium::rclone
+{
+	auto config_create::check_attributes() const -> void
+	{
+		if (_name.empty())
+			throw std::runtime_error("name must be set");
+		if (_type.empty())
+			throw std::runtime_error("type must be set");
+	}
+
+	config_create::config_create(rclone::process * process) : _process(process) {}
+
+	auto config_create::process() const -> rclone::process&
+	{
+		check_attributes();
+		_process->_args = {"config", "create", _name, _type};
+		return *_process;
+	}
+
+	auto config_create::execute() const -> rclone::process&
+	{
+		check_attributes();
+		_process->_args = {"config", "create", _name, _type};
+		return _process->execute();
+	}
+
+	auto config_create::name(const std::string& name) -> config_create&
+	{
+		_name = name;
+		return *this;
+	}
+
+	auto config_create::type(const std::string& type) -> config_create&
+	{
+		_type = type;
+		return *this;
+	}
+} // namespace iridium::rclone

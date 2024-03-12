@@ -25,9 +25,9 @@ namespace iridium::rclone::parser
 
 		virtual ~basic_parser() = default;
 
-        static std::shared_ptr<basic_parser<T>> create(basic_parser<T>* parser)
+        static auto create(basic_parser* parser) -> std::shared_ptr<basic_parser>
         {
-            return std::move(std::shared_ptr<basic_parser<T>>(parser));
+            return std::move(std::shared_ptr<basic_parser>(parser));
         }
 	};
 } // namespace iridium::rclone

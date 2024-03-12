@@ -10,9 +10,9 @@ class rclone_cppRecipe(ConanFile):
     # Optional metadata
     license = "MIT"
     author = "Rahman YILMAZ"
-    url = "<Package recipe repository url here, for issues about the package>"
-    description = "Wrapper for rclone in C++"
-    topics = ("<Put some tag here>", "<here>", "<and here>")
+    url = "<https://github.com/Sudo-Rahman/rclone_cpp>"
+    description = "C++ library for rclone"
+    topics = ("<rclone>", "<C++>")
 
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"

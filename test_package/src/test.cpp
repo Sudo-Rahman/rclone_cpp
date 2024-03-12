@@ -1,6 +1,7 @@
 //
 // Created by sr-71 on 05/02/2024.
 //
+#include <iridium/process/config_create.hpp>
 #include <iostream>
 #include <iridium/entities.hpp>
 #include <iridium/parsers.hpp>
@@ -60,6 +61,7 @@ auto main() -> int
                                                                    [](const entity::file &file)
                                                                    {
                                                                        std::cout << file << std::endl;
+                                                                       process().lsjson(file).execute().wait_for_finish();
                                                                    }));
 
     auto parser = parser::json_log_parser::create(new parser::json_log_parser([](const entity::json_log &log)
@@ -74,12 +76,12 @@ auto main() -> int
 
 
     rclone->
-//    version()
-                    check(bureau, file)
+    // version()
+                    // check(bureau, file)
 //                    copy_to(bureau, file)
 //			lsjson(bureau)
-                    // lsjson(file)
-//			 .every_line_parser(ser)
+                    lsjson(file)
+			 .every_line_parser(ser)
                     //            .about(*remote, [n](const entity::about &about)
                     //            {
                     //                std::cout << about << std::endl;
@@ -102,7 +104,8 @@ auto main() -> int
                     //                        std::cout << file << std::endl;
                     //                    })
                     //            list_remotes(lst)
-                    //    config()
+                    //config()
+                    // config_create().name("gtg").type("drive").process()
                     //    lsjson(iridium::rclone_remote("drive",
                     //    iridium::rclone_remote::remote_type::google_drive, "/"))
             .every_line([&](const std::string &line)
@@ -115,15 +118,19 @@ auto main() -> int
                             //                            std::cout << boost::this_thread::get_id()
                             //                            << std::endl;
                         })
-            .every_line_parser(parser)
-//			.every_line_parser(ser)
+            // .every_line_parser(parser)
+			// .every_line_parser(ser)
 //            .on_finish_parser(parserr)
 
             .execute()
             .wait_for_start()
-            .wait_for_finish()
-//			            .stop()
+            // .wait_for_finish()
+			            // .stop()
             ;
+    boost::this_thread::sleep_for(boost::chrono::seconds(2));
+    cout << "n = " << *n << endl;
+    // rclone->stop();
+
 
     std::function<void(entity::file &)> print;
 
