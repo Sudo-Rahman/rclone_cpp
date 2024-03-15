@@ -15,12 +15,13 @@ namespace iridium::rclone
 			throw std::runtime_error("type must be set");
 	}
 
-	config_create::config_create(rclone::process * process) : _process(process) {}
+	config_create::config_create(rclone::process * process) : _process(process){}
 
 	auto config_create::process() const -> rclone::process&
 	{
 		check_attributes();
 		_process->_args = {"config", "create", _name, _type};
+		_process->_args.insert(_process->_args.end(), _params.begin(), _params.end());
 		return *_process;
 	}
 
@@ -28,6 +29,7 @@ namespace iridium::rclone
 	{
 		check_attributes();
 		_process->_args = {"config", "create", _name, _type};
+		_process->_args.insert(_process->_args.end(), _params.begin(), _params.end());
 		return _process->execute();
 	}
 
@@ -42,4 +44,11 @@ namespace iridium::rclone
 		_type = type;
 		return *this;
 	}
+
+	auto config_create::add_param(const std::string & param) -> config_create &
+	{
+		_params.push_back(param);
+		return *this;
+	}
+
 } // namespace iridium::rclone

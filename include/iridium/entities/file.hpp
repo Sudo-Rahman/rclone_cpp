@@ -88,4 +88,8 @@ namespace iridium::rclone
 		bool _is_dir{};
 		boost::posix_time::ptime _mod_time;
 	};
+
+	using file_ptr = std::shared_ptr<entity::file>;
+	using file_uptr = std::unique_ptr<entity::file>;
+
 } // namespace iridium::rclone

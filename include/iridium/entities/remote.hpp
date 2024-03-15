@@ -66,7 +66,9 @@ namespace iridium::rclone
 
 	public:
 		static const std::map<std::string, remote_type> string_to_remote_type;
+		[[nodiscard]] static auto remote_type_to_string(const remote_type& type) -> const std::string;
 	};
 
 	using remote_ptr = std::shared_ptr<entity::remote>;
+	using remote_uptr = std::unique_ptr<entity::remote>;
 } // namespace iridium::rclone

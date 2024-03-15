@@ -66,6 +66,16 @@ namespace iridium::rclone
 		return std::make_unique<remote>(std::move(name), type, std::move(path));
 	}
 
+	auto entity::remote::remote_type_to_string(const remote_type & type) -> const std::string
+	{
+		for (const auto &pair : string_to_remote_type)
+		{
+			if (pair.second == type)
+				return pair.first;
+		}
+		return "none";
+	}
+
 	const std::map<std::string, entity::remote::remote_type> entity::remote::string_to_remote_type = {
 					{"drive", remote_type::google_drive},
 					{"sftp", remote_type::sftp},

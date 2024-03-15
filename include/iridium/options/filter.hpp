@@ -1,7 +1,8 @@
 #pragma once
 
 #include "basic_option.hpp"
-
+#include <iomanip>
+#include <iostream>
 namespace iridium::rclone::option
 {
 	class filter : public basic_option
@@ -62,7 +63,20 @@ namespace iridium::rclone::option
 		 * @brief Add a file filtering rule
 		 * @return filter
 		 */
-		static auto filter_file(const std::string& value) -> filter { return filter("--filter", value); }
+		static auto filter_file(const std::string& value) -> filter { return filter("--filter="+value); }
+
+		/**
+         * @brief Add a file filtering rule
+         * @return filter
+         */
+		template<class... Args>
+		static auto filter_file(const std::string& value, Args&&... args) -> filter
+		{
+			auto f = filter("--filter="+value);
+			for (const std::string& arg : {args...})
+				f._options.push_back("--filter="+arg);
+			return f;
+		}
 
 		/**
 		 * @brief Read file filtering patterns from a file (use - to read from stdin)
@@ -74,7 +88,7 @@ namespace iridium::rclone::option
 		 * @brief  Include files matching pattern
 		 * @return filter
 		 */
-		static auto include(const std::string& value) -> filter { return filter("--include", value); }
+		static auto include(const std::string& value) -> filter { return filter("--include",value); }
 
 		/**
 		 * @brief Read file include patterns from file (use - to read from stdin)
