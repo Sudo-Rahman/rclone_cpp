@@ -38,7 +38,7 @@ auto main() -> int
     };
     process::add_global_option(
             option::listing::fast_list(),
-            option::logging::log_level("INFO"),
+            option::logging::log_level("INFO")
             // option::filter::max_depth(1000)
             // option::filter::filter_file("- TP4.pdf", "+ *.pdf", "- *")
 //        option::logging::progress(),
