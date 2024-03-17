@@ -3,6 +3,7 @@
 #include "basic_option.hpp"
 #include <iomanip>
 #include <iostream>
+
 namespace iridium::rclone::option
 {
 	class filter : public basic_option
@@ -63,7 +64,7 @@ namespace iridium::rclone::option
 		 * @brief Add a file filtering rule
 		 * @return filter
 		 */
-		static auto filter_file(const std::string& value) -> filter { return filter("--filter="+value); }
+		static auto filter_file(const std::string& value) -> filter { return filter("--filter=" + value); }
 
 		/**
          * @brief Add a file filtering rule
@@ -72,9 +73,9 @@ namespace iridium::rclone::option
 		template<class... Args>
 		static auto filter_file(const std::string& value, Args&&... args) -> filter
 		{
-			auto f = filter("--filter="+value);
-			for (const std::string& arg : {args...})
-				f._options.push_back("--filter="+arg);
+			auto f = filter("--filter=" + value);
+			for (const std::string& arg: {args...})
+				f._options.push_back("--filter=" + arg);
 			return f;
 		}
 
@@ -88,7 +89,7 @@ namespace iridium::rclone::option
 		 * @brief  Include files matching pattern
 		 * @return filter
 		 */
-		static auto include(const std::string& value) -> filter { return filter("--include",value); }
+		static auto include(const std::string& value) -> filter { return filter("--include", value); }
 
 		/**
 		 * @brief Read file include patterns from file (use - to read from stdin)
@@ -106,7 +107,7 @@ namespace iridium::rclone::option
 		 * @brief If set limits the recursion depth to this (default -1)
 		 * @return filter
 		 */
-		static auto max_depth(const std::string& value) -> filter { return filter("--max-depth", value); }
+		static auto max_depth(int value) -> filter { return filter("--max-depth", std::to_string(value)); }
 
 		/**
 		* @brief Exclude files larger than this in the listing

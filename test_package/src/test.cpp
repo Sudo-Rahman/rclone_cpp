@@ -1,7 +1,6 @@
 //
 // Created by sr-71 on 05/02/2024.
 //
-#include <iridium/process/config_create.hpp>
 #include <iostream>
 #include <iridium/entities.hpp>
 #include <iridium/parsers.hpp>
@@ -39,11 +38,14 @@ auto main() -> int
     };
     process::add_global_option(
             option::listing::fast_list(),
-            option::logging::log_level("INFO")
+            option::logging::log_level("INFO"),
+            // option::filter::max_depth(1000)
+            // option::filter::filter_file("- TP4.pdf", "+ *.pdf", "- *")
 //        option::logging::progress(),
 //        option::logging::use_json_log(),
 //        option::logging::verbose()
-            //            option::filter(option::filter::include, "*.txt")
+            // option::filter::include("*.pdf"),
+            // option::filter::exclude("*")
     );
 
     std::vector<std::shared_ptr<entity::remote>> remotes;
@@ -57,12 +59,12 @@ auto main() -> int
     auto bureau = entity::file(nullptr, "/Users/sr-71/Documents", 0, true,
                                boost::posix_time::second_clock::local_time(), nullptr);
 
-    auto ser = parser::file_parser::create(new parser::file_parser(&bureau,
+    auto ser = parser::file_parser::create(new parser::file_parser(&file,
                                                                    [](const entity::file &file)
                                                                    {
-                                                                       std::cout << file << std::endl;
-                                                                       process().lsjson(file).execute().wait_for_finish();
-                                                                   }));
+                                                                       // std::cout << file << std::endl;
+                                                                       // process().lsjson(file).execute().wait_for_finish();
+                                                                   },parser::file_parser::json));
 
     auto parser = parser::json_log_parser::create(new parser::json_log_parser([](const entity::json_log &log)
                                                                               {
@@ -111,7 +113,7 @@ auto main() -> int
             .every_line([&](const std::string &line)
                         {
                             //                *rclone << "q";
-                            std::cout << line << std::endl;
+                            // std::cout << line << std::endl;
                             //                                std::cout << line <<
                             //                                boost::this_thread::get_id() <<
                             //                                std::endl << std::endl;
@@ -124,7 +126,7 @@ auto main() -> int
 
             .execute()
             .wait_for_start()
-            // .wait_for_finish()
+            .wait_for_finish()
 			            // .stop()
             ;
     boost::this_thread::sleep_for(boost::chrono::seconds(2));
@@ -145,7 +147,7 @@ auto main() -> int
 
     print(file);
 
-    process_pool pool{10};
+    // process_pool pool{10};
 
 
 //    for (int i = 0; i < 100; ++i)
@@ -162,7 +164,7 @@ auto main() -> int
 
 //    this_thread::sleep_for(std::chrono::milliseconds (1000));
 
-    pool.wait();
+    // pool.wait();
 
     delete rclone;
     delete n;

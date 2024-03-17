@@ -5,8 +5,8 @@
 
 namespace iridium::rclone
 {
-	entity::file::file(file * parent, const std::string& file_name, uint64_t size, bool is_dir,
-                       const boost::posix_time::ptime& mod_time, const remote_ptr& remote)
+	entity::file::file(file * parent, const std::string& file_name, int64_t size, bool is_dir,
+	                   const boost::posix_time::ptime& mod_time, const remote_ptr& remote)
 	{
 		_parent = parent;
 		set_name(file_name);
@@ -16,9 +16,9 @@ namespace iridium::rclone
 		_remote = remote;
 	}
 
-	entity::file::file(file * parent, const std::string& file_name, uint64_t size, bool is_dir,
-                       const boost::posix_time::seconds& mod_time,
-                       const remote_ptr& remote)
+	entity::file::file(file * parent, const std::string& file_name, int64_t size, bool is_dir,
+	                   const boost::posix_time::seconds& mod_time,
+	                   const remote_ptr& remote)
 	{
 		_parent = parent;
 		set_name(file_name);
@@ -28,7 +28,7 @@ namespace iridium::rclone
 		_remote = remote;
 	}
 
-	entity::file::file(file * parent, const std::string & file_name, const remote_ptr & remote)
+	entity::file::file(file * parent, const std::string& file_name, const remote_ptr& remote)
 	{
 		_parent = parent;
 		set_name(file_name);
@@ -60,6 +60,16 @@ namespace iridium::rclone
 
 	auto entity::file::operator!=(const file& rhs) const -> bool { return !(rhs == *this); }
 
+	void entity::file::add_child(const std::shared_ptr<file>& child) { _children.push_back(child); }
+
+	void entity::file::add_child_if_not_exist(const std::shared_ptr<file>& child)
+	{
+		for (const auto& f: _children)
+			if (*f == *child)
+				return;
+		add_child(child);
+	}
+
 	auto entity::file::operator==(const file& rhs) const -> bool
 	{
 		return _name == rhs._name &&
@@ -70,9 +80,9 @@ namespace iridium::rclone
 	}
 
 	auto
-	entity::file::create_shared_ptr(file * parent, const std::string& name_file, uint64_t size, bool is_dir,
-                                    boost::posix_time::ptime mod_time,
-                                    const remote_ptr& remote) -> std::shared_ptr<file>
+	entity::file::create_shared_ptr(file * parent, const std::string& name_file, int64_t size, bool is_dir,
+	                                boost::posix_time::ptime mod_time,
+	                                const remote_ptr& remote) -> std::shared_ptr<file>
 	{
 		return std::make_shared<file>(parent, name_file, size, is_dir, mod_time, remote);
 	}
