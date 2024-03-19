@@ -3,6 +3,7 @@
 #include "../entities/entity.hpp"
 #include <functional>
 #include <string>
+#include <memory>
 
 namespace iridium::rclone::parser
 {
