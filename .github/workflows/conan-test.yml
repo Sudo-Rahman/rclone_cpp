@@ -9,8 +9,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name : Install Rclone
-        run: apt install rclone
+      - name: Install Rclone
+        run: sudo apt-get update && sudo apt-get install -y rclone
 
       - name: Install Conan
         run: pip install conan
@@ -18,6 +18,5 @@ jobs:
       - name: Conan Install and Test
         run: |
           conan profile detect --force
-          conan install . -of build --build=missing
-          conan create .
-
+          conan install . --install-folder=build --build=missing
+          conan create . --test-folder=None
