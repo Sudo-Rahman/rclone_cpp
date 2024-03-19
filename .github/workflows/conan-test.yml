@@ -9,6 +9,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name : Install Rclone
+        run: apt install rclone
+
       - name: Install Conan
         run: pip install conan
 
