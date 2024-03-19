@@ -18,6 +18,9 @@ namespace iridium::rclone
 		return _name;
 	}
 
+	/**
+	 * @return name and ":" if it doesn't end with ":"
+	 */
 	auto entity::remote::root_path() const -> std::string
 	{
 		if (not _name.ends_with(":"))
@@ -25,7 +28,10 @@ namespace iridium::rclone
 		return _name;
 	}
 
-	auto entity::remote::full_path() const -> std::string { return name() + ":" + path(); }
+	/**
+	 * @return  root_path() + path()
+	 */
+	auto entity::remote::full_path() const -> std::string { return root_path() + path(); }
 
 	auto operator<<(std::ostream& os, const entity::remote& remote) -> std::ostream&
 	{

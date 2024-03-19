@@ -18,9 +18,9 @@ namespace iridium::rclone
 	public:
 		explicit config_create(process * process);
 
-		//[[nodiscard]] auto process() const -> rclone::process&;
+		[[nodiscard]] auto get_process() const -> process&;
 
-		auto execute() const -> rclone::process&;
+		auto execute() const -> process&;
 
 		auto name(const std::string& name) -> config_create&;
 

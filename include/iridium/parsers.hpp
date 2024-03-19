@@ -26,3 +26,6 @@ namespace iridium::rclone::parser
 
     class RCLONE_CPP_EXPORT version_parser;
 } // namespace iridium::rclone::parser
+
+namespace ir = iridium::rclone;
+namespace irp = iridium::rclone::parser;

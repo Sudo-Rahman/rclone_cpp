@@ -27,3 +27,6 @@ namespace iridium::rclone::option
 
     class RCLONE_CPP_EXPORT logging;
 }
+
+namespace ir = iridium::rclone;
+namespace iro = iridium::rclone::option;

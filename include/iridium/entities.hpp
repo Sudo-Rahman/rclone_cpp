@@ -27,3 +27,6 @@ namespace iridium::rclone
 
 	struct  RCLONE_CPP_EXPORT version;
 }
+
+namespace ir = iridium::rclone;
+using ire = iridium::rclone::entity;

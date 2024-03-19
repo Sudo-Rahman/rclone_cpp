@@ -1,4 +1,4 @@
-name: Conan Test Workflow
+name: Build and Test
 
 on: [push, pull_request]
 

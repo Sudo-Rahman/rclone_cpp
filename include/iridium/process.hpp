@@ -18,3 +18,4 @@ namespace iridium::rclone
     class RCLONE_CPP_EXPORT process_pool;
 
 }
+namespace ir = iridium::rclone;
