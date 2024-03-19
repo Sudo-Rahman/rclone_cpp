@@ -16,7 +16,7 @@ namespace iridium::rclone
 	}
 
 	config_create::config_create(rclone::process * process) : _process(process){}
-
+/*
 	auto config_create::process() const -> rclone::process&
 	{
 		check_attributes();
@@ -24,6 +24,7 @@ namespace iridium::rclone
 		_process->_args.insert(_process->_args.end(), _params.begin(), _params.end());
 		return *_process;
 	}
+ */
 
 	auto config_create::execute() const -> rclone::process&
 	{
