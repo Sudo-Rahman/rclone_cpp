@@ -1,4 +1,4 @@
-# rclone_cpp [![Build](https://github.com/Sudo-Rahman/rclone_cpp/actions/workflows/conan-test.yml/badge.svg)](https://github.com/Sudo-Rahman/rclone_cpp/actions/workflows/conan-test.yml)
+# rclone_cpp [![Build and Test](https://github.com/Sudo-Rahman/rclone_cpp/actions/workflows/build_and_test.yml/badge.svg)](https://github.com/Sudo-Rahman/rclone_cpp/actions/workflows/build_and_test.yml)
 
 rclone_cpp is a C++ library for rclone. Execute rclone commands, add parser to transform the output of command on object,
 add options to the command, etc.
