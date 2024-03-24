@@ -24,10 +24,10 @@ namespace iridium::rclone
 		enum class state : uint8_t
 		{
 			not_launched,
-            running,
-            finished,
-            stopped = finished,
-            error = finished
+			running,
+			finished,
+			stopped = finished,
+			error = finished
 		};
 
 		/**
@@ -48,11 +48,13 @@ namespace iridium::rclone
 
 		auto execute() -> process&;
 
+		auto get() -> process* { return this; };
+
 		[[nodiscard]] auto exit_code() const -> int;
 
 		[[nodiscard]] auto get_state() const -> state { return _state; }
 
-        [[nodiscard]] auto is_running() -> bool { return _state == state::running;}
+		[[nodiscard]] auto is_running() const -> bool { return _state == state::running; }
 
 		[[nodiscard]] auto get_output() const -> std::vector<std::string> { return _output; }
 
@@ -75,7 +77,10 @@ namespace iridium::rclone
 		template<class T>
 		auto every_line_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process&
 		{
-			_signal_every_line->connect([this, parser = std::move(parser)](const std::string& line) {parser->parse(line); });
+			_signal_every_line->connect([this, parser = std::move(parser)](const std::string& line)
+			{
+				parser->parse(line);
+			});
 			return *this;
 		}
 
@@ -86,7 +91,10 @@ namespace iridium::rclone
 		template<class T>
 		auto on_finish_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process&
 		{
-			_signal_finish->connect([this, parser = std::move(parser)](int) { parser->parse(boost::algorithm::join(_output, endl)); });
+			_signal_finish->connect([this, parser = std::move(parser)](int)
+			{
+				parser->parse(boost::algorithm::join(_output, endl));
+			});
 			return *this;
 		}
 
@@ -103,6 +111,7 @@ namespace iridium::rclone
 		auto config() -> process&;
 
 		auto config_create() -> config_create;
+
 		friend class config_create;
 
 		auto lsjson(const entity::remote& remote) -> process&;
@@ -142,15 +151,17 @@ namespace iridium::rclone
 
 		auto clean_up(const entity::remote& remote) -> process&;
 
-		auto copy_url(const std::string &url, const entity::file& destination) -> process&;
+		auto copy_url(const std::string& url, const entity::file& destination) -> process&;
 
 
-        /**
-         * @brief Compare the source and destination and check if the files are the same
-         */
+		/**
+		 * @brief Compare the source and destination and check if the files are the same
+		 */
 		auto check(const entity::file& source, const entity::file& destination) -> process&;
 
 		auto add_option(const option::basic_option& option) -> process&;
+
+		auto add_option(const std::vector<option::basic_option>& option) -> process&;
 
 		template<class... Args>
 		auto add_option(const option::basic_option& option1, Args&&... args) -> process&
@@ -162,14 +173,14 @@ namespace iridium::rclone
 
 		static void add_global_option(const option::basic_option& option);
 
+		static void add_global_option(const std::vector<option::basic_option>& option);
+
 		template<class... Args>
 		static void add_global_option(const option::basic_option& option1, Args&&... args)
 		{
 			add_global_option(option1);
 			add_global_option(std::forward<Args>(args)...);
 		}
-
-		static auto create_unique_ptr() -> std::unique_ptr<process>;
 
 	private:
 		static std::string _path_rclone;
@@ -203,5 +214,8 @@ namespace iridium::rclone
 		std::unique_ptr<boost::signals2::signal<void(const std::string& line)>> _signal_every_line;
 		std::unique_ptr<boost::signals2::signal<void(int)>> _signal_finish;
 		std::unique_ptr<boost::signals2::signal<void()>> _signal_start;
-    };
+	};
+
+	using process_ptr = std::shared_ptr<process>;
+	using process_uptr = std::unique_ptr<process>;
 } // namespace iridium::rclone

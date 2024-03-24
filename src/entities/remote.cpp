@@ -6,10 +6,7 @@
 
 namespace iridium::rclone
 {
-	entity::remote::remote(std::string name, remote_type type, std::string path) : _name(std::move(name)), _type(type)
-	{
-		set_path(std::move(path));
-	}
+	entity::remote::remote(const std::string &name,remote_type type,const std::string& path) : _name(name), _type(type), _path(path) {}
 
 	auto entity::remote::name() const -> std::string
 	{
@@ -42,11 +39,9 @@ namespace iridium::rclone
 		return os;
 	}
 
-	void entity::remote::set_path(std::string path)
+	void entity::remote::set_path(const std::string &path)
 	{
-		_path = std::move(path);
-		if (_path.ends_with("/"))
-			_path = _path.substr(0, _path.size() - 1);
+		_path = path;
 	}
 
 	auto entity::remote::operator==(const remote& remote) const -> bool
@@ -59,17 +54,15 @@ namespace iridium::rclone
 	auto entity::remote::operator!=(const remote& remote) const -> bool { return !(remote == *this); }
 
 	auto
-	entity::remote::create_shared_ptr(std::string name, remote_type type,
-                                      std::string path) -> std::shared_ptr<entity::remote>
+	entity::remote::create_shared_ptr(const std::string &name,remote_type type,const std::string& path) -> std::shared_ptr<entity::remote>
 	{
-		return std::make_shared<remote>(std::move(name), type, std::move(path));
+		return std::make_shared<remote>(name, type, path);
 	}
 
 	auto
-	entity::remote::create_unique_ptr(std::string name, remote_type type,
-                                      std::string path) -> std::unique_ptr<entity::remote>
+	entity::remote::create_unique_ptr(const std::string &name,remote_type type,const std::string& path) -> std::unique_ptr<entity::remote>
 	{
-		return std::make_unique<remote>(std::move(name), type, std::move(path));
+		return std::make_unique<remote>(name, type, path);
 	}
 
 	auto entity::remote::remote_type_to_string(const remote_type & type) -> const std::string

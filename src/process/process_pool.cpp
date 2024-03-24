@@ -4,21 +4,22 @@
 namespace iridium::rclone
 {
 
-    process_pool::process_pool(size_t simultaneous_processes)
+    process_pool::process_pool(uint16_t simultaneous_processes)
             : _simultaneous_processes(simultaneous_processes)
     {
         _thread = boost::thread([this]
                                 {
                                     while (true) {
-                                        std::unique_lock<std::mutex> lock(_process_mutex);
+                                        std::unique_lock lock(_process_mutex);
                                         _cv_process.wait(lock, [this]
                                         {
                                             boost::this_thread::interruption_point();
                                             return _running_processes < _simultaneous_processes
-                                                   and not _processes.empty() and _executed_processes < _processes.size();
+                                                   and not _processes.empty() and _executed_processes < _processes.size() and get_process() != nullptr;
                                         });
+                                        std::cout << "process found" << std::endl;
                                         boost::this_thread::interruption_point();
-                                        auto process = get_process();
+                                        auto *process = get_process();
                                         if (process == nullptr) {
                                             continue;
                                         }
@@ -27,9 +28,9 @@ namespace iridium::rclone
                                                                _running_processes--;
                                                                _executed_processes++;
                                                                _cv_process.notify_one();
-
                                                            });
                                         process->execute();
+                                        std::cout << "process started" << std::endl;
                                         _running_processes++;
                                     }
                                 });
@@ -39,6 +40,8 @@ namespace iridium::rclone
     auto process_pool::add_process(std::unique_ptr<process> &&process) -> void
     {
         lock();
+        if(_state == stopped)
+            throw std::runtime_error("process pool is stopped");
         _processes.push_back(std::move(process));
         _cv_process.notify_one();
         unlock();
@@ -53,24 +56,34 @@ namespace iridium::rclone
         for (auto &process: _processes)
             if (process->is_running())
                 process->stop();
+        _state = stopped;
+        unlock();
+    }
+
+    void process_pool::stop_all_processes()
+    {
+        lock();
+        for (auto &process: _processes)
+            if (process->is_running())
+                process->stop();
         unlock();
     }
 
     void process_pool::wait()
     {
-        std::unique_lock<std::mutex> lock(_mutex);
+        std::unique_lock lock(_mutex);
         _cv.wait(lock, [this]
         {
             return _executed_processes == _processes.size();
         });
     }
 
-    bool process_pool::empty() const
+    auto process_pool::empty() const -> bool
     {
         return _processes.empty();
     }
 
-    uint16_t process_pool::size() const
+    auto process_pool::size() const -> uint16_t
     {
         return _processes.size();
     }
@@ -82,9 +95,14 @@ namespace iridium::rclone
         unlock();
     }
 
-    void process_pool::stop_and_clear()
+    auto process_pool::set_simultaneous_processes(uint16_t simultaneous_processes) -> void
     {
-        stop();
+        _simultaneous_processes = simultaneous_processes;
+    }
+
+    void process_pool::stop_all_processes_and_clear()
+    {
+        stop_all_processes();
         clear_pool();
     }
 
@@ -95,7 +113,7 @@ namespace iridium::rclone
 
     void process_pool::lock()
     {
-        std::unique_lock<std::mutex> lock(_mutex);
+        std::unique_lock lock(_mutex);
         _cv.wait(lock, [this] { return _operation == operation::none; });
         _operation = operation::lock;
     }

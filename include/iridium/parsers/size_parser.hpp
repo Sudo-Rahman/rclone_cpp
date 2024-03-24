@@ -1,6 +1,6 @@
 #pragma once
 
-#include "parsers.hpp"
+#include "basic_parser.hpp"
 #include "../entities/size.hpp"
 
 namespace iridium::rclone::parser

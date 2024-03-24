@@ -44,7 +44,7 @@ namespace iridium::rclone
 
 		[[nodiscard]] auto pointer() -> file* { return this; }
 
-		void set_name(const std::string& path);
+		void set_name(const std::string& name);
 
 		void set_remote(const remote_ptr& remote) { _remote = remote; }
 
@@ -80,6 +80,8 @@ namespace iridium::rclone
 		                  boost::posix_time::ptime mod_time, const remote_ptr& remote) -> std::shared_ptr<file>;
 
 		file() = default;
+
+		virtual ~file() = default;
 
 	private:
 		std::string _name;

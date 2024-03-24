@@ -73,9 +73,9 @@ namespace iridium::rclone::option
 		template<class... Args>
 		static auto filter_file(const std::string& value, Args&&... args) -> filter
 		{
-			auto f = filter("--filter=" + value);
+			auto f = filter_file(value);
 			for (const std::string& arg: {args...})
-				f._options.push_back("--filter=" + arg);
+				f._options.push_back(filter_file(arg)._options[0]);
 			return f;
 		}
 

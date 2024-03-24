@@ -6,7 +6,8 @@
 
 namespace iridium::rclone
 {
-    class process_pool {
+    class process_pool
+    {
         std::vector<std::unique_ptr<process>> _processes;
         uint16_t _simultaneous_processes{};
         std::atomic<uint16_t> _running_processes = 0;
@@ -20,13 +21,21 @@ namespace iridium::rclone
         std::mutex _mutex;
         std::condition_variable _cv;
 
-        process_pool() = default;
 
         enum class operation : uint8_t
         {
             none,
             lock,
         };
+
+        enum  state
+        {
+            running,
+            stopped,
+        };
+
+
+        state _state = running;
         std::atomic<operation> _operation = operation::none;
 
         void lock();
@@ -37,8 +46,10 @@ namespace iridium::rclone
 
     public:
 
+        process_pool() = delete;
+
         /// @brief Construct a process pool with a maximum number of simultaneous processes
-        explicit process_pool(size_t simultaneous_processes);
+        explicit process_pool(uint16_t simultaneous_processes);
 
         ~process_pool();
 
@@ -46,29 +57,54 @@ namespace iridium::rclone
 
         process_pool(process_pool &&) = delete;
 
+
         auto operator=(const process_pool &) -> process_pool & = delete;
 
         auto operator=(process_pool &&) -> process_pool & = delete;
 
-        /// @brief Add a process to the pool
+        /**
+         * @brief Add a process to the pool
+         * @param process
+         */
         auto add_process(std::unique_ptr<process> &&process) -> void;
 
-        /// @brief Clear all processes from the pool
+        /**
+         * @brief Clear all processes from the pool
+         */
         void clear_pool();
 
-        /// @brief Get the number of processes in the pool
+        auto set_simultaneous_processes(uint16_t simultaneous_processes) -> void;
+
+        /**
+         * @brief Get the number of processes in the pool
+         * @return the number of processes in the pool
+         */
         [[nodiscard]] uint16_t size() const;
 
-        /// @brief Check if the pool is empty
+        /**
+         * @brief Check if the pool is empty
+         * @return true if the pool is empty
+         */
         [[nodiscard]] bool empty() const;
 
-        /// @brief Wait for all processes to finish
+        /**
+		 * @brief wait for all processes to finish
+		 */
         void wait();
 
-        /// @brief stop all processes
+        /**
+		 * @brief stop pool and all processes
+		 */
         void stop();
 
-        /// @brief stop all processes and clear the pool
-        void stop_and_clear();
+        /**
+         * @brief stop all processes
+         */
+        void stop_all_processes();
+
+        /**
+		 * @brief stop all processes and clear the pool
+		 */
+        void stop_all_processes_and_clear();
     };
 } // namespace iridium::rclone

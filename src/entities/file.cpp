@@ -112,9 +112,9 @@ namespace iridium::rclone
 		return std::regex_replace(path, regex, "/");
 	}
 
-	void entity::file::set_name(const std::string& path)
+	void entity::file::set_name(const std::string& name)
 	{
 		auto regex = std::regex(R"([/]{2,})");
-		_name = std::regex_replace(path, regex, "/");
+		_name = std::regex_replace(name, regex, "/");
 	}
 } // Iridium::rclone

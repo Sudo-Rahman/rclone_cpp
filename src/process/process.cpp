@@ -124,7 +124,8 @@ namespace iridium::rclone
 			_out = std::make_unique<bp::ipstream>();
 			_err = std::make_unique<bp::ipstream>();
 			_child = bp::child(
-				_path_rclone, bp::args(_args),
+				bp::exe(_path_rclone),
+				bp::args(_args),
 				bp::std_in < *_in, bp::std_out > *_out,
 				bp::std_err > *_err);
 		}
@@ -398,7 +399,19 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	void process::add_global_option(const option::basic_option& option) { process::_global_options.push_back(option); }
+	auto process::add_option(const std::vector<option::basic_option> & options) -> process &
+	{
+		for (const auto& option: options)
+			_local_options.push_back(option);
+		return *this;
+	}
 
-	auto process::create_unique_ptr() -> std::unique_ptr<process> { return std::make_unique<process>(); }
+	void process::add_global_option(const std::vector<option::basic_option> & options)
+	{
+		for (const auto& option: options)
+			_global_options.push_back(option);
+	}
+
+	void process::add_global_option(const option::basic_option& option) { _global_options.push_back(option); }
+
 } // namespace iridium::rclone

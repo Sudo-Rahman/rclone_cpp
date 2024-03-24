@@ -20,7 +20,7 @@ namespace iridium::rclone
 
 		remote() = default;
 
-		remote(std::string name, remote_type type, std::string path);
+		remote(const std::string &name,remote_type type,const std::string& path);
 
 		remote(const remote& remote) = default;
 
@@ -30,7 +30,7 @@ namespace iridium::rclone
 
 		auto operator=(remote&& remote) -> entity::remote& = default;
 
-		~remote() = default;
+		virtual ~remote() = default;
 
 		[[nodiscard]] auto name() const -> std::string;
 
@@ -47,7 +47,7 @@ namespace iridium::rclone
 
 		void set_type(remote_type type) { _type = type; }
 
-		void set_path(std::string path);
+		void set_path(const std::string& path);
 
 		auto operator==(const remote& remote) const -> bool;
 
@@ -55,9 +55,9 @@ namespace iridium::rclone
 
 		friend auto operator<<(std::ostream& os, const remote& remote) -> std::ostream&;
 
-		static auto create_shared_ptr(std::string name, remote_type type, std::string path) -> std::shared_ptr<remote>;
+		static auto create_shared_ptr(const std::string &name,remote_type type,const std::string& path) -> std::shared_ptr<remote>;
 
-		static auto create_unique_ptr(std::string name, remote_type type, std::string path) -> std::unique_ptr<remote>;
+		static auto create_unique_ptr(const std::string &name,remote_type type,const std::string& path) -> std::unique_ptr<remote>;
 
 	private:
 		std::string _name;

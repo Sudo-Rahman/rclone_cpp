@@ -12,11 +12,6 @@ namespace iridium::rclone::option
 
 		virtual ~basic_option() = default;
 
-	protected:
-		std::vector<std::string> _options;
-
-		basic_option() = default;
-
 		basic_option(const basic_option&) = default;
 
 		basic_option(basic_option&&) = default;
@@ -24,6 +19,12 @@ namespace iridium::rclone::option
 		auto operator=(const basic_option&) -> basic_option& = default;
 
 		auto operator=(basic_option&&) -> basic_option& = default;
+	protected:
+
+		basic_option() = default;
+
+		std::vector<std::string> _options;
+
 
 		explicit basic_option(const std::string& option) { _options.push_back(option); }
 
@@ -38,7 +39,7 @@ namespace iridium::rclone::option
 		struct option_allocator : std::allocator<basic_option>
 		{
 			template<class U, class... Args>
-			void construct(U * p, Args&&... args) { ::new((void *)p) U(std::forward<Args>(args)...); }
+			void construct(U * p, Args&&... args) { ::new(static_cast<void *>(p)) U(std::forward<Args>(args)...); }
 
 			template<class U>
 			struct rebind
