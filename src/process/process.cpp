@@ -12,7 +12,7 @@ namespace iridium::rclone
 	std::string process::_path_rclone;
 	bool process::_is_initialized = false;
 	const std::string process::endl = "\n";
-	option::basic_option::vector process::_global_options = {};
+	option::vector process::_global_options = {};
 
 
 	auto process::initialize(const std::string& path_rclone) -> void
@@ -399,14 +399,14 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	auto process::add_option(const std::vector<option::basic_option> & options) -> process &
+	auto process::add_option(const option::vector & options) -> process &
 	{
 		for (const auto& option: options)
 			_local_options.push_back(option);
 		return *this;
 	}
 
-	void process::add_global_option(const std::vector<option::basic_option> & options)
+	void process::add_global_option(const option::vector & options)
 	{
 		for (const auto& option: options)
 			_global_options.push_back(option);

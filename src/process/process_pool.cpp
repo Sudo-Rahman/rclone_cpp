@@ -15,9 +15,8 @@ namespace iridium::rclone
                                         {
                                             boost::this_thread::interruption_point();
                                             return _running_processes < _simultaneous_processes
-                                                   and not _processes.empty() and _executed_processes < _processes.size() and get_process() != nullptr;
+                                                   and not _processes.empty() and _executed_processes < _processes.size() and get_process() not_eq nullptr;
                                         });
-                                        std::cout << "process found" << std::endl;
                                         boost::this_thread::interruption_point();
                                         auto *process = get_process();
                                         if (process == nullptr) {
@@ -30,7 +29,6 @@ namespace iridium::rclone
                                                                _cv_process.notify_one();
                                                            });
                                         process->execute();
-                                        std::cout << "process started" << std::endl;
                                         _running_processes++;
                                     }
                                 });
@@ -66,6 +64,8 @@ namespace iridium::rclone
         for (auto &process: _processes)
             if (process->is_running())
                 process->stop();
+        _running_processes = 0;
+        _executed_processes = 0;
         unlock();
     }
 

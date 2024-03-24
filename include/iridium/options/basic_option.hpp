@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -36,25 +37,14 @@ namespace iridium::rclone::option
 
 		friend class process;
 
-		struct option_allocator : std::allocator<basic_option>
-		{
-			template<class U, class... Args>
-			void construct(U * p, Args&&... args) { ::new(static_cast<void *>(p)) U(std::forward<Args>(args)...); }
-
-			template<class U>
-			struct rebind
-			{
-				using other = option_allocator;
-			};
-		};
-
-		friend struct option_allocator;
-
 	public:
-		using vector = std::vector<basic_option, option_allocator>;
 
 		static void add_option_to_vector(const basic_option& option, std::vector<std::string>& vector);
 
-		static void add_options_to_vector(const vector& options, std::vector<std::string>& vector);
+		static void add_options_to_vector(const std::vector<basic_option>& options, std::vector<std::string>& vector);
+
+		friend auto operator<<(std::ostream & os, const basic_option & obj) -> std::ostream &;
 	};
+
+	using vector = std::vector<basic_option>;
 }

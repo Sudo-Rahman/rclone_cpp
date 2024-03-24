@@ -10,6 +10,10 @@ using namespace boost::asio;
 using namespace std;
 using namespace iridium::rclone;
 
+process_pool pool{10};
+
+
+
 auto main() -> int
 {
     process::initialize();
@@ -32,15 +36,16 @@ auto main() -> int
     auto n = new int{0};
     auto remote = entity::remote::create_shared_ptr(
             "test", entity::remote::remote_type::google_drive, "");
+    std::cout << *remote << std::endl;
     auto file = entity::file{
             nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(),
             remote
     };
-    process::add_global_option(
+    rclone->add_option(
             option::listing::fast_list(),
-            option::logging::log_level("INFO")
+            option::logging::log_level("INFO"),
             // option::filter::max_depth(1000)
-            // option::filter::filter_file("- TP4.pdf", "+ *.pdf", "- *")
+            option::filter::filter_file("- TP4.pdf", "+ *.pdf", "- *")
 //        option::logging::progress(),
 //        option::logging::use_json_log(),
 //        option::logging::verbose()
@@ -145,26 +150,28 @@ auto main() -> int
         cout << *remote << endl;
     }
 
-    print(file);
+    for (auto option : rclone->get_options())
+    {
+        std::cout << option << std::endl;
+    }
 
-    // process_pool pool{10};
+    // print(file);
 
+    for (int i = 0; i < 4; ++i)
+    {
+        auto counter = int{0};
+        auto proc = std::make_unique<process>();
+        proc->list_remotes()
+        .on_finish([&](int exit) {
+            std::cout << counter++ << std::endl;
+        })
+        ;
+        pool.add_process(std::move(proc));
+    }
 
-//    for (int i = 0; i < 100; ++i)
-//    {
-//        auto counter = int{0};
-//        auto proc = new process();
-//        proc->list_remotes()
-//        .on_finish([&](int exit) {
-//            std::cout << counter++ << std::endl;
-//        })
-//        ;
-//        pool.add_process(std::unique_ptr<process>(proc));
-//    }
+    this_thread::sleep_for(std::chrono::milliseconds (1000));
 
-//    this_thread::sleep_for(std::chrono::milliseconds (1000));
-
-    // pool.wait();
+    pool.wait();
 
     delete rclone;
     delete n;

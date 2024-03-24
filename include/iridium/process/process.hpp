@@ -60,9 +60,9 @@ namespace iridium::rclone
 
 		[[nodiscard]] auto get_error() const -> std::vector<std::string> { return _error; }
 
-		[[nodiscard]] auto get_options() const -> option::basic_option::vector { return _local_options; }
+		[[nodiscard]] auto get_options() const -> option::vector { return _local_options; }
 
-		[[nodiscard]] static auto get_global_options() -> option::basic_option::vector { return _global_options; }
+		[[nodiscard]] static auto get_global_options() -> option::vector { return _global_options; }
 
 		auto stop() -> void;
 
@@ -161,7 +161,7 @@ namespace iridium::rclone
 
 		auto add_option(const option::basic_option& option) -> process&;
 
-		auto add_option(const std::vector<option::basic_option>& option) -> process&;
+		auto add_option(const option::vector& option) -> process&;
 
 		template<class... Args>
 		auto add_option(const option::basic_option& option1, Args&&... args) -> process&
@@ -173,7 +173,7 @@ namespace iridium::rclone
 
 		static void add_global_option(const option::basic_option& option);
 
-		static void add_global_option(const std::vector<option::basic_option>& option);
+		static void add_global_option(const option::vector& option);
 
 		template<class... Args>
 		static void add_global_option(const option::basic_option& option1, Args&&... args)
@@ -185,7 +185,7 @@ namespace iridium::rclone
 	private:
 		static std::string _path_rclone;
 		static bool _is_initialized;
-		static option::basic_option::vector _global_options;
+		static option::vector _global_options;
 
 		std::mutex _mutex;
 		std::condition_variable _cv;
@@ -205,7 +205,7 @@ namespace iridium::rclone
 		std::vector<std::string> _output;
 		std::vector<std::string> _error;
 
-		option::basic_option::vector _local_options;
+		option::vector _local_options;
 
 		auto read_output() -> void;
 
