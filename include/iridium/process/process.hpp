@@ -200,6 +200,7 @@ namespace iridium::rclone
 		/// 1 thread for wait child, 1 thread for reading output,
 		/// 1 thread for reading error and 2 last threads computing the signals for every line and finish
 		boost::asio::thread_pool _pool{5};
+		std::atomic_uint8_t _counter_read{0};
 
 		std::vector<std::string> _args;
 		std::vector<std::string> _output;

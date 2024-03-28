@@ -140,8 +140,8 @@ namespace iridium::rclone
 			(*_signal_start)();
 		_cv.notify_all();
 
-		ba::post(_pool, [this] { read_output(); });
-		ba::post(_pool, [this] { read_error(); });
+		ba::post(_pool, [this] { read_output();_counter_read++; });
+		ba::post(_pool, [this] { read_error();_counter_read++; });
 
 		ba::post(_pool, [this]
 		{
@@ -154,6 +154,8 @@ namespace iridium::rclone
 			if (_child.exit_code() == 0)
 				_state = state::finished;
 			else _state = state::error;
+			while(_counter_read < 2)
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			if (_signal_finish != nullptr)
 				(*_signal_finish)(_child.exit_code());
 			_cv.notify_all();
@@ -399,19 +401,18 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	auto process::add_option(const option::vector & options) -> process &
+	auto process::add_option(const option::vector& options) -> process&
 	{
 		for (const auto& option: options)
 			_local_options.push_back(option);
 		return *this;
 	}
 
-	void process::add_global_option(const option::vector & options)
+	void process::add_global_option(const option::vector& options)
 	{
 		for (const auto& option: options)
 			_global_options.push_back(option);
 	}
 
 	void process::add_global_option(const option::basic_option& option) { _global_options.push_back(option); }
-
 } // namespace iridium::rclone
