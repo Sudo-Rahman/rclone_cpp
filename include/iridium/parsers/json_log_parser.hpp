@@ -16,6 +16,10 @@ namespace iridium::rclone::parser
         auto parse(const std::string& data) const -> void override;
 
     private:
-        [[nodiscard]] static struct entity::json_log::stats parse_stats(const boost::json::object& obj) ;
+        [[nodiscard]] static auto parse_stats(const boost::json::object&) -> entity::json_log::stats ;
+
+        [[nodiscard]] static auto parse_transferring(const boost::json::value*) -> std::vector<entity::json_log::stats::transfer>;
+
+        [[nodiscard]] static auto parse_transfer(const boost::json::object&) -> entity::json_log::stats::transfer ;
     };
 } // namespace iridium::rclone

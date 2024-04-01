@@ -5,78 +5,102 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace iridium::rclone { namespace parser
-    {
-        class json_log_parser;
-    };
+	{
+		class json_log_parser;
+	};
 
-    class entity::json_log : public entity
-    {
-    public:
-        enum class log_level : uint8_t
-        {
-            info,
-            warning,
-            error,
-        };
+	class entity::json_log : public entity
+	{
+	public:
+		enum class log_level : uint8_t
+		{
+			info,
+			warning,
+			error,
+		};
 
-        struct stats;
+		struct stats;
 
-        json_log() = default;
+		json_log() = default;
 
-        virtual ~json_log();
+		json_log(const json_log&);
 
-        [[nodiscard]] auto level() const -> log_level { return _level; }
+		auto operator=(const json_log&) -> json_log&;
 
-        [[nodiscard]] auto message() const -> std::string { return _message; }
+		json_log(json_log&&) noexcept;
 
-        [[nodiscard]] auto source() const -> std::string { return _source; }
+		auto operator=(json_log&&) noexcept -> json_log& ;
 
-        [[nodiscard]] auto time() const -> boost::posix_time::ptime { return _time; }
+		virtual ~json_log();
 
-        [[nodiscard]] const struct json_log::stats* get_stats() const { return _stats; }
+		[[nodiscard]] auto level() const -> log_level { return _level; }
 
-        static auto string_to_level(const std::string& level) -> log_level;
+		[[nodiscard]] auto message() const -> std::string { return _message; }
 
-        static auto level_to_string(const log_level& level) -> std::string;
+		[[nodiscard]] auto source() const -> std::string { return _source; }
 
-        friend auto operator<<(std::ostream& os, const json_log& log) -> std::ostream&;
+		[[nodiscard]] auto object() const -> std::string { return _object; }
 
-        friend class parser::json_log_parser;
+		[[nodiscard]] auto object_type() const -> std::string { return _object_type; }
 
-    protected:
-        log_level _level{};
-        std::string _message;
-        std::string _source;
-        boost::posix_time::ptime _time;
-        struct stats * _stats{};
+		[[nodiscard]] auto time() const -> boost::posix_time::ptime { return _time; }
 
-    private:
-        [[nodiscard]] static struct json_log::stats create_stats();
-    };
+		[[nodiscard]] auto get_stats() const -> const stats* { return _stats; }
 
-    struct entity::json_log::stats
-    {
-        uint64_t bytes{};
-        uint64_t checks{};
-        uint64_t deletes{};
-        double_t elapsed_time{};
-        uint64_t errors{};
-        bool fatal_error{};
-        std::string last_error;
-        uint64_t renames{};
-        bool retry_error{};
-        double_t speed{};
-        double_t total_bytes{};
-        uint64_t total_checks{};
-        uint64_t total_transfers{};
-        double_t transfer_time{};
-        uint64_t transfers{};
+		static auto string_to_level(const std::string& level) -> log_level;
 
-        friend auto operator<<(std::ostream& os, const stats& stats) -> std::ostream&;
+		static auto level_to_string(const log_level& level) -> std::string;
 
-        friend class json_log;
+		friend auto operator<<(std::ostream& os, const json_log& log) -> std::ostream&;
 
-    private:
-        stats() = default;
-    };
+		friend class parser::json_log_parser;
+
+	protected:
+		log_level _level{};
+		std::string _message;
+		std::string _source;
+		std::string _object;
+		std::string _object_type;
+		boost::posix_time::ptime _time;
+		stats * _stats{};
+	};
+
+	struct entity::json_log::stats
+	{
+		struct transfer;
+
+		uint64_t bytes{};
+		uint64_t checks{};
+		uint64_t deletes{};
+		double_t elapsed_time{};
+		uint64_t errors{};
+		std::optional<uint64_t> eta;
+		bool fatal_error{};
+		std::string last_error;
+		uint64_t renames{};
+		bool retry_error{};
+		double_t speed{};
+		uint64_t total_bytes{};
+		uint64_t total_checks{};
+		uint64_t total_transfers{};
+		double_t transfer_time{};
+		std::vector<transfer> transferring;
+		uint64_t transfers{};
+
+		friend auto operator<<(std::ostream& os, const stats& stats) -> std::ostream&;
+	};
+
+	struct entity::json_log::stats::transfer
+	{
+		uint64_t bytes{};
+		std::optional<uint64_t> eta;
+		std::string group;
+		std::string name;
+		uint64_t percentage{};
+		uint64_t size{};
+		double_t speed{};
+		double_t speed_avg{};
+
+		friend auto operator<<(std::ostream& os, const transfer& transfer) -> std::ostream&;
+	};
 } // namespace iridium::rclone::entity

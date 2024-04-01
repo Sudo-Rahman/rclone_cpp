@@ -166,7 +166,7 @@ namespace iridium::rclone
 
 	auto process::stop() -> void
 	{
-		if (not is_running()) throw std::runtime_error("process not started");
+		if (not is_running()) throw std::runtime_error("process not running");
 		close_input_pipe();
 		_child.terminate();
 		if (is_running())
