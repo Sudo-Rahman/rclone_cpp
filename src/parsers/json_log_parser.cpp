@@ -62,7 +62,7 @@ namespace iridium::rclone::parser
 			stats.deletes = get_from_obj<uint64_t>(obj, "deletes");
 			stats.elapsed_time = get_from_obj<double_t>(obj, "elapsedTime");
 			stats.errors = get_from_obj<uint64_t>(obj, "errors");
-			stats.eta= get_from_obj<uint64_t>(obj, "eta");
+			stats.eta = get_from_obj_optional<uint64_t>(obj, "eta");
 			stats.fatal_error = get_from_obj<bool>(obj, "fatalError");
 			stats.last_error = get_from_obj<std::string>(obj, "lastError");
 			stats.renames = get_from_obj<uint64_t>(obj, "renames");
@@ -97,7 +97,7 @@ namespace iridium::rclone::parser
 	{
 		auto transfer = entity::json_log::stats::transfer();
 		transfer.bytes = get_from_obj<uint64_t>(obj, "bytes");
-		transfer.eta = get_from_obj<uint64_t>(obj, "eta");
+		transfer.eta = get_from_obj_optional<uint64_t>(obj, "eta");
 		transfer.group = get_from_obj<std::string>(obj, "group");
 		transfer.name = get_from_obj<std::string>(obj, "name");
 		transfer.percentage = get_from_obj<uint64_t>(obj, "percentage");

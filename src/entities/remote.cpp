@@ -6,7 +6,28 @@
 
 namespace iridium::rclone
 {
-	entity::remote::remote(const std::string &name,remote_type type,const std::string& path) : _name(name), _type(type), _path(path) {}
+	entity::remote::remote(const std::string& name, remote_type type, const std::string& path) : _name(name),
+		_type(type), _path(path) {}
+
+	entity::remote::remote(remote&& remote) noexcept
+	{
+		_name = std::move(remote._name);
+		_type = remote._type;
+		remote._type = none;
+		_path = std::move(remote._path);
+	}
+
+	auto entity::remote::operator=(remote&& remote) noexcept -> entity::remote&
+	{
+		if (this == &remote) return *this;
+
+		_name = std::move(remote._name);
+		_type = remote._type;
+		remote._type = none;
+		_path = std::move(remote._path);
+
+		return *this;
+	}
 
 	auto entity::remote::name() const -> std::string
 	{
@@ -39,10 +60,7 @@ namespace iridium::rclone
 		return os;
 	}
 
-	void entity::remote::set_path(const std::string &path)
-	{
-		_path = path;
-	}
+	void entity::remote::set_path(const std::string& path) { _path = path; }
 
 	auto entity::remote::operator==(const remote& remote) const -> bool
 	{
@@ -54,20 +72,22 @@ namespace iridium::rclone
 	auto entity::remote::operator!=(const remote& remote) const -> bool { return !(remote == *this); }
 
 	auto
-	entity::remote::create_shared_ptr(const std::string &name,remote_type type,const std::string& path) -> std::shared_ptr<entity::remote>
+	entity::remote::create_shared_ptr(const std::string& name, remote_type type,
+	                                  const std::string& path) -> std::shared_ptr<entity::remote>
 	{
 		return std::make_shared<remote>(name, type, path);
 	}
 
 	auto
-	entity::remote::create_unique_ptr(const std::string &name,remote_type type,const std::string& path) -> std::unique_ptr<entity::remote>
+	entity::remote::create_unique_ptr(const std::string& name, remote_type type,
+	                                  const std::string& path) -> std::unique_ptr<entity::remote>
 	{
 		return std::make_unique<remote>(name, type, path);
 	}
 
-	auto entity::remote::remote_type_to_string(const remote_type & type) -> const std::string
+	auto entity::remote::remote_type_to_string(const remote_type& type) -> const std::string
 	{
-		for (const auto &pair : string_to_remote_type)
+		for (const auto& pair: string_to_remote_type)
 		{
 			if (pair.second == type)
 				return pair.first;

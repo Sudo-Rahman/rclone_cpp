@@ -16,6 +16,7 @@ namespace iridium::rclone
         uint64_t other{};
 
         friend auto operator<<(std::ostream &os, const about &about) -> std::ostream &;
+
     };
 
 } // namespace Iridium::process

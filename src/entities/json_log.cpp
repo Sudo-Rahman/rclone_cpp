@@ -36,11 +36,13 @@ namespace iridium::rclone
 	entity::json_log::json_log(json_log &&log) noexcept
 	{
 		_level = log._level;
+		log._level = log_level::no_level;
 		_message = std::move(log._message);
 		_source = std::move(log._source);
 		_object = std::move(log._object);
 		_object_type = std::move(log._object_type);
 		_time = log._time;
+		log._time = boost::posix_time::not_a_date_time;
 		_stats = log._stats;
 		log._stats = nullptr;
 	}
@@ -51,11 +53,13 @@ namespace iridium::rclone
 			return *this;
 
 		_level = log._level;
+		log._level = log_level::no_level;
 		_message = std::move(log._message);
 		_source = std::move(log._source);
 		_object = std::move(log._object);
 		_object_type = std::move(log._object_type);
 		_time = log._time;
+		log._time = boost::posix_time::not_a_date_time;
 		_stats = log._stats;
 		log._stats = nullptr;
 
@@ -73,7 +77,7 @@ namespace iridium::rclone
 			return log_level::warning;
 		if (level == "error")
 			return log_level::error;
-		return log_level::info;
+		return log_level::no_level;
 	}
 
 	auto operator<<(std::ostream& os, const entity::json_log& log) -> std::ostream&
@@ -111,8 +115,9 @@ namespace iridium::rclone
 				return "warning";
 			case log_level::error:
 				return "error";
+			default:
+				return "no_level";
 		}
-		return "info";
 	}
 
 	auto operator<<(std::ostream& os, const entity::json_log::stats& stats) -> std::ostream&

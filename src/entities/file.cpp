@@ -87,6 +87,39 @@ namespace iridium::rclone
 		return std::make_shared<file>(parent, name_file, size, is_dir, mod_time, remote);
 	}
 
+	entity::file::file(file&& file) noexcept
+	{
+		_parent = file._parent;
+		file._parent = nullptr;
+		_name = std::move(file._name);
+		_size = file._size;
+		file._size = 0;
+		_is_dir = file._is_dir;
+		file._is_dir = false;
+		_mod_time = file._mod_time;
+		file._mod_time = boost::posix_time::not_a_date_time;
+		_remote = std::move(file._remote);
+		_children = std::move(file._children);
+	}
+
+	auto entity::file::operator=(file&& f) noexcept -> file&
+	{
+		if (this == &f) return *this;
+		_parent = f._parent;
+		f._parent = nullptr;
+		_name = std::move(f._name);
+		_size = f._size;
+		f._size = 0;
+		_is_dir = f._is_dir;
+		f._is_dir = false;
+		_mod_time = f._mod_time;
+		f._mod_time = boost::posix_time::not_a_date_time;
+		_remote = std::move(f._remote);
+		_children = std::move(f._children);
+
+		return *this;
+	}
+
 
 	auto entity::file::absolute_path() const -> std::string
 	{
@@ -111,6 +144,21 @@ namespace iridium::rclone
 		auto regex = std::regex(R"([/]{2,})");
 		return std::regex_replace(path, regex, "/");
 	}
+
+	auto entity::file::parent_dir()const -> std::string
+	{
+		if(_parent not_eq nullptr)
+			return _parent->path();
+		return "";
+	}
+
+	auto entity::file::parent_absolute_dir() const -> std::string
+	{
+		if(_parent not_eq nullptr)
+			return _parent->absolute_path();
+		return "";
+	}
+
 
 	void entity::file::set_name(const std::string& name)
 	{

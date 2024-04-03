@@ -32,6 +32,10 @@ namespace iridium::rclone
 
 		[[nodiscard]] auto parent() -> file* { return _parent; }
 
+		[[nodiscard]] auto parent_dir() const-> std::string;
+
+		[[nodiscard]] auto parent_absolute_dir() const-> std::string;
+
 		[[nodiscard]] auto nb_chilchren() const -> uint32_t
 		{
 			if (_is_dir) { return _children.size(); }
@@ -82,6 +86,12 @@ namespace iridium::rclone
 		file() = default;
 
 		virtual ~file() = default;
+
+		file(const file&) = default;
+		auto operator=(const file&) -> file & = default;
+
+		file(file&&) noexcept;
+		auto operator=(file&&) noexcept -> file&;
 
 	private:
 		std::string _name;

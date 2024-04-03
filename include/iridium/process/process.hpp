@@ -19,7 +19,7 @@ namespace iridium::rclone
 	public:
 		process();
 
-		~process();
+		~process() noexcept;
 
 		enum class state : uint8_t
 		{
@@ -63,6 +63,8 @@ namespace iridium::rclone
 		[[nodiscard]] auto get_options() const -> option::vector { return _local_options; }
 
 		[[nodiscard]] static auto get_global_options() -> option::vector { return _global_options; }
+
+		[[nodiscard]] auto commands() const -> std::string;
 
 		auto stop() -> void;
 

@@ -15,6 +15,7 @@ namespace iridium::rclone { namespace parser
 	public:
 		enum class log_level : uint8_t
 		{
+			no_level,
 			info,
 			warning,
 			error,

@@ -24,11 +24,11 @@ namespace iridium::rclone
 
 		remote(const remote& remote) = default;
 
-		remote(remote&& remote) = default;
+		remote(remote&& remote) noexcept;
 
 		auto operator=(const remote& remote) -> entity::remote& = default;
 
-		auto operator=(remote&& remote) -> entity::remote& = default;
+		auto operator=(remote&& remote) noexcept -> entity::remote&;
 
 		virtual ~remote() = default;
 

@@ -140,8 +140,16 @@ namespace iridium::rclone
 			(*_signal_start)();
 		_cv.notify_all();
 
-		ba::post(_pool, [this] { read_output();_counter_read++; });
-		ba::post(_pool, [this] { read_error();_counter_read++; });
+		ba::post(_pool, [this]
+		{
+			read_output();
+			_counter_read++;
+		});
+		ba::post(_pool, [this]
+		{
+			read_error();
+			_counter_read++;
+		});
 
 		ba::post(_pool, [this]
 		{
@@ -154,7 +162,7 @@ namespace iridium::rclone
 			if (_child.exit_code() == 0)
 				_state = state::finished;
 			else _state = state::error;
-			while(_counter_read < 2)
+			while (_counter_read < 2)
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			if (_signal_finish != nullptr)
 				(*_signal_finish)(_child.exit_code());
@@ -162,6 +170,14 @@ namespace iridium::rclone
 		});
 
 		return *this;
+	}
+
+	auto process::commands() const -> std::string
+	{
+		auto args = _args;
+		option::basic_option::add_options_to_vector(_global_options, args);
+		option::basic_option::add_options_to_vector(_local_options, args);
+		return boost::algorithm::join(args, " ");
 	}
 
 	auto process::stop() -> void
@@ -185,7 +201,7 @@ namespace iridium::rclone
 	}
 
 
-	process::~process()
+	process::~process() noexcept
 	{
 		if (_state == state::running)
 		{

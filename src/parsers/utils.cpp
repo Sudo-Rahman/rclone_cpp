@@ -6,13 +6,21 @@ auto get_from_obj(const boost::json::object& obj, const std::string& key) -> T
 {
 	const auto * it = obj.if_contains(key);
 	if (it)
+		return boost::json::value_to<T>(obj.at(key));
+	return T();
+}
+
+template<class T>
+auto get_from_obj_optional(const boost::json::object& obj, const std::string& key) -> std::optional<T>
+{
+	const auto * it = obj.if_contains(key);
+	if (it)
 	{
 		auto val = boost::json::try_value_to<T>(obj.at(key));
 		if (val)
 			return *val;
-		return T();
 	}
-	return T();
+	return std::nullopt;
 }
 
 
