@@ -36,9 +36,6 @@ namespace iridium::rclone
 
 	auto process_pool::add_process(std::unique_ptr<process>&& process, priority priority) -> void
 	{
-		for (const auto& pair: _processes)
-			std::cout << pair.first << std::endl;
-		std::cout << std::endl;
 		lock();
 		if (_state == stopped)
 			throw std::runtime_error("process pool is stopped");
