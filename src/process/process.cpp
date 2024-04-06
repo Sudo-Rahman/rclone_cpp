@@ -430,5 +430,10 @@ namespace iridium::rclone
 			_global_options.push_back(option);
 	}
 
+	void process::clear_global_options()
+	{
+		_global_options.clear();
+	}
+
 	void process::add_global_option(const option::basic_option& option) { _global_options.push_back(option); }
 } // namespace iridium::rclone

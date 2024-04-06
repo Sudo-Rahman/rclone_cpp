@@ -184,6 +184,8 @@ namespace iridium::rclone
 			add_global_option(std::forward<Args>(args)...);
 		}
 
+		static void clear_global_options();
+
 	private:
 		static std::string _path_rclone;
 		static bool _is_initialized;

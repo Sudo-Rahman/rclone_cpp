@@ -66,18 +66,6 @@ namespace iridium::rclone::option
 		 */
 		static auto filter_file(const std::string& value) -> filter { return filter("--filter=" + value); }
 
-		/**
-         * @brief Add a file filtering rule
-         * @return filter
-         */
-		template<class... Args>
-		static auto filter_file(const std::string& value, Args&&... args) -> filter
-		{
-			auto f = filter_file(value);
-			for (const std::string& arg: {args...})
-				f._options.push_back(filter_file(arg)._options[0]);
-			return f;
-		}
 
 		/**
 		 * @brief Read file filtering patterns from a file (use - to read from stdin)
