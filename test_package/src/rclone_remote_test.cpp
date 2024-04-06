@@ -54,6 +54,9 @@ BOOST_AUTO_TEST_SUITE(Suite)
         entity::remote r("TestRemote", entity::remote::google_drive, "/tests/path");
         entity::remote remoteCopy(std::move(r));
 
+        BOOST_CHECK_EQUAL(r.name(), "");
+        BOOST_CHECK_EQUAL(r.type(), entity::remote::none);
+        BOOST_CHECK_EQUAL(r.path(), "");
         BOOST_CHECK_EQUAL(remoteCopy.name(), "TestRemote");
         BOOST_CHECK_EQUAL(remoteCopy.type(), entity::remote::google_drive);
         BOOST_CHECK_EQUAL(remoteCopy.path(), "/tests/path");

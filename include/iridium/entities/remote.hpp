@@ -34,13 +34,13 @@ namespace iridium::rclone
 
 		[[nodiscard]] auto name() const -> std::string;
 
-		[[nodiscard]] auto root_path() const -> std::string;
+		[[nodiscard]] virtual auto root_path() const -> std::string;
 
 		[[nodiscard]] auto type() const -> remote_type { return _type; }
 
 		[[nodiscard]] auto path() const -> std::string { return _path; }
 
-		[[nodiscard]] auto full_path() const -> std::string;
+		[[nodiscard]] virtual auto full_path() const -> std::string;
 
 
 		void set_name(std::string name) { _name = std::move(name); }

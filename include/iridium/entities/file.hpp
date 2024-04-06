@@ -22,9 +22,9 @@ namespace iridium::rclone
 
 		[[nodiscard]] auto name() const -> std::string { return _name; }
 
-		[[nodiscard]] auto absolute_path() const -> std::string;
+		[[nodiscard]] virtual auto absolute_path() const -> std::string;
 
-		[[nodiscard]] auto path() const -> std::string;
+		[[nodiscard]] virtual auto path() const -> std::string;
 
 		[[nodiscard]] auto remote() const -> remote_ptr { return _remote; }
 
@@ -32,9 +32,9 @@ namespace iridium::rclone
 
 		[[nodiscard]] auto parent() -> file* { return _parent; }
 
-		[[nodiscard]] auto parent_dir() const-> std::string;
+		[[nodiscard]] virtual auto parent_dir() const-> std::string;
 
-		[[nodiscard]] auto parent_absolute_dir() const-> std::string;
+		[[nodiscard]] virtual auto parent_absolute_dir() const-> std::string;
 
 		[[nodiscard]] auto nb_chilchren() const -> uint32_t
 		{
