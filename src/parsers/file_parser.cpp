@@ -4,16 +4,14 @@
 #include <iostream>
 #include <regex>
 
-
-extern auto string_to_mode_time(const std::string& time) -> boost::posix_time::ptime;
+extern auto string_to_mode_time(const std::string &time) -> boost::posix_time::ptime;
 
 using std::cout;
 using std::endl;
 
-
 namespace iridium::rclone::parser
 {
-	void file_parser::parse(const std::string& data) const
+	void file_parser::parse(const std::string &data) const
 	{
 		switch (_type)
 		{
@@ -26,11 +24,11 @@ namespace iridium::rclone::parser
 		}
 	}
 
-	auto dir_is_in_parent(const entity::file * dir, const entity::file * parent,
-	                      bool (*prediact)(const entity::file&, const entity::file&) = nullptr) -> entity::file*
+	auto dir_is_in_parent(const entity::file *dir, const entity::file *parent,
+	                      bool (*prediact)(const entity::file &, const entity::file &) = nullptr) -> entity::file *
 	{
-		entity::file * find = nullptr;
-		for (auto& child: parent->children())
+		entity::file *find = nullptr;
+		for (auto &child: parent->children())
 		{
 			if (prediact not_eq nullptr)
 			{
@@ -49,7 +47,7 @@ namespace iridium::rclone::parser
 		return find;
 	}
 
-	auto file_parser::json_parse(const std::string& data) const -> void
+	auto file_parser::json_parse(const std::string &data) const -> void
 	{
 		if (_parent == nullptr)
 			return;
@@ -69,7 +67,7 @@ namespace iridium::rclone::parser
 					        json.as_object().contains("ModTime"))) { return; }
 
 					std::string path = json.at("Path").as_string().c_str();
-					entity::file * parent = _parent;
+					entity::file *parent = _parent;
 
 					while (path.find_first_of('/') not_eq std::string::npos)
 					{
@@ -78,17 +76,16 @@ namespace iridium::rclone::parser
 							                                           json.at("ModTime").as_string().c_str()),
 						                                           parent->remote());
 
-						entity::file * dir = dir_is_in_parent(file.get(), parent,
-						                                      [](const entity::file& f1, const entity::file& f2)
-						                                      {
-							                                      return f1.name() == f2.name() and f1.is_dir() == f2.
-							                                             is_dir();
-						                                      });
+						entity::file *dir = dir_is_in_parent(file.get(), parent,
+						                                     [](const entity::file &f1, const entity::file &f2)
+						                                     {
+							                                     return f1.name() == f2.name() and f1.is_dir() == f2.
+							                                            is_dir();
+						                                     });
 						if (dir not_eq nullptr)
 							parent = dir;
 						path = path.substr(path.find_first_of('/') + 1);
 					}
-
 
 					entity::file file = entity::file(parent, json.at("Name").as_string().c_str(),
 					                                 json.at("Size").as_int64(),
@@ -99,11 +96,11 @@ namespace iridium::rclone::parser
 					callback(file);
 				}
 			}
-			catch (const std::exception& e) { std::cerr << "Error: " << e.what() << std::endl; }
+			catch (const std::exception &e) { std::cerr << "Error: " << e.what() << std::endl; }
 		}
 	}
 
-	auto file_parser::lsl_parse(const std::string& data) const -> void
+	auto file_parser::lsl_parse(const std::string &data) const -> void
 	{
 		// example out file :     26264 2024-02-06 15:09:45.212000000 Rahman_YILMAZ_M1_INFO.pdf
 		auto regex = std::regex(R"((\d+)\s+(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{9})\s+(.*))");
@@ -113,7 +110,7 @@ namespace iridium::rclone::parser
 			try
 			{
 				auto path = match[3].str();
-				entity::file * parent = _parent;
+				entity::file *parent = _parent;
 
 				while (path.find_first_of('/') not_eq std::string::npos)
 				{
@@ -122,7 +119,7 @@ namespace iridium::rclone::parser
 					file->set_is_dir(true);
 					file->set_size(-1);
 
-					entity::file * dir = dir_is_in_parent(file.get(), parent);
+					entity::file *dir = dir_is_in_parent(file.get(), parent);
 					if (dir not_eq nullptr)
 						parent = dir;
 					else
@@ -141,7 +138,7 @@ namespace iridium::rclone::parser
 
 				callback(file);
 			}
-			catch (const std::exception& e) { std::cerr << "Error: " << e.what() << std::endl; }
+			catch (const std::exception &e) { std::cerr << "Error: " << e.what() << std::endl; }
 		}
 	}
 } // namespace iridium::rclone::parser

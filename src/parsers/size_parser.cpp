@@ -1,10 +1,9 @@
 #include <regex>
 #include <size_parser.hpp>
 
-
 namespace iridium::rclone::parser
 {
-	void size_parser::parse(const std::string& data) const
+	void size_parser::parse(const std::string &data) const
 	{
 		auto size = entity::size();
 		std::regex total = std::regex(R"(([0-9]+))");

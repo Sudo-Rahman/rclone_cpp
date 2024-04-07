@@ -1,6 +1,5 @@
 #include <json_log.hpp>
 
-
 namespace iridium::rclone
 {
 	entity::json_log::json_log(const json_log &log)
@@ -12,11 +11,11 @@ namespace iridium::rclone
 		  _object_type(log._object_type),
 		  _time(log._time)
 	{
-		if(log._stats not_eq nullptr)
+		if (log._stats not_eq nullptr)
 			_stats = new stats(*log._stats);
 	}
 
-	auto entity::json_log::operator=(const json_log &log) -> json_log &
+	auto entity::json_log::operator=(const json_log &log) -> json_log&
 	{
 		if (this == &log)
 			return *this;
@@ -47,7 +46,7 @@ namespace iridium::rclone
 		log._stats = nullptr;
 	}
 
-	auto entity::json_log::operator=(json_log &&log) noexcept -> json_log &
+	auto entity::json_log::operator=(json_log &&log) noexcept -> json_log&
 	{
 		if (this == &log)
 			return *this;
@@ -66,10 +65,9 @@ namespace iridium::rclone
 		return *this;
 	}
 
-
 	entity::json_log::~json_log() { delete _stats; }
 
-	auto entity::json_log::string_to_level(const std::string& level) -> log_level
+	auto entity::json_log::string_to_level(const std::string &level) -> log_level
 	{
 		if (level == "info")
 			return log_level::info;
@@ -80,7 +78,7 @@ namespace iridium::rclone
 		return log_level::no_level;
 	}
 
-	auto operator<<(std::ostream& os, const entity::json_log& log) -> std::ostream&
+	auto operator<<(std::ostream &os, const entity::json_log &log) -> std::ostream&
 	{
 		auto stats = std::string{};
 		auto buffer = std::stringstream{};
@@ -105,7 +103,7 @@ namespace iridium::rclone
 		return os;
 	}
 
-	auto entity::json_log::level_to_string(const log_level& level) -> std::string
+	auto entity::json_log::level_to_string(const log_level &level) -> std::string
 	{
 		switch (level)
 		{
@@ -120,7 +118,7 @@ namespace iridium::rclone
 		}
 	}
 
-	auto operator<<(std::ostream& os, const entity::json_log::stats& stats) -> std::ostream&
+	auto operator<<(std::ostream &os, const entity::json_log::stats &stats) -> std::ostream&
 	{
 		os << "stats : {" << std::endl <<
 				"\tbytes : " << stats.bytes << ", " << std::endl <<
@@ -128,7 +126,8 @@ namespace iridium::rclone
 				"\tdeletes : " << stats.deletes << ", " << std::endl <<
 				"\telapsed_time : " << stats.elapsed_time << ", " << std::endl <<
 				"\terrors : " << stats.errors << ", " << std::endl <<
-				"\teta : " << (not stats.eta.has_value() ? "null" :  std::to_string(stats.eta.value())) << ", " << std::endl <<
+				"\teta : " << (not stats.eta.has_value() ? "null" : std::to_string(stats.eta.value())) << ", " <<
+				std::endl <<
 				"\tfatal_error : " << boost::lexical_cast<std::string>(stats.fatal_error) << std::endl <<
 				"\tlast_error : " << stats.last_error << std::endl <<
 				"\trenames : " << stats.renames << std::endl <<
@@ -144,12 +143,12 @@ namespace iridium::rclone
 		return os;
 	}
 
-
-	auto operator<<(std::ostream& os, const entity::json_log::stats::transfer& transfer) -> std::ostream&
+	auto operator<<(std::ostream &os, const entity::json_log::stats::transfer &transfer) -> std::ostream&
 	{
 		os << "transfer : {" << std::endl <<
 				"\tbytes : " << transfer.bytes << ", " << std::endl <<
-				"\teta : " << (not transfer.eta.has_value() ? "null" : std::to_string(transfer.eta.value())) << ", " << std::endl <<
+				"\teta : " << (not transfer.eta.has_value() ? "null" : std::to_string(transfer.eta.value())) << ", " <<
+				std::endl <<
 				"\tgroup : " << transfer.group << ", " << std::endl <<
 				"\tname : " << transfer.name << std::endl <<
 				"\tsize : " << transfer.size << std::endl <<

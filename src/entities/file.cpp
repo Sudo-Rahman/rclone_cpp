@@ -5,8 +5,8 @@
 
 namespace iridium::rclone
 {
-	entity::file::file(file * parent, const std::string& file_name, int64_t size, bool is_dir,
-	                   const boost::posix_time::ptime& mod_time, const remote_ptr& remote)
+	entity::file::file(file *parent, const std::string &file_name, int64_t size, bool is_dir,
+	                   const boost::posix_time::ptime &mod_time, const remote_ptr &remote)
 	{
 		_parent = parent;
 		set_name(file_name);
@@ -16,9 +16,9 @@ namespace iridium::rclone
 		_remote = remote;
 	}
 
-	entity::file::file(file * parent, const std::string& file_name, int64_t size, bool is_dir,
-	                   const boost::posix_time::seconds& mod_time,
-	                   const remote_ptr& remote)
+	entity::file::file(file *parent, const std::string &file_name, int64_t size, bool is_dir,
+	                   const boost::posix_time::seconds &mod_time,
+	                   const remote_ptr &remote)
 	{
 		_parent = parent;
 		set_name(file_name);
@@ -28,14 +28,14 @@ namespace iridium::rclone
 		_remote = remote;
 	}
 
-	entity::file::file(file * parent, const std::string& file_name, const remote_ptr& remote)
+	entity::file::file(file *parent, const std::string &file_name, const remote_ptr &remote)
 	{
 		_parent = parent;
 		set_name(file_name);
 		_remote = remote;
 	}
 
-	auto operator<<(std::ostream& os, const entity::file& file) -> std::ostream&
+	auto operator<<(std::ostream &os, const entity::file &file) -> std::ostream&
 	{
 		auto remote = std::string();
 		auto string_stream = std::stringstream();
@@ -57,20 +57,19 @@ namespace iridium::rclone
 		return os;
 	}
 
+	auto entity::file::operator!=(const file &rhs) const -> bool { return !(rhs == *this); }
 
-	auto entity::file::operator!=(const file& rhs) const -> bool { return !(rhs == *this); }
+	void entity::file::add_child(const std::shared_ptr<file> &child) { _children.push_back(child); }
 
-	void entity::file::add_child(const std::shared_ptr<file>& child) { _children.push_back(child); }
-
-	void entity::file::add_child_if_not_exist(const std::shared_ptr<file>& child)
+	void entity::file::add_child_if_not_exist(const std::shared_ptr<file> &child)
 	{
-		for (const auto& f: _children)
+		for (const auto &f: _children)
 			if (*f == *child)
 				return;
 		add_child(child);
 	}
 
-	auto entity::file::operator==(const file& rhs) const -> bool
+	auto entity::file::operator==(const file &rhs) const -> bool
 	{
 		return _name == rhs._name &&
 		       _size == rhs._size &&
@@ -80,14 +79,14 @@ namespace iridium::rclone
 	}
 
 	auto
-	entity::file::create_shared_ptr(file * parent, const std::string& name_file, int64_t size, bool is_dir,
+	entity::file::create_shared_ptr(file *parent, const std::string &name_file, int64_t size, bool is_dir,
 	                                boost::posix_time::ptime mod_time,
-	                                const remote_ptr& remote) -> std::shared_ptr<file>
+	                                const remote_ptr &remote) -> std::shared_ptr<file>
 	{
 		return std::make_shared<file>(parent, name_file, size, is_dir, mod_time, remote);
 	}
 
-	entity::file::file(file&& file) noexcept
+	entity::file::file(file &&file) noexcept
 	{
 		_parent = file._parent;
 		file._parent = nullptr;
@@ -102,7 +101,7 @@ namespace iridium::rclone
 		_children = std::move(file._children);
 	}
 
-	auto entity::file::operator=(file&& f) noexcept -> file&
+	auto entity::file::operator=(file &&f) noexcept -> file&
 	{
 		if (this == &f) return *this;
 		_parent = f._parent;
@@ -119,7 +118,6 @@ namespace iridium::rclone
 
 		return *this;
 	}
-
 
 	auto entity::file::absolute_path() const -> std::string
 	{
@@ -145,22 +143,21 @@ namespace iridium::rclone
 		return std::regex_replace(path, regex, "/");
 	}
 
-	auto entity::file::parent_dir()const -> std::string
+	auto entity::file::parent_dir() const -> std::string
 	{
-		if(_parent not_eq nullptr)
+		if (_parent not_eq nullptr)
 			return _parent->path();
 		return "";
 	}
 
 	auto entity::file::parent_absolute_dir() const -> std::string
 	{
-		if(_parent not_eq nullptr)
+		if (_parent not_eq nullptr)
 			return _parent->absolute_path();
 		return "";
 	}
 
-
-	void entity::file::set_name(const std::string& name)
+	void entity::file::set_name(const std::string &name)
 	{
 		auto regex = std::regex(R"([/]{2,})");
 		_name = std::regex_replace(name, regex, "/");

@@ -2,7 +2,7 @@
 
 namespace iridium::rclone::parser
 {
-	void remote_parser::parse(const std::string& data) const
+	void remote_parser::parse(const std::string &data) const
 	{
 		entity::remote remote;
 		std::regex re(R"((\w+):\s+(\w+))");
@@ -15,7 +15,7 @@ namespace iridium::rclone::parser
 				remote.set_type(entity::remote::string_to_remote_type.at(match[2]));
 				callback(remote);
 			}
-			catch (const std::exception& e) { std::cerr << "Error: " << e.what() << std::endl; }
+			catch (const std::exception &e) { std::cerr << "Error: " << e.what() << std::endl; }
 		}
 	}
 } // namespace iridium::rclone::parser

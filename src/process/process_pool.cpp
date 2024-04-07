@@ -1,6 +1,5 @@
 #include <process_pool.hpp>
 
-
 namespace iridium::rclone
 {
 	process_pool::process_pool(uint16_t simultaneous_processes)
@@ -19,7 +18,7 @@ namespace iridium::rclone
 					       not_eq nullptr;
 				});
 				boost::this_thread::interruption_point();
-				auto * process = get_process();
+				auto *process = get_process();
 				if (process == nullptr) { continue; }
 				process->on_finish([this](int)
 				{
@@ -33,8 +32,7 @@ namespace iridium::rclone
 		});
 	}
 
-
-	auto process_pool::add_process(std::unique_ptr<process>&& process, priority priority) -> void
+	auto process_pool::add_process(std::unique_ptr<process> &&process, priority priority) -> void
 	{
 		lock();
 		if (_state == stopped)
@@ -44,19 +42,18 @@ namespace iridium::rclone
 		unlock();
 	}
 
-	auto process_pool::add_process(process * process, priority priority) -> void
+	auto process_pool::add_process(process *process, priority priority) -> void
 	{
 		add_process(process_uptr(process), priority);
 	}
-
 
 	void process_pool::stop()
 	{
 		lock();
 		_thread.interrupt();
 		_cv_process.notify_one();
-		for (const auto& pair: _processes)
-			for (const auto& process: pair.second)
+		for (const auto &pair: _processes)
+			for (const auto &process: pair.second)
 				if (process->is_running())
 					process->stop();
 		_state = stopped;
@@ -66,8 +63,8 @@ namespace iridium::rclone
 	void process_pool::stop_all_processes()
 	{
 		lock();
-		for (const auto& pair: _processes)
-			for (const auto& process: pair.second)
+		for (const auto &pair: _processes)
+			for (const auto &process: pair.second)
 				if (process->is_running())
 					process->stop();
 		_running_processes = 0;
@@ -78,8 +75,8 @@ namespace iridium::rclone
 	void process_pool::wait()
 	{
 		lock();
-		for (const auto& pair: _processes)
-			for (const auto& process: pair.second)
+		for (const auto &pair: _processes)
+			for (const auto &process: pair.second)
 				if (process->is_running())
 					process->wait_for_finish();
 		unlock();
@@ -122,12 +119,12 @@ namespace iridium::rclone
 		_cv.notify_one();
 	}
 
-	auto process_pool::get_process() -> process*
+	auto process_pool::get_process() -> process *
 	{
 		lock();
-		process * result = nullptr;
-		for (const auto& pair: _processes)
-			for (const auto& process: pair.second)
+		process *result = nullptr;
+		for (const auto &pair: _processes)
+			for (const auto &process: pair.second)
 				if (process->get_state() == process::state::not_launched)
 					result = process.get();
 		unlock();
@@ -138,8 +135,8 @@ namespace iridium::rclone
 	{
 		lock();
 		_running_processes = 0;
-		for (const auto& pair: _processes)
-			for (const auto& process: pair.second)
+		for (const auto &pair: _processes)
+			for (const auto &process: pair.second)
 				if (process->is_running())
 					_running_processes++;
 		unlock();

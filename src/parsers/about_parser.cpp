@@ -3,7 +3,7 @@
 
 namespace iridium::rclone::parser
 {
-	auto convert_to_bytes(const std::string& input) -> uint64_t
+	auto convert_to_bytes(const std::string &input) -> uint64_t
 	{
 		std::regex size(R"(([0-9]+)(.[0-9]+)?)");
 		std::regex unit(R"((B|KiB|MiB|GiB|TiB))");
@@ -24,8 +24,7 @@ namespace iridium::rclone::parser
 		return 0;
 	}
 
-
-	void about_parser::parse(const std::string& data) const
+	void about_parser::parse(const std::string &data) const
 	{
 		auto about = entity::about();
 		std::regex total = std::regex("Total:.*\n");

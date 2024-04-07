@@ -1,8 +1,8 @@
+#include <memory>
 #include <process.hpp>
 #include <iostream>
 #include <parsers.hpp>
 #include <config_create.hpp>
-
 
 namespace iridium::rclone
 {
@@ -12,10 +12,9 @@ namespace iridium::rclone
 	std::string process::_path_rclone;
 	bool process::_is_initialized = false;
 	const std::string process::endl = "\n";
-	option::vector process::_global_options = {};
+	std::vector<option::uptr_basic_opt> process::_global_options = {};
 
-
-	auto process::initialize(const std::string& path_rclone) -> void
+	auto process::initialize(const std::string &path_rclone) -> void
 	{
 		if (path_rclone.empty())
 		{
@@ -32,7 +31,7 @@ namespace iridium::rclone
 	{
 		if (!_is_initialized)
 			throw std::runtime_error("process not initialized");
-		_signal_every_line = std::make_unique<bs2::signal<void(const std::string&)>>();
+		_signal_every_line = std::make_unique<bs2::signal<void(const std::string &)>>();
 		_signal_finish = std::make_unique<bs2::signal<void(int)>>();
 		_signal_start = std::make_unique<bs2::signal<void()>>();
 	}
@@ -76,7 +75,7 @@ namespace iridium::rclone
 
 	auto process::exit_code() const -> int { return _child.exit_code(); }
 
-	auto process::write_input(const std::string& input) const -> void
+	auto process::write_input(const std::string &input) const -> void
 	{
 		if (_state != state::running)
 			throw std::runtime_error("process not started");
@@ -129,7 +128,7 @@ namespace iridium::rclone
 				bp::std_in < *_in, bp::std_out > *_out,
 				bp::std_err > *_err);
 		}
-		catch (const std::exception& e)
+		catch (const std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
 			exit(1);
@@ -158,7 +157,7 @@ namespace iridium::rclone
 				if (_child.running())
 					_child.wait();
 			}
-			catch (boost::wrapexcept<boost::process::process_error>& e) { std::cerr << e.what() << std::endl; }
+			catch (boost::wrapexcept<boost::process::process_error> &e) { std::cerr << e.what() << std::endl; }
 			if (_child.exit_code() == 0)
 				_state = state::finished;
 			else _state = state::error;
@@ -174,6 +173,8 @@ namespace iridium::rclone
 
 	auto process::commands() const -> std::string
 	{
+		if (_state not_eq state::not_launched)
+			return boost::algorithm::join(_args, " ");
 		auto args = _args;
 		option::basic_option::add_options_to_vector(_global_options, args);
 		option::basic_option::add_options_to_vector(_local_options, args);
@@ -194,12 +195,11 @@ namespace iridium::rclone
 		_cv.notify_all();
 	}
 
-	auto process::operator<<(const std::string& input) -> process&
+	auto process::operator<<(const std::string &input) -> process&
 	{
 		write_input(input);
 		return *this;
 	}
-
 
 	process::~process() noexcept
 	{
@@ -210,42 +210,42 @@ namespace iridium::rclone
 		}
 	}
 
-	auto process::every_line(std::function<void(const std::string&)>&& callback) -> process&
+	auto process::every_line(std::function<void(const std::string &)> &&callback) -> process&
 	{
 		_signal_every_line->connect(
-			[this, callback](const std::string& line) { ba::post(_pool, [callback, line] { callback(line); }); }
-		);
+				[this, callback](const std::string &line) { ba::post(_pool, [callback, line] { callback(line); }); }
+			);
 		return *this;
 	}
 
-	auto process::on_finish(std::function<void(int)>&& callback) -> process&
+	auto process::on_finish(std::function<void(int)> &&callback) -> process&
 	{
 		_signal_finish->connect(
-			[this, callback = std::move(callback)](const int& exit_code)
-			{
-				ba::post(_pool, [callback, exit_code] { callback(exit_code); });
-			}
-		);
+				[this, callback = std::move(callback)](const int &exit_code)
+				{
+					ba::post(_pool, [callback, exit_code] { callback(exit_code); });
+				}
+			);
 		return *this;
 	}
 
-	auto process::on_start(std::function<void()>&& callback) -> process&
+	auto process::on_start(std::function<void()> &&callback) -> process&
 	{
 		_signal_start->connect(
-			[this, callback = std::move(callback)]() { ba::post(_pool, [callback] { callback(); }); }
-		);
+				[this, callback = std::move(callback)]() { ba::post(_pool, [callback] { callback(); }); }
+			);
 		return *this;
 	}
 
-	auto process::on_finish_error(std::function<void()>&& callback) -> process&
+	auto process::on_finish_error(std::function<void()> &&callback) -> process&
 	{
 		_signal_finish->connect(
-			[this, callback = std::move(callback)](const int& exit_code)
-			{
-				if (exit_code not_eq 0)
-					ba::post(_pool, [&callback] { callback(); });
-			}
-		);
+				[this, callback = std::move(callback)](const int &exit_code)
+				{
+					if (exit_code not_eq 0)
+						ba::post(_pool, [&callback] { callback(); });
+				}
+			);
 		return *this;
 	}
 
@@ -255,7 +255,7 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	auto process::list_remotes(std::function<void(const std::vector<remote_ptr>&)>&& callback) -> process&
+	auto process::list_remotes(std::function<void(const std::vector<remote_ptr> &)> &&callback) -> process&
 	{
 		_args = {"listremotes", "--long"};
 		on_finish([this, callback = std::move(callback)](int exit_code)
@@ -263,11 +263,11 @@ namespace iridium::rclone
 			if (exit_code not_eq 0) throw std::runtime_error("error in listremotes");
 			auto remotes = std::vector<remote_ptr>();
 			auto parser = parser::remote_parser(
-				[&remotes](const entity::remote& remote)
+				[&remotes](const entity::remote &remote)
 				{
 					remotes.push_back(std::make_shared<entity::remote>(remote));
 				});
-			for (const auto& line: _output)
+			for (const auto &line: _output)
 				parser.parse(line);
 			callback(remotes);
 		});
@@ -280,12 +280,11 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	auto process::delete_remote(const entity::remote& remote) -> process&
+	auto process::delete_remote(const entity::remote &remote) -> process&
 	{
 		_args = {"config", "delete", remote.name()};
 		return *this;
 	}
-
 
 	auto process::config() -> process&
 	{
@@ -295,115 +294,114 @@ namespace iridium::rclone
 
 	auto process::config_create() -> rclone::config_create { return rclone::config_create(this); }
 
-	auto process::lsjson(const entity::remote& remote) -> process&
+	auto process::lsjson(const entity::remote &remote) -> process&
 	{
 		_args = {"lsjson", remote.full_path()};
 		return *this;
 	}
 
-	auto process::lsjson(const entity::file& file) -> process&
+	auto process::lsjson(const entity::file &file) -> process&
 	{
 		if (not file.is_dir()) throw std::runtime_error("file is not a directory");
 		_args = {"lsjson", file.absolute_path()};
 		return *this;
 	}
 
-	auto process::ls(const entity::file& file) -> process&
+	auto process::ls(const entity::file &file) -> process&
 	{
 		if (not file.is_dir()) throw std::runtime_error("file is not a directory");
 		_args = {"ls", file.absolute_path()};
 		return *this;
 	}
 
-	auto process::lsl(const entity::file& file) -> process&
+	auto process::lsl(const entity::file &file) -> process&
 	{
 		if (not file.is_dir()) throw std::runtime_error("file is not a directory");
 		_args = {"lsl", file.absolute_path()};
 		return *this;
 	}
 
-	auto process::lsd(const entity::file& file) -> process&
+	auto process::lsd(const entity::file &file) -> process&
 	{
 		if (not file.is_dir()) throw std::runtime_error("file is not a directory");
 		_args = {"lsd", file.absolute_path()};
 		return *this;
 	}
 
-	auto process::lsf(const entity::file& file) -> process&
+	auto process::lsf(const entity::file &file) -> process&
 	{
 		if (not file.is_dir()) throw std::runtime_error("file is not a directory");
 		_args = {"lsf", file.absolute_path()};
 		return *this;
 	}
 
-
-	auto process::copy_to(const entity::file& source, const entity::file& destination) -> process&
+	auto process::copy_to(const entity::file &source, const entity::file &destination) -> process&
 	{
 		_args = {"copyto", source.absolute_path(), destination.absolute_path()};
 		return *this;
 	}
 
-	auto process::move_to(const entity::file& source, const entity::file& destination) -> process&
+	auto process::move_to(const entity::file &source, const entity::file &destination) -> process&
 	{
 		_args = {"moveto", source.absolute_path(), destination.absolute_path()};
 		return *this;
 	}
 
-	auto process::delete_file(const entity::file& file) -> process&
+	auto process::delete_file(const entity::file &file) -> process&
 	{
 		_args = {"delete", file.absolute_path()};
 		return *this;
 	}
 
-	auto process::mkdir(const entity::file& file) -> process&
+	auto process::mkdir(const entity::file &file) -> process&
 	{
 		_args = {"mkdir", file.absolute_path()};
 		return *this;
 	}
 
-	auto process::cat(const entity::file& file) -> process&
+	auto process::cat(const entity::file &file) -> process&
 	{
 		_args = {"cat", file.absolute_path()};
 		return *this;
 	}
 
-	auto process::about(const entity::remote& remote) -> process&
+	auto process::about(const entity::remote &remote) -> process&
 	{
 		_args = {"about", remote.root_path()};
 		return *this;
 	}
 
-	auto process::size(const entity::file& file) -> process&
+	auto process::size(const entity::file &file) -> process&
 	{
 		_args = {"size", file.absolute_path()};
 		return *this;
 	}
 
-	auto process::tree(const entity::file& file) -> process&
+	auto process::tree(const entity::file &file) -> process&
 	{
 		_args = {"tree", file.absolute_path()};
 		return *this;
 	}
 
-	auto process::bi_sync(const entity::file& source, const entity::file& destination) -> process&
+	auto process::bi_sync(const entity::file &source, const entity::file &destination) -> process&
 	{
 		_args = {"bisync", source.absolute_path(), destination.absolute_path()};
 		return *this;
 	}
 
-	auto process::clean_up(const entity::remote& remote) -> process&
+	auto process::clean_up(const entity::remote &remote) -> process&
 	{
 		_args = {"cleanup", remote.root_path()};
 		return *this;
 	}
 
-	auto process::copy_url(const std::string& url, const entity::file& destination) -> process&
+	auto process::copy_url(const std::string &url, const entity::file &destination) -> process&
 	{
 		_args = {"copyurl", url, destination.absolute_path()};
 		return *this;
 	}
 
-	auto process::check(const entity::file& source, const entity::file& destination) -> process&
+	auto process::check(const entity::file &source, const entity::file &destination) -> process&
 	{
 		if (not source.is_dir() or not destination.is_dir())
 			throw std::runtime_error("source or destination is not a directory");
@@ -411,29 +409,5 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	auto process::add_option(const option::basic_option& option) -> process&
-	{
-		_local_options.push_back(option);
-		return *this;
-	}
-
-	auto process::add_option(const option::vector& options) -> process&
-	{
-		for (const auto& option: options)
-			_local_options.push_back(option);
-		return *this;
-	}
-
-	void process::add_global_option(const option::vector& options)
-	{
-		for (const auto& option: options)
-			_global_options.push_back(option);
-	}
-
-	void process::clear_global_options()
-	{
-		_global_options.clear();
-	}
-
-	void process::add_global_option(const option::basic_option& option) { _global_options.push_back(option); }
+	void process::clear_global_options() { _global_options.clear(); }
 } // namespace iridium::rclone

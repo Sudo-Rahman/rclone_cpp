@@ -3,15 +3,12 @@
 #include <regex>
 #include "utils.cpp"
 
-
 template<class T>
-extern auto get_from_obj(const boost::json::object& obj, const std::string& key) -> T;
-
-
+extern auto get_from_obj(const boost::json::object &obj, const std::string &key) -> T;
 
 namespace iridium::rclone::parser
 {
-	auto json_log_parser::parse(const std::string& data) const -> void
+	auto json_log_parser::parse(const std::string &data) const -> void
 	{
 		auto log = entity::json_log();
 
@@ -45,13 +42,13 @@ namespace iridium::rclone::parser
 
 			callback(log);
 		}
-		catch (const std::exception& e)
+		catch (const std::exception &e)
 		{
 			std::cerr << "Error parsing json log: " << e.what() << " " << data << std::endl;
 		}
 	}
 
-	auto json_log_parser::parse_stats(const boost::json::object& obj) -> entity::json_log::stats
+	auto json_log_parser::parse_stats(const boost::json::object &obj) -> entity::json_log::stats
 	{
 		auto stats = entity::json_log::stats();
 
@@ -75,25 +72,25 @@ namespace iridium::rclone::parser
 			stats.transferring = parse_transferring(obj.if_contains("transferring"));
 			stats.transfers = get_from_obj<uint64_t>(obj, "transfers");
 		}
-		catch (const std::exception& e) { std::cerr << "Error parsing stats: " << e.what() << " "<< obj << std::endl; }
+		catch (const std::exception &e) { std::cerr << "Error parsing stats: " << e.what() << " " << obj << std::endl; }
 		return stats;
 	}
 
 	auto json_log_parser::parse_transferring(
-		const boost::json::value * value) -> std::vector<entity::json_log::stats::transfer>
+		const boost::json::value *value) -> std::vector<entity::json_log::stats::transfer>
 	{
 		if (value == nullptr)
 			return {};
 		if (value->is_null()) return {};
 		auto array = value->as_array();
 		auto transferring = std::vector<entity::json_log::stats::transfer>();
-		for (const auto& obj: array)
+		for (const auto &obj: array)
 			transferring.push_back(parse_transfer(obj.as_object()));
 
 		return transferring;
 	}
 
-	auto json_log_parser::parse_transfer(const boost::json::object& obj) -> entity::json_log::stats::transfer
+	auto json_log_parser::parse_transfer(const boost::json::object &obj) -> entity::json_log::stats::transfer
 	{
 		auto transfer = entity::json_log::stats::transfer();
 		transfer.bytes = get_from_obj<uint64_t>(obj, "bytes");

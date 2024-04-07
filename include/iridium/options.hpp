@@ -17,15 +17,6 @@ namespace iridium::rclone::option
 {
     class RCLONE_CPP_EXPORT basic_option;
 
-    class RCLONE_CPP_EXPORT filter;
-
-    class RCLONE_CPP_EXPORT listing;
-
-    class RCLONE_CPP_EXPORT performance;
-
-    class RCLONE_CPP_EXPORT tree;
-
-    class RCLONE_CPP_EXPORT logging;
 }
 
 namespace ir = iridium::rclone;

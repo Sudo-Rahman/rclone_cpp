@@ -60,9 +60,9 @@ namespace iridium::rclone
 
 		[[nodiscard]] auto get_error() const -> std::vector<std::string> { return _error; }
 
-		[[nodiscard]] auto get_options() const -> option::vector { return _local_options; }
+		[[nodiscard]] auto options() -> std::vector<option::uptr_basic_opt>& { return _local_options; }
 
-		[[nodiscard]] static auto get_global_options() -> option::vector { return _global_options; }
+		[[nodiscard]] static auto global_options() -> std::vector<option::uptr_basic_opt>& { return _global_options; }
 
 		[[nodiscard]] auto commands() const -> std::string;
 
@@ -161,27 +161,20 @@ namespace iridium::rclone
 		 */
 		auto check(const entity::file& source, const entity::file& destination) -> process&;
 
-		auto add_option(const option::basic_option& option) -> process&;
-
-		auto add_option(const option::vector& option) -> process&;
-
 		template<class... Args>
-		auto add_option(const option::basic_option& option1, Args&&... args) -> process&
+		auto add_option(Args&&... args) -> process& requires(std::conjunction_v<std::is_convertible<Args,
+			option::uptr_basic_opt>...>)
 		{
-			add_option(option1);
-			add_option(std::forward<Args>(args)...);
+			(_local_options.push_back(std::forward<Args>(args)), ...);
 			return *this;
 		}
 
-		static void add_global_option(const option::basic_option& option);
-
-		static void add_global_option(const option::vector& option);
-
 		template<class... Args>
-		static void add_global_option(const option::basic_option& option1, Args&&... args)
+		auto add_global_option(Args&&... args) -> process& requires(std::conjunction_v<std::is_convertible<Args,
+			option::uptr_basic_opt>...>)
 		{
-			add_global_option(option1);
-			add_global_option(std::forward<Args>(args)...);
+			(_global_options.push_back(std::forward<Args>(args)), ...);
+			return *this;
 		}
 
 		static void clear_global_options();
@@ -189,7 +182,7 @@ namespace iridium::rclone
 	private:
 		static std::string _path_rclone;
 		static bool _is_initialized;
-		static option::vector _global_options;
+		static std::vector<option::uptr_basic_opt> _global_options;
 
 		std::mutex _mutex;
 		std::condition_variable _cv;
@@ -210,7 +203,7 @@ namespace iridium::rclone
 		std::vector<std::string> _output;
 		std::vector<std::string> _error;
 
-		option::vector _local_options;
+		std::vector<option::uptr_basic_opt> _local_options;
 
 		auto read_output() -> void;
 
