@@ -17,14 +17,14 @@ namespace iridium::rclone::option
 		_value = value;
 	}
 
-	void basic_option::add_option_to_vector(const uptr_basic_opt &option, std::vector<std::string> &vector)
+	void basic_option::add_option_to_vector(const basic_opt_uptr &option, std::vector<std::string> &vector)
 	{
 		std::vector<std::string> vec = option->get();
 		std::erase(vec, "");
 		vector.insert(vector.end(), vec.begin(), vec.end());
 	}
 
-	void basic_option::add_options_to_vector(const std::vector<uptr_basic_opt> &options,
+	void basic_option::add_options_to_vector(const std::vector<basic_opt_uptr> &options,
 	                                         std::vector<std::string> &vector)
 	{
 		for (const auto &opt: options)

@@ -9,7 +9,7 @@ namespace iridium::rclone::option::logging
 	 * @param value The file path
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto log_file(const std::string& value) -> uptr_basic_opt
+	static auto log_file(const std::string& value) -> basic_opt_uptr
 	{
 		return std::make_unique<basic_option>("--log-file", value);
 	}
@@ -19,7 +19,7 @@ namespace iridium::rclone::option::logging
 	 * @param value The desired format string
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto log_format(const std::string& value) -> uptr_basic_opt
+	static auto log_format(const std::string& value) -> basic_opt_uptr
 	{
 		return std::make_unique<basic_option>("--log-format", value);
 	}
@@ -60,14 +60,14 @@ namespace iridium::rclone::option::logging
 	 * @brief Activate systemd integration for the logger
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto log_systemd() -> uptr_basic_opt { return std::make_unique<basic_option>("--log-systemd"); }
+	static auto log_systemd() -> basic_opt_uptr { return std::make_unique<basic_option>("--log-systemd"); }
 
 	/**
 	 * @brief Set the maximum number of stats groups to keep in memory
 	 * @param value The maximum number of groups
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto max_stats_groups(int value) -> uptr_basic_opt
+	static auto max_stats_groups(int value) -> basic_opt_uptr
 	{
 		return std::make_unique<basic_option>("--max-stats-groups", std::to_string(value));
 	}
@@ -76,13 +76,13 @@ namespace iridium::rclone::option::logging
 	 * @brief Show progress during transfer
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto progress() -> uptr_basic_opt { return std::make_unique<basic_option>("--progress"); }
+	static auto progress() -> basic_opt_uptr { return std::make_unique<basic_option>("--progress"); }
 
 	/**
 	 * @brief Show progress on the terminal title (requires -P/--progress)
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto progress_terminal_title() -> uptr_basic_opt
+	static auto progress_terminal_title() -> basic_opt_uptr
 	{
 		return std::make_unique<basic_option>("--progress-terminal-title");
 	}
@@ -91,14 +91,14 @@ namespace iridium::rclone::option::logging
 	 * @brief Print as little stuff as possible
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto quiet() -> uptr_basic_opt { return std::make_unique<basic_option>("--quiet"); }
+	static auto quiet() -> basic_opt_uptr { return std::make_unique<basic_option>("--quiet"); }
 
 	/**
 	 * @brief Interval between printing stats (e.g. 500ms, 60s, 5m)
 	 * @param duration The interval duration
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto stats(const std::string& duration) -> uptr_basic_opt
+	static auto stats(const std::string& duration) -> basic_opt_uptr
 	{
 		return std::make_unique<basic_option>("--stats", duration);
 	}
@@ -108,7 +108,7 @@ namespace iridium::rclone::option::logging
 	 * @param value The maximum length
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto stats_file_name_length(int value) -> uptr_basic_opt
+	static auto stats_file_name_length(int value) -> basic_opt_uptr
 	{
 		return std::make_unique<basic_option>("--stats-file-name-length", std::to_string(value));
 	}
@@ -117,13 +117,13 @@ namespace iridium::rclone::option::logging
 	 * @brief Make the stats fit on one line
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto stats_one_line() -> uptr_basic_opt { return std::make_unique<basic_option>("--stats-one-line"); }
+	static auto stats_one_line() -> basic_opt_uptr { return std::make_unique<basic_option>("--stats-one-line"); }
 
 	/**
 	 * @brief Enable --stats-one-line and add current date/time prefix
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto stats_one_line_date() -> uptr_basic_opt
+	static auto stats_one_line_date() -> basic_opt_uptr
 	{
 		return std::make_unique<basic_option>("--stats-one-line-date");
 	}
@@ -133,7 +133,7 @@ namespace iridium::rclone::option::logging
 	 * @param format The desired date format string
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto stats_one_line_date_format(const std::string& format) -> uptr_basic_opt
+	static auto stats_one_line_date_format(const std::string& format) -> basic_opt_uptr
 	{
 		return std::make_unique<basic_option>("--stats-one-line-date-format", format);
 	}
@@ -143,7 +143,7 @@ namespace iridium::rclone::option::logging
 	 * @param unit The desired unit ('bits' or 'bytes')
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto stats_unit(const std::string& unit) -> uptr_basic_opt
+	static auto stats_unit(const std::string& unit) -> basic_opt_uptr
 	{
 		return std::make_unique<basic_option>("--stats-unit", unit);
 	}
@@ -152,14 +152,14 @@ namespace iridium::rclone::option::logging
 	 * @brief Use Syslog for logging
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto syslog() -> uptr_basic_opt { return std::make_unique<basic_option>("--syslog"); }
+	static auto syslog() -> basic_opt_uptr { return std::make_unique<basic_option>("--syslog"); }
 
 	/**
 	 * @brief Facility for syslog, e.g. KERN,USER,...
 	 * @param facility The desired facility
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto syslog_facility(const std::string& facility) -> uptr_basic_opt
+	static auto syslog_facility(const std::string& facility) -> basic_opt_uptr
 	{
 		return std::make_unique<basic_option>("--syslog-facility", facility);
 	}
@@ -168,11 +168,11 @@ namespace iridium::rclone::option::logging
 	 * @brief Use json log format
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto use_json_log() -> uptr_basic_opt { return std::make_unique<basic_option>("--use-json-log"); }
+	static auto use_json_log() -> basic_opt_uptr { return std::make_unique<basic_option>("--use-json-log"); }
 
 	/**
 	 * @brief Print lots more stuff (repeat for more)
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto verbose() -> uptr_basic_opt { return std::make_unique<basic_option>("--verbose"); }
+	static auto verbose() -> basic_opt_uptr { return std::make_unique<basic_option>("--verbose"); }
 }; // namespace iridium::rclone::option::logging

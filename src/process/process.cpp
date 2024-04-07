@@ -12,7 +12,7 @@ namespace iridium::rclone
 	std::string process::_path_rclone;
 	bool process::_is_initialized = false;
 	const std::string process::endl = "\n";
-	std::vector<option::uptr_basic_opt> process::_global_options = {};
+	std::vector<option::basic_opt_uptr> process::_global_options = {};
 
 	auto process::initialize(const std::string &path_rclone) -> void
 	{

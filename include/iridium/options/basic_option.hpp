@@ -9,8 +9,8 @@
 namespace iridium::rclone::option
 {
 	class basic_option;
-	using uptr_basic_opt = std::unique_ptr<basic_option>;
-	using ptr_basic_opt = std::shared_ptr<basic_option>;
+	using basic_opt_uptr = std::unique_ptr<basic_option>;
+	using basic_opt_ptr = std::shared_ptr<basic_option>;
 
 	class basic_option
 	{
@@ -42,13 +42,13 @@ namespace iridium::rclone::option
 		std::optional<std::string> _value;
 
 	public:
-		static void add_option_to_vector(const uptr_basic_opt& option, std::vector<std::string>& vector);
+		static void add_option_to_vector(const basic_opt_uptr& option, std::vector<std::string>& vector);
 
-		static void add_options_to_vector(const std::vector<uptr_basic_opt>& options, std::vector<std::string>& vector);
+		static void add_options_to_vector(const std::vector<basic_opt_uptr>& options, std::vector<std::string>& vector);
 
 		friend auto operator<<(std::ostream& os, const basic_option& obj) -> std::ostream&;
 	};
 
-	using uptr_basic_opt = std::unique_ptr<basic_option>;
-	using ptr_basic_opt = std::shared_ptr<basic_option>;
+	using basic_opt_uptr = std::unique_ptr<basic_option>;
+	using basic_opt_ptr = std::shared_ptr<basic_option>;
 }
