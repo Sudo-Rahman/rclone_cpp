@@ -3,6 +3,7 @@
 #include <optional>
 #include <ostream>
 #include <string>
+#include <memory>
 #include <vector>
 
 namespace iridium::rclone::option
