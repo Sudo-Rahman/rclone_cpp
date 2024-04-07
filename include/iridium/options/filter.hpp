@@ -89,10 +89,8 @@ namespace iridium::rclone::option::filter
 		explicit filter_file(Args && ...args) requires (std::conjunction_v<std::is_convertible<Args, std::string> ...>)
 		{
 			std::vector<std::string> arg_strings{std::forward<Args>(args) ...}; // Store arguments for file list
-			// Add the first argument as the main filter
-			_files.push_back("--filter=" + arg_strings[0]); // Add the first argument as the main filter
-			for (int i = 1; i < arg_strings.size(); i++)
-				_files.push_back("--filter=" + arg_strings[i]);
+			for (const auto &arg: arg_strings)
+				_files.push_back("--filter=" + arg);
 			// Discard the first argument (pattern for main filter)
 		}
 
