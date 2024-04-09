@@ -20,7 +20,7 @@ namespace iridium::rclone::entities
 		if (this == &log)
 			return *this;
 
-		operator=(log);
+		entity::operator=(log);
 		_level = log._level;
 		_message = log._message;
 		_source = log._source;
@@ -32,8 +32,9 @@ namespace iridium::rclone::entities
 		return *this;
 	}
 
-	json_log::json_log(json_log &&log) noexcept
+	json_log::json_log(json_log &&log) noexcept : entity(log)
 	{
+
 		_level = log._level;
 		log._level = log_level::no_level;
 		_message = std::move(log._message);
@@ -51,6 +52,7 @@ namespace iridium::rclone::entities
 		if (this == &log)
 			return *this;
 
+		entity::operator=(log);
 		_level = log._level;
 		log._level = log_level::no_level;
 		_message = std::move(log._message);

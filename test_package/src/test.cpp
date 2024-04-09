@@ -44,12 +44,12 @@ auto main() -> int
 					remote
 			};
 	rclone->add_option(
-			filter::filter_file::uptr("+ TP4.pdf", "- *.pdf", "+ *.torrent", "- *"),
-			listing::fast_list(),
-			logging::use_json_log(),
-			logging::verbose(),
-			logging::stats("0.1"),
-			filter::max_depth(1)
+			// filter::filter_file::uptr("+ TP4.pdf", "- *.pdf", "+ *.torrent", "- *"),
+			// listing::fast_list(),
+			// logging::use_json_log(),
+			// logging::verbose(),
+			// logging::stats("0.1"),
+			// filter::max_depth(1)
 			//        option::logging::progress(),
 			//        option::logging::use_json_log(),
 			//        option::logging::verbose()
@@ -87,7 +87,7 @@ auto main() -> int
 			//    copy_to(bureau, file)
 			//			lsjson(bureau)
 			lsl(file)
-			.every_line_parser<::file>(ser)
+			// .every_line_parser<::file>(ser)
 			//.on_finish_parser<::file>(ser)
 			//            .about(*remote, [n](const about &about)
 			//            {
@@ -128,13 +128,16 @@ auto main() -> int
 			// .every_line_parser(parser)
 			// .every_line_parser(ser)
 			//            .on_finish_parser(parserr)
-
+			.on_stop([&]
+			{
+				std::cout << "stop" << std::endl;
+			})
 			.execute()
-			.wait_for_start()
+			// .wait_for_start();
 			.wait_for_finish()
-			// .stop()
+	// boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+	// 		 rclone->stop()
 			;
-	boost::this_thread::sleep_for(boost::chrono::seconds(2));
 	cout << "n = " << *n << endl;
 	// rclone->stop();
 

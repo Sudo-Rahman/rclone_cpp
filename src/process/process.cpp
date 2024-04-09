@@ -92,7 +92,8 @@ namespace iridium::rclone
 		while (std::getline(*_out, line))
 		{
 			_output.emplace_back(line);
-			_signal_every_line->operator()(line);
+			if (_signal_every_line)
+				_signal_every_line->operator()(line);
 		}
 		_out.reset();
 	}
@@ -104,7 +105,8 @@ namespace iridium::rclone
 		{
 			_error.emplace_back(line);
 			_output.emplace_back(line);
-			_signal_every_line->operator()(line);
+			if (_signal_every_line)
+				_signal_every_line->operator()(line);
 		}
 		_err.reset();
 	}
@@ -135,7 +137,8 @@ namespace iridium::rclone
 		}
 
 		_state = state::running;
-		_signal_start->operator()();
+		if (_signal_start)
+			_signal_start->operator()();
 		_cv.notify_all();
 
 		ba::post(_pool, [this]
@@ -162,7 +165,8 @@ namespace iridium::rclone
 			else _state = state::error;
 			while (_counter_read < 2)
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			_signal_finish->operator()(_child.exit_code());
+			if (_signal_finish)
+				_signal_finish->operator()(_child.exit_code());
 			_cv.notify_all();
 		});
 
@@ -182,13 +186,15 @@ namespace iridium::rclone
 	auto process::stop() -> void
 	{
 		if (not is_running()) throw std::runtime_error("process not running");
+		if(_signal_stop)
+			_signal_stop->operator()();
 		close_input_pipe();
 		_child.terminate();
 		if (is_running())
 		{
+
 			_pool.stop();
 			_pool.join();
-			_signal_stop->operator()();
 		}
 		_state = state::stopped;
 		_cv.notify_all();
@@ -270,10 +276,7 @@ namespace iridium::rclone
 			if (exit_code not_eq 0) throw std::runtime_error("error in listremotes");
 			auto remotes = std::vector<remote_ptr>();
 			auto parser = parser::remote_parser(
-				[&remotes](const remote &remote)
-				{
-					remotes.push_back(std::make_shared<entities::remote>(remote));
-				});
+				[&remotes](const remote &remote) { remotes.push_back(std::make_shared<entities::remote>(remote)); });
 			for (const auto &line: _output)
 				parser.parse(line);
 			callback(remotes);
