@@ -5,12 +5,17 @@
 
 namespace iridium::rclone::parser
 {
-	class size_parser : public basic_parser<entity::size>
+	class size_parser : public basic_parser<entities::size>
 	{
 	public:
-		explicit size_parser(std::function<void(const entity::size&)> callback)
-			: basic_parser(std::move(callback)) {};
+		explicit size_parser(std::function<void(const entities::size &)> callback)
+			: basic_parser(std::move(callback)) {}
 
-		void parse(const std::string& data) const override;
+		static auto ptr(std::function<void(const entities::size &)> callback) -> std::shared_ptr<size_parser>
+		{
+			return std::make_shared<size_parser>(std::move(callback));
+		}
+
+		void parse(const std::string &data) const override;
 	};
 }; // namespace iridium::rclone::parser

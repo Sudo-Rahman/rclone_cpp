@@ -17,16 +17,19 @@ namespace iridium::rclone
 {
 	class RCLONE_CPP_EXPORT entity;
 
-	using RCLONE_CPP_EXPORT remote = entity::remote;
+	namespace entities
+	{
+		using RCLONE_CPP_EXPORT remote = remote;
 
-	using RCLONE_CPP_EXPORT file = entity::file;
+		using RCLONE_CPP_EXPORT file = file;
 
-	using RCLONE_CPP_EXPORT about = entity::about;
+		using RCLONE_CPP_EXPORT about = about;
 
-	using RCLONE_CPP_EXPORT size = entity::size;
+		using RCLONE_CPP_EXPORT size = size;
 
-	using RCLONE_CPP_EXPORT version = entity::version;
+		using RCLONE_CPP_EXPORT version = version;
+	}
 }
 
 namespace ir = iridium::rclone;
-using ire = iridium::rclone::entity;
+namespace ire = iridium::rclone::entities;

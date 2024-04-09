@@ -5,13 +5,17 @@
 
 namespace iridium::rclone::parser
 {
-    class version_parser : public basic_parser<entity::version> {
+	class version_parser : public basic_parser<entities::version>
+	{
+	public :
+		explicit version_parser(std::function<void(entities::version)> callback)
+			: basic_parser(std::move(callback)) {}
 
-    public :
-        version_parser(std::function<void(entity::version)> callback)
-                : basic_parser(std::move(callback)) {}
+		static auto ptr(std::function<void(entities::version)> callback) -> std::shared_ptr<version_parser>
+		{
+			return std::make_shared<version_parser>(std::move(callback));
+		}
 
-        void parse(const std::string &data) const override;
-    };
-
+		void parse(const std::string &data) const override;
+	};
 } // namespace iridium::rclone

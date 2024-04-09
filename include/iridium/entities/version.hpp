@@ -3,9 +3,9 @@
 #include "entity.hpp"
 #include <string>
 
-namespace iridium::rclone
+namespace iridium::rclone::entities
 {
-	struct entity::version : entity
+	struct version : entity
 	{
         std::string rclone_version;
 		std::string os_version;

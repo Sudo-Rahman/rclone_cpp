@@ -3,9 +3,9 @@
 #include <string>
 #include "entity.hpp"
 
-namespace iridium::rclone
+namespace iridium::rclone::entities
 {
-    class entity::size : public entity
+    class size : public entity
     {
     public:
         uint64_t total_objects{};

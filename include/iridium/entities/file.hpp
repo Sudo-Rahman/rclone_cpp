@@ -4,9 +4,9 @@
 #include <boost/date_time.hpp>
 #include "remote.hpp"
 
-namespace iridium::rclone
+namespace iridium::rclone::entities
 {
-	class entity::file : public entity
+	class file : public entity
 	{
 	public:
 		file(file * parent, const std::string& file_name, int64_t size, bool is_dir,
@@ -85,7 +85,7 @@ namespace iridium::rclone
 
 		file() = default;
 
-		virtual ~file() = default;
+		~file() override = default;
 
 		file(const file&) = default;
 		auto operator=(const file&) -> file & = default;
@@ -103,7 +103,7 @@ namespace iridium::rclone
 		boost::posix_time::ptime _mod_time;
 	};
 
-	using file_ptr = std::shared_ptr<entity::file>;
-	using file_uptr = std::unique_ptr<entity::file>;
+	using file_ptr = std::shared_ptr<file>;
+	using file_uptr = std::unique_ptr<file>;
 
 } // namespace iridium::rclone

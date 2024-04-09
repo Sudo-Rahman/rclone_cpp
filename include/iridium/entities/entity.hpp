@@ -4,21 +4,9 @@ namespace iridium::rclone
 {
 	class entity
 	{
+	public:
 		entity() = default;
 
-		friend class process;
-
-	public:
-		class about;
-
-		class size;
-
-		class file;
-
-		class remote;
-
-        class json_log;
-
-		struct  version;
+		virtual ~entity() = default;
 	};
 } // namespace iridium::rclone

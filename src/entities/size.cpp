@@ -1,9 +1,9 @@
 #include "entities/size.hpp"
 #include <iostream>
 
-namespace iridium::rclone
+namespace iridium::rclone::entities
 {
-	auto operator<<(std::ostream &os, const entity::size &size) -> std::ostream&
+	auto operator<<(std::ostream &os, const size &size) -> std::ostream&
 	{
 		os << "RcloneSize: {" << std::endl <<
 				"\ttotal_objects: " << size.total_objects << "," << std::endl <<

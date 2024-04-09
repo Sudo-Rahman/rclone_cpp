@@ -4,9 +4,9 @@
 #include "entity.hpp"
 
 
-namespace iridium::rclone
+namespace iridium::rclone::entities
 {
-	class entity::about : public entity
+	class about : public entity
 	{
 	public:
 		uint64_t total_bytes{};
@@ -16,5 +16,7 @@ namespace iridium::rclone
 		uint64_t other{};
 
 		friend auto operator<<(std::ostream& os, const about& about) -> std::ostream&;
+
+		~about() override = default;
 	};
 } // namespace Iridium::process

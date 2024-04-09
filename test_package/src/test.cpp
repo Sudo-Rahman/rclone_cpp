@@ -10,7 +10,9 @@
 using namespace boost::asio;
 using namespace std;
 using namespace iridium::rclone;
-using namespace iridium::rclone::option;
+using namespace option;
+using namespace parser;
+using namespace entities;
 
 process_pool pool{10};
 
@@ -32,12 +34,12 @@ auto main() -> int
 	//    for (int i = 0; i < 10000; ++i)
 	//    {
 	auto rclone = new process();
-	auto lst = std::vector<entity::remote>{};
+	auto lst = std::vector<remote>{};
 	auto n = new int{0};
-	auto remote = entity::remote::create_shared_ptr(
-		"drive", entity::remote::remote_type::google_drive, "");
+	auto remote = remote::create_shared_ptr(
+		"drive", remote::remote_type::google_drive, "");
 	std::cout << *remote << std::endl;
-	auto file = entity::file{
+	auto file = ::file{
 					nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(),
 					remote
 			};
@@ -55,32 +57,29 @@ auto main() -> int
 			// option::filter::exclude("*")
 		);
 
-	std::vector<std::shared_ptr<entity::remote>> remotes;
-	auto fn = [&](const std::vector<std::shared_ptr<entity::remote>> &val) -> void
+	std::vector<std::shared_ptr<::remote>> remotes;
+	auto fn = [&](const std::vector<std::shared_ptr<::remote>> &val) -> void
 	{
 		remotes = val;
 		std::cout << "remotes = " << remotes.size() << std::endl;
 	};
 
-	auto bureau = entity::file(nullptr, "/Users/sr-71/Desktop", 0, true,
-	                           boost::posix_time::second_clock::local_time(), nullptr);
+	auto bureau = ::file(nullptr, "/Users/sr-71/Desktop", 0, true,
+	                     boost::posix_time::second_clock::local_time(), nullptr);
 
-	auto ser = parser::file_parser::create(new parser::file_parser(&file,
-	                                                               [](const entity::file &file)
-	                                                               {
-		                                                               // std::cout << file << std::endl;
-		                                                               // process().lsjson(file).execute().wait_for_finish();
-	                                                               }, parser::file_parser::lsl));
+	auto ser = file_parser::ptr(&file,
+	                            [](const ::file &file)
+	                            {
+		                            std::cout << file << std::endl;
+		                            // process().lsjson(file).execute().wait_for_finish();
+	                            }, parser::file_parser::lsl);
 
-	auto parser = parser::json_log_parser::create(new parser::json_log_parser([](const entity::json_log &log)
+	auto parser = parser::json_log_parser::create(new parser::json_log_parser([](const json_log &log)
 	{
 		// std::cout << log << std::endl;
 	}));
 
-	auto parserr = parser::version_parser::create(new parser::version_parser([](const entity::version &version)
-	{
-		std::cout << version << std::endl;
-	}));
+	auto parserr = parser::version_parser::ptr([](const version &version) { std::cout << version << std::endl; });
 
 	rclone->
 			// version()
@@ -88,8 +87,9 @@ auto main() -> int
 			//    copy_to(bureau, file)
 			//			lsjson(bureau)
 			lsl(file)
-			.every_line_parser(ser)
-			//            .about(*remote, [n](const entity::about &about)
+			.every_line_parser<::file>(ser)
+			.on_finish_parser<::file>(ser)
+			//            .about(*remote, [n](const about &about)
 			//            {
 			//                std::cout << about << std::endl;
 			//
@@ -118,7 +118,7 @@ auto main() -> int
 			.every_line([&](const std::string &line)
 			{
 				//                *rclone << "q";
-				std::cout << line << std::endl;
+				// std::cout << line << std::endl;
 				//                                std::cout << line <<
 				//                                boost::this_thread::get_id() <<
 				//                                std::endl << std::endl;
@@ -138,9 +138,9 @@ auto main() -> int
 	cout << "n = " << *n << endl;
 	// rclone->stop();
 
-	std::function<void(entity::file &)> print;
+	std::function<void(::file &)> print;
 
-	print = [&print](entity::file &file)
+	print = [&print](::file &file)
 	{
 		std::cout << file << std::endl;
 		if (file.nb_chilchren() > 0) { for (const auto &f: file.children()) { print(*f); } }

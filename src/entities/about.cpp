@@ -2,9 +2,9 @@
 #include <regex>
 #include <iostream>
 
-namespace iridium::rclone
+namespace iridium::rclone::entities
 {
-	auto operator<<(std::ostream &os, const entity::about &about) -> std::ostream&
+	auto operator<<(std::ostream &os, const about &about) -> std::ostream&
 	{
 		os << "About: {" << std::endl <<
 				"\ttotal_bytes: " << about.total_bytes << "," << std::endl <<

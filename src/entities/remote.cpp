@@ -3,12 +3,12 @@
 #include <utility>
 #include <boost/algorithm/string/split.hpp>
 
-namespace iridium::rclone
+namespace iridium::rclone::entities
 {
-	entity::remote::remote(const std::string &name, remote_type type, const std::string &path) : _name(name),
+	remote::remote(const std::string &name, remote_type type, const std::string &path) : _name(name),
 		_type(type), _path(path) {}
 
-	entity::remote::remote(remote &&remote) noexcept
+	remote::remote(remote &&remote) noexcept
 	{
 		_name = std::move(remote._name);
 		_type = remote._type;
@@ -16,7 +16,7 @@ namespace iridium::rclone
 		_path = std::move(remote._path);
 	}
 
-	auto entity::remote::operator=(remote &&remote) noexcept -> entity::remote&
+	auto remote::operator=(remote &&remote) noexcept -> entities::remote&
 	{
 		if (this == &remote) return *this;
 
@@ -28,7 +28,7 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	auto entity::remote::name() const -> std::string
+	auto remote::name() const -> std::string
 	{
 		if (_name.ends_with(":"))
 			return _name.substr(0, _name.size() - 1);
@@ -38,7 +38,7 @@ namespace iridium::rclone
 	/**
 	 * @return name and ":" if it doesn't end with ":"
 	 */
-	auto entity::remote::root_path() const -> std::string
+	auto remote::root_path() const -> std::string
 	{
 		if (not _name.ends_with(":"))
 			return _name + ":";
@@ -48,9 +48,9 @@ namespace iridium::rclone
 	/**
 	 * @return  root_path() + path()
 	 */
-	auto entity::remote::full_path() const -> std::string { return root_path() + path(); }
+	auto remote::full_path() const -> std::string { return root_path() + path(); }
 
-	auto operator<<(std::ostream &os, const entity::remote &remote) -> std::ostream&
+	auto operator<<(std::ostream &os, const remote &remote) -> std::ostream&
 	{
 		os << "Remote: {" << std::endl <<
 				"\tname: " << remote._name << "," << std::endl <<
@@ -59,32 +59,32 @@ namespace iridium::rclone
 		return os;
 	}
 
-	void entity::remote::set_path(const std::string &path) { _path = path; }
+	void remote::set_path(const std::string &path) { _path = path; }
 
-	auto entity::remote::operator==(const remote &remote) const -> bool
+	auto remote::operator==(const remote &remote) const -> bool
 	{
 		return _name == remote._name &&
 		       _type == remote._type &&
 		       _path == remote._path;
 	}
 
-	auto entity::remote::operator!=(const remote &remote) const -> bool { return !(remote == *this); }
+	auto remote::operator!=(const remote &remote) const -> bool { return !(remote == *this); }
 
 	auto
-	entity::remote::create_shared_ptr(const std::string &name, remote_type type,
-	                                  const std::string &path) -> std::shared_ptr<entity::remote>
+	remote::create_shared_ptr(const std::string &name, remote_type type,
+	                                  const std::string &path) -> std::shared_ptr<remote>
 	{
 		return std::make_shared<remote>(name, type, path);
 	}
 
 	auto
-	entity::remote::create_unique_ptr(const std::string &name, remote_type type,
-	                                  const std::string &path) -> std::unique_ptr<entity::remote>
+	remote::create_unique_ptr(const std::string &name, remote_type type,
+	                                  const std::string &path) -> std::unique_ptr<remote>
 	{
 		return std::make_unique<remote>(name, type, path);
 	}
 
-	auto entity::remote::remote_type_to_string(const remote_type &type) -> const std::string
+	auto remote::remote_type_to_string(const remote_type &type) -> const std::string
 	{
 		for (const auto &pair: string_to_remote_type)
 		{
@@ -94,7 +94,7 @@ namespace iridium::rclone
 		return "none";
 	}
 
-	const std::map<std::string, entity::remote::remote_type> entity::remote::string_to_remote_type = {
+	const std::map<std::string, remote::remote_type> remote::string_to_remote_type = {
 					{"drive", remote_type::google_drive},
 					{"sftp", remote_type::sftp},
 					{"onedrive", remote_type::onedrive},

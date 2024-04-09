@@ -3,6 +3,8 @@
 #include <regex>
 #include "utils.cpp"
 
+using namespace iridium::rclone::entities;
+
 template<class T>
 extern auto get_from_obj(const boost::json::object &obj, const std::string &key) -> T;
 
@@ -10,7 +12,7 @@ namespace iridium::rclone::parser
 {
 	auto json_log_parser::parse(const std::string &data) const -> void
 	{
-		auto log = entity::json_log();
+		auto log = json_log();
 
 		auto regex = std::regex(R"(\{.*\})");
 		std::smatch match;
@@ -23,7 +25,7 @@ namespace iridium::rclone::parser
 		try
 		{
 			boost::json::object obj = boost::json::parse(data).as_object();
-			log._level = entity::json_log::string_to_level(get_from_obj<std::string>(obj, "level"));
+			log._level = json_log::string_to_level(get_from_obj<std::string>(obj, "level"));
 			log._message = get_from_obj<std::string>(obj, "msg");
 			log._source = get_from_obj<std::string>(obj, "source");
 			log._object = get_from_obj<std::string>(obj, "object");
@@ -38,7 +40,7 @@ namespace iridium::rclone::parser
 			iss >> abs_time;
 			log._time = abs_time;
 			if (obj.contains("stats"))
-				log._stats = new entity::json_log::stats(parse_stats(obj.at("stats").as_object()));
+				log._stats = new json_log::stats(parse_stats(obj.at("stats").as_object()));
 
 			callback(log);
 		}
@@ -48,9 +50,9 @@ namespace iridium::rclone::parser
 		}
 	}
 
-	auto json_log_parser::parse_stats(const boost::json::object &obj) -> entity::json_log::stats
+	auto json_log_parser::parse_stats(const boost::json::object &obj) -> json_log::stats
 	{
-		auto stats = entity::json_log::stats();
+		auto stats = json_log::stats();
 
 		try
 		{
@@ -77,22 +79,22 @@ namespace iridium::rclone::parser
 	}
 
 	auto json_log_parser::parse_transferring(
-		const boost::json::value *value) -> std::vector<entity::json_log::stats::transfer>
+		const boost::json::value *value) -> std::vector<json_log::stats::transfer>
 	{
 		if (value == nullptr)
 			return {};
 		if (value->is_null()) return {};
 		auto array = value->as_array();
-		auto transferring = std::vector<entity::json_log::stats::transfer>();
+		auto transferring = std::vector<json_log::stats::transfer>();
 		for (const auto &obj: array)
 			transferring.push_back(parse_transfer(obj.as_object()));
 
 		return transferring;
 	}
 
-	auto json_log_parser::parse_transfer(const boost::json::object &obj) -> entity::json_log::stats::transfer
+	auto json_log_parser::parse_transfer(const boost::json::object &obj) -> json_log::stats::transfer
 	{
-		auto transfer = entity::json_log::stats::transfer();
+		auto transfer = json_log::stats::transfer();
 		transfer.bytes = get_from_obj<uint64_t>(obj, "bytes");
 		transfer.eta = get_from_obj_optional<uint64_t>(obj, "eta");
 		transfer.group = get_from_obj<std::string>(obj, "group");

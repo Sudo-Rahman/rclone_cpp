@@ -6,12 +6,17 @@
 
 namespace iridium::rclone::parser
 {
-	class remote_parser : public basic_parser<entity::remote>
+	class remote_parser : public basic_parser<entities::remote>
 	{
 	public:
-		explicit remote_parser(std::function<void(const entity::remote&)> callback)
-			: basic_parser(std::move(callback)) {};
+		explicit remote_parser(std::function<void(const entities::remote &)> callback)
+			: basic_parser(std::move(callback)) {}
 
-		void parse(const std::string& data) const override;
+		static auto ptr(std::function<void(const entities::remote &)> callback) -> std::shared_ptr<remote_parser>
+		{
+			return std::make_shared<remote_parser>(std::move(callback));
+		}
+
+		void parse(const std::string &data) const override;
 	};
 } // namespace iridium::rclone

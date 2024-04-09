@@ -1,8 +1,8 @@
 #include <json_log.hpp>
 
-namespace iridium::rclone
+namespace iridium::rclone::entities
 {
-	entity::json_log::json_log(const json_log &log)
+	json_log::json_log(const json_log &log)
 		: entity(log),
 		  _level(log._level),
 		  _message(log._message),
@@ -15,12 +15,12 @@ namespace iridium::rclone
 			_stats = new stats(*log._stats);
 	}
 
-	auto entity::json_log::operator=(const json_log &log) -> json_log&
+	auto json_log::operator=(const json_log &log) -> json_log&
 	{
 		if (this == &log)
 			return *this;
 
-		entity::operator=(log);
+		operator=(log);
 		_level = log._level;
 		_message = log._message;
 		_source = log._source;
@@ -32,7 +32,7 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	entity::json_log::json_log(json_log &&log) noexcept
+	json_log::json_log(json_log &&log) noexcept
 	{
 		_level = log._level;
 		log._level = log_level::no_level;
@@ -46,7 +46,7 @@ namespace iridium::rclone
 		log._stats = nullptr;
 	}
 
-	auto entity::json_log::operator=(json_log &&log) noexcept -> json_log&
+	auto json_log::operator=(json_log &&log) noexcept -> json_log&
 	{
 		if (this == &log)
 			return *this;
@@ -65,9 +65,9 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	entity::json_log::~json_log() { delete _stats; }
+	json_log::~json_log() { delete _stats; }
 
-	auto entity::json_log::string_to_level(const std::string &level) -> log_level
+	auto json_log::string_to_level(const std::string &level) -> log_level
 	{
 		if (level == "info")
 			return log_level::info;
@@ -78,7 +78,7 @@ namespace iridium::rclone
 		return log_level::no_level;
 	}
 
-	auto operator<<(std::ostream &os, const entity::json_log &log) -> std::ostream&
+	auto operator<<(std::ostream &os, const json_log &log) -> std::ostream&
 	{
 		auto stats = std::string{};
 		auto buffer = std::stringstream{};
@@ -92,7 +92,7 @@ namespace iridium::rclone
 
 		os << "json_log" << std::endl <<
 				"{" << std::endl <<
-				"\tlevel : " << entity::json_log::level_to_string(log._level) << ", " << std::endl <<
+				"\tlevel : " << json_log::level_to_string(log._level) << ", " << std::endl <<
 				"\tmessage : " << log.message() << ", " << std::endl <<
 				"\tsource : " << log.source() << ", " << std::endl <<
 				"\tobject : " << log.object() << ", " << std::endl <<
@@ -103,7 +103,7 @@ namespace iridium::rclone
 		return os;
 	}
 
-	auto entity::json_log::level_to_string(const log_level &level) -> std::string
+	auto json_log::level_to_string(const log_level &level) -> std::string
 	{
 		switch (level)
 		{
@@ -118,7 +118,7 @@ namespace iridium::rclone
 		}
 	}
 
-	auto operator<<(std::ostream &os, const entity::json_log::stats &stats) -> std::ostream&
+	auto operator<<(std::ostream &os, const json_log::stats &stats) -> std::ostream&
 	{
 		os << "stats : {" << std::endl <<
 				"\tbytes : " << stats.bytes << ", " << std::endl <<
@@ -143,7 +143,7 @@ namespace iridium::rclone
 		return os;
 	}
 
-	auto operator<<(std::ostream &os, const entity::json_log::stats::transfer &transfer) -> std::ostream&
+	auto operator<<(std::ostream &os, const json_log::stats::transfer &transfer) -> std::ostream&
 	{
 		os << "transfer : {" << std::endl <<
 				"\tbytes : " << transfer.bytes << ", " << std::endl <<

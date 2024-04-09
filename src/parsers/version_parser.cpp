@@ -1,11 +1,13 @@
 #include <version_parser.hpp>
 #include <sstream>
 
+using namespace iridium::rclone::entities;
+
 namespace iridium::rclone::parser
 {
 	void version_parser::parse(const std::string &data) const
 	{
-		entity::version version;
+		version version;
 		std::istringstream iss(data);
 		std::string line;
 		while (std::getline(iss, line))

@@ -77,7 +77,7 @@ namespace iridium::rclone
 		auto every_line(std::function<void(const std::string &)> &&callback) -> process&;
 
 		template<class T>
-		auto every_line_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process&
+		auto every_line_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process& requires(std::is_base_of_v<entity, T>)
 		{
 			_signal_every_line->connect([this, parser = std::move(parser)](const std::string &line)
 			{
@@ -88,10 +88,12 @@ namespace iridium::rclone
 
 		auto on_finish(std::function<void(int)> &&callback) -> process&;
 
+		auto on_stop(std::function<void()> &&callback) -> process&;
+
 		auto on_start(std::function<void()> &&callback) -> process&;
 
 		template<class T>
-		auto on_finish_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process&
+		auto on_finish_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process& requires(std::is_base_of_v<entity, T>)
 		{
 			_signal_finish->connect([this, parser = std::move(parser)](int)
 			{
@@ -104,11 +106,11 @@ namespace iridium::rclone
 
 		auto version() -> process&;
 
-		auto list_remotes(std::function<void(const std::vector<remote_ptr> &)> &&) -> process&;
+		auto list_remotes(std::function<void(const std::vector<entities::remote_ptr> &)> &&) -> process&;
 
 		auto list_remotes() -> process&;
 
-		auto delete_remote(const entity::remote &remote) -> process&;
+		auto delete_remote(const entities::remote &remote) -> process&;
 
 		auto config() -> process&;
 
@@ -116,49 +118,49 @@ namespace iridium::rclone
 
 		friend class config_create;
 
-		auto lsjson(const entity::remote &remote) -> process&;
+		auto lsjson(const entities::remote &remote) -> process&;
 
-		auto lsjson(const entity::file &file) -> process&;
+		auto lsjson(const entities::file &file) -> process&;
 
 		/**
 		 * \brief Lists the objects in the source path to standard output in a human readable format with size and path. Recurses by default.
 		 * \param file
 		 * \return
 		 */
-		auto ls(const entity::file &file) -> process&;
+		auto ls(const entities::file &file) -> process&;
 
-		auto lsl(const entity::file &file) -> process&;
+		auto lsl(const entities::file &file) -> process&;
 
-		auto lsd(const entity::file &file) -> process&;
+		auto lsd(const entities::file &file) -> process&;
 
-		auto lsf(const entity::file &file) -> process&;
+		auto lsf(const entities::file &file) -> process&;
 
-		auto copy_to(const entity::file &source, const entity::file &destination) -> process&;
+		auto copy_to(const entities::file &source, const entities::file &destination) -> process&;
 
-		auto move_to(const entity::file &source, const entity::file &destination) -> process&;
+		auto move_to(const entities::file &source, const entities::file &destination) -> process&;
 
-		auto delete_file(const entity::file &file) -> process&;
+		auto delete_file(const entities::file &file) -> process&;
 
-		auto mkdir(const entity::file &file) -> process&;
+		auto mkdir(const entities::file &file) -> process&;
 
-		auto cat(const entity::file &file) -> process&;
+		auto cat(const entities::file &file) -> process&;
 
-		auto about(const entity::remote &remote) -> process&;
+		auto about(const entities::remote &remote) -> process&;
 
-		auto size(const entity::file &file) -> process&;
+		auto size(const entities::file &file) -> process&;
 
-		auto tree(const entity::file &file) -> process&;
+		auto tree(const entities::file &file) -> process&;
 
-		auto bi_sync(const entity::file &source, const entity::file &destination) -> process&;
+		auto bi_sync(const entities::file &source, const entities::file &destination) -> process&;
 
-		auto clean_up(const entity::remote &remote) -> process&;
+		auto clean_up(const entities::remote &remote) -> process&;
 
-		auto copy_url(const std::string &url, const entity::file &destination) -> process&;
+		auto copy_url(const std::string &url, const entities::file &destination) -> process&;
 
 		/**
 		 * @brief Compare the source and destination and check if the files are the same
 		 */
-		auto check(const entity::file &source, const entity::file &destination) -> process&;
+		auto check(const entities::file &source, const entities::file &destination) -> process&;
 
 		template<class ...Args>
 		auto add_option(Args && ...args) -> process& requires(std::conjunction_v<std::is_convertible<Args,
@@ -207,6 +209,7 @@ namespace iridium::rclone
 		std::unique_ptr<boost::signals2::signal<void(const std::string &line)>> _signal_every_line;
 		std::unique_ptr<boost::signals2::signal<void(int)>> _signal_finish;
 		std::unique_ptr<boost::signals2::signal<void()>> _signal_start;
+		std::unique_ptr<boost::signals2::signal<void()>> _signal_stop;
 	};
 
 	using process_ptr = std::shared_ptr<process>;

@@ -26,7 +26,7 @@ namespace iridium::rclone::parser
 
 	void about_parser::parse(const std::string &data) const
 	{
-		auto about = entity::about();
+		auto about = entities::about();
 		std::regex total = std::regex("Total:.*\n");
 		std::regex used = std::regex("Used:.*\n");
 		std::regex free = std::regex("Free:.*\n");

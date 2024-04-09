@@ -13,9 +13,7 @@ namespace iridium::rclone
 				_cv_process.wait(lock, [this]
 				{
 					boost::this_thread::interruption_point();
-					return nb_running_processes() < _simultaneous_processes
-					       and not _processes.empty() and _executed_processes < _processes.size() and get_process()
-					       not_eq nullptr;
+					return nb_running_processes() < _simultaneous_processes and get_process() not_eq nullptr;
 				});
 				boost::this_thread::interruption_point();
 				auto *process = get_process();

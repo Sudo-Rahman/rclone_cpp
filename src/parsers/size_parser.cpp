@@ -1,11 +1,13 @@
 #include <regex>
 #include <size_parser.hpp>
 
+using namespace iridium::rclone::entities;
+
 namespace iridium::rclone::parser
 {
 	void size_parser::parse(const std::string &data) const
 	{
-		auto size = entity::size();
+		auto size = ::size();
 		std::regex total = std::regex(R"(([0-9]+))");
 		std::regex size_regex = std::regex(R"(([0-9]+ Byte))");
 		std::smatch match;

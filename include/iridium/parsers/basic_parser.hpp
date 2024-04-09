@@ -7,10 +7,7 @@
 
 namespace iridium::rclone::parser
 {
-	template<class Type, class BaseClass>
-	concept CheckType = std::is_base_of_v<BaseClass, Type>;
-
-	template<class T> requires CheckType<T, entity>
+	template<class T> requires (std::is_base_of_v<entity, T>)
 	class basic_parser
 	{
 		std::function<void(const T&)> _callback;
@@ -31,4 +28,7 @@ namespace iridium::rclone::parser
             return std::shared_ptr<basic_parser>(parser);
         }
 	};
+
+	using parser_ptr = std::shared_ptr<basic_parser<entity>>;
+	using parser_uptr = std::unique_ptr<basic_parser<entity>>;
 } // namespace iridium::rclone
