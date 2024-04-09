@@ -93,6 +93,8 @@ namespace iridium::rclone
 
 		std::mutex _mutex;
 		std::condition_variable _cv;
+		std::mutex _wait_mutex;
+		std::condition_variable _wait_cv;
 
 
 		enum class operation : uint8_t

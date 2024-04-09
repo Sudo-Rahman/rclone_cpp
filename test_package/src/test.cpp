@@ -88,7 +88,7 @@ auto main() -> int
 			//			lsjson(bureau)
 			lsl(file)
 			.every_line_parser<::file>(ser)
-			.on_finish_parser<::file>(ser)
+			//.on_finish_parser<::file>(ser)
 			//            .about(*remote, [n](const about &about)
 			//            {
 			//                std::cout << about << std::endl;
@@ -160,7 +160,7 @@ auto main() -> int
 		pool.add_process(std::move(proc), process_pool::priority::low);
 	}
 
-	this_thread::sleep_for(std::chrono::milliseconds(1000));
+	// this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 	pool.wait();
 

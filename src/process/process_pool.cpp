@@ -13,7 +13,7 @@ namespace iridium::rclone
 				_cv_process.wait(lock, [this]
 				{
 					boost::this_thread::interruption_point();
-					return nb_running_processes() < _simultaneous_processes and get_process() not_eq nullptr;
+					return _running_processes < _simultaneous_processes and get_process() not_eq nullptr;
 				});
 				boost::this_thread::interruption_point();
 				auto *process = get_process();
@@ -23,6 +23,7 @@ namespace iridium::rclone
 					_running_processes--;
 					_executed_processes++;
 					_cv_process.notify_one();
+					_wait_cv.notify_one();
 				});
 				process->execute();
 				_running_processes++;
@@ -72,12 +73,14 @@ namespace iridium::rclone
 
 	void process_pool::wait()
 	{
-		lock();
-		for (const auto &pair: _processes)
-			for (const auto &process: pair.second)
-				if (process->is_running())
-					process->wait_for_finish();
-		unlock();
+		auto unique_lock = std::unique_lock(_wait_mutex);
+		_wait_cv.wait(unique_lock, [this]
+		{
+			auto size = 0;
+			for (const auto &pair: _processes)
+				size += pair.second.size();
+			return _executed_processes == size;
+		});
 	}
 
 	auto process_pool::empty() const -> bool { return _processes.empty(); }
