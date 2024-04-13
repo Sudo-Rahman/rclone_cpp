@@ -4,7 +4,7 @@ from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 
 class rclone_cppRecipe(ConanFile):
     name = "rclone_cpp"
-    version = "0.2"
+    version = "0.3"
     package_type = "library"
 
     # Optional metadata

@@ -4,6 +4,10 @@
 #include <parsers.hpp>
 #include <config_create.hpp>
 
+#if defined(_WIN32)
+#include <boost/process/windows.hpp>
+#endif
+
 namespace iridium::rclone
 {
 	namespace ba = boost::asio;
@@ -125,10 +129,14 @@ namespace iridium::rclone
 			_out = std::make_unique<bp::ipstream>();
 			_err = std::make_unique<bp::ipstream>();
 			_child = bp::child(
-				bp::exe(_path_rclone),
-				bp::args(_args),
-				bp::std_in < *_in, bp::std_out > *_out,
-				bp::std_err > *_err);
+					bp::exe(_path_rclone),
+					bp::args(_args),
+					bp::std_in < *_in, bp::std_out > *_out,
+					bp::std_err > *_err
+#if defined(_WIN32)
+					, bp::windows::hide
+#endif
+				);
 		}
 		catch (const std::exception &e)
 		{
@@ -186,13 +194,12 @@ namespace iridium::rclone
 	auto process::stop() -> void
 	{
 		if (not is_running()) throw std::runtime_error("process not running");
-		if(_signal_stop)
+		if (_signal_stop)
 			_signal_stop->operator()();
 		close_input_pipe();
 		_child.terminate();
 		if (is_running())
 		{
-
 			_pool.stop();
 			_pool.join();
 		}

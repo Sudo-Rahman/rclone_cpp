@@ -15,20 +15,6 @@
 #endif
 
 
-namespace iridium::rclone::parser
-{
-	class RCLONE_CPP_EXPORT file_parser;
-
-	class RCLONE_CPP_EXPORT remote_parser;
-
-	class RCLONE_CPP_EXPORT about_parser;
-
-    class RCLONE_CPP_EXPORT json_log_parser;
-
-    class RCLONE_CPP_EXPORT version_parser;
-
-	class RCLONE_CPP_EXPORT size_parser;
-} // namespace iridium::rclone::parser
 
 namespace ir = iridium::rclone;
 namespace irp = iridium::rclone::parser;

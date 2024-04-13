@@ -2,6 +2,7 @@
 
 #include <string>
 #include "entity.hpp"
+#include <cstdint>
 
 
 namespace iridium::rclone::entities
