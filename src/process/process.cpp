@@ -19,17 +19,27 @@ namespace iridium::rclone
 	std::vector<option::basic_opt_uptr> process::_global_options = {};
 	using namespace entities;
 
-	auto process::initialize(const std::string &path_rclone) -> void
+	auto process::initialize(const std::string &path_rclone) -> bool
 	{
+		auto is_ok = false;
 		if (path_rclone.empty())
 		{
+#if defined(_WIN32)
+			auto path = bp::search_path("rclone.exe");
+#else
 			auto path = bp::search_path("rclone");
+#endif
 			if (path.empty())
 				throw std::runtime_error("rclone not found in the path");
 			_path_rclone = path.string();
 		}
 		else _path_rclone = path_rclone;
+
+		if(boost::filesystem::exists(_path_rclone))
+			is_ok = true;
+
 		_is_initialized = true;
+		return is_ok;
 	}
 
 	process::process()
@@ -367,6 +377,24 @@ namespace iridium::rclone
 	auto process::delete_file(const file &file) -> process&
 	{
 		_args = {"delete", file.absolute_path()};
+		return *this;
+	}
+
+	auto process::rmdir(const file &file) -> process&
+	{
+		_args = {"rmdir", file.absolute_path()};
+		return *this;
+	}
+
+	auto process::rmdirs(const file &file) -> process&
+	{
+		_args = {"rmdirs", file.absolute_path()};
+		return *this;
+	}
+
+	auto process::purge(const file &file) -> process&
+	{
+		_args = {"purge", file.absolute_path()};
 		return *this;
 	}
 

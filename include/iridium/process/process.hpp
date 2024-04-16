@@ -33,8 +33,9 @@ namespace iridium::rclone
 		/**
 		 * @brief Initialize the rclone process
 		 * @param path_rclone the path to the rclone executable or if empty the system path will be used
+		 * @return return true if rclone is found
 		 */
-		static auto initialize(const std::string &path_rclone = "") -> void;
+		static auto initialize(const std::string &path_rclone = "") -> bool;
 
 		auto wait_for_start() -> process&;
 
@@ -77,7 +78,8 @@ namespace iridium::rclone
 		auto every_line(std::function<void(const std::string &)> &&callback) -> process&;
 
 		template<class T>
-		auto every_line_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process& requires(std::is_base_of_v<entity, T>)
+		auto every_line_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process& requires(std::is_base_of_v<
+			entity, T>)
 		{
 			_signal_every_line->connect([this, parser = std::move(parser)](const std::string &line)
 			{
@@ -93,7 +95,8 @@ namespace iridium::rclone
 		auto on_start(std::function<void()> &&callback) -> process&;
 
 		template<class T>
-		auto on_finish_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process& requires(std::is_base_of_v<entity, T>)
+		auto on_finish_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process& requires(std::is_base_of_v<
+			entity, T>)
 		{
 			_signal_finish->connect([this, parser = std::move(parser)](int)
 			{
@@ -140,6 +143,28 @@ namespace iridium::rclone
 		auto move_to(const entities::file &source, const entities::file &destination) -> process&;
 
 		auto delete_file(const entities::file &file) -> process&;
+
+		auto rmdir(const entities::file &file) -> process&;
+
+		/**
+		 * @brief Remove empty directories under the path.
+		 * @details This recursively removes any empty directories (including directories that only contain empty directories),
+		 * that it finds under the path. The root path itself will also be removed if it is empty, unless you supply the --leave-root flag.
+		 * @param file
+		 * @return this
+		 */
+		auto rmdirs(const entities::file &file) -> process&;
+
+		/**
+		 * @brief Remove the path and all of its contents.
+		 * @details Remove the path and all of its contents.
+		 * Note that this does not obey include/exclude filters - everything will be removed.
+		 * Use the delete command if you want to selectively delete files.
+		 * To delete empty directories only, use command rmdir or rmdirs.
+		 * @param file
+		 * @return this
+		 */
+		auto purge(const entities::file &file) -> process&;
 
 		auto mkdir(const entities::file &file) -> process&;
 

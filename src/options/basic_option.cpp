@@ -17,6 +17,16 @@ namespace iridium::rclone::option
 		_value = value;
 	}
 
+	auto basic_option::uptr(const std::string &option) -> basic_opt_uptr
+	{
+		return std::make_unique<basic_option>(option);
+	}
+
+	auto basic_option::uptr(const std::string &option, const std::string &value) -> basic_opt_uptr
+	{
+		return std::make_unique<basic_option>(option, value);
+	}
+
 	void basic_option::add_option_to_vector(const basic_opt_uptr &option, std::vector<std::string> &vector)
 	{
 		std::vector<std::string> vec = option->get();
