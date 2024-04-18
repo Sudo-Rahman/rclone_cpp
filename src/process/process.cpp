@@ -35,7 +35,7 @@ namespace iridium::rclone
 		}
 		else _path_rclone = path_rclone;
 
-		if(boost::filesystem::exists(_path_rclone))
+		if (boost::filesystem::exists(_path_rclone))
 			is_ok = true;
 
 		_is_initialized = true;
@@ -178,13 +178,16 @@ namespace iridium::rclone
 					_child.wait();
 			}
 			catch (boost::wrapexcept<boost::process::process_error> &e) { std::cerr << e.what() << std::endl; }
-			if (_child.exit_code() == 0)
-				_state = state::finished;
-			else _state = state::error;
-			while (_counter_read < 2)
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			if (_signal_finish)
-				_signal_finish->operator()(_child.exit_code());
+			if (_state not_eq state::stopped)
+			{
+				if (_child.exit_code() == 0)
+					_state = state::finished;
+				else _state = state::error;
+				while (_counter_read < 2)
+					std::this_thread::sleep_for(std::chrono::milliseconds(10));
+				if (_signal_finish)
+					_signal_finish->operator()(_child.exit_code());
+			}
 			_cv.notify_all();
 		});
 
@@ -204,6 +207,7 @@ namespace iridium::rclone
 	auto process::stop() -> void
 	{
 		if (not is_running()) throw std::runtime_error("process not running");
+		_state = state::stopped;
 		if (_signal_stop)
 			_signal_stop->operator()();
 		close_input_pipe();
@@ -213,7 +217,6 @@ namespace iridium::rclone
 			_pool.stop();
 			_pool.join();
 		}
-		_state = state::stopped;
 		_cv.notify_all();
 	}
 

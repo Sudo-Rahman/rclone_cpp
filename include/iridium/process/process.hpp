@@ -26,8 +26,8 @@ namespace iridium::rclone
 			not_launched,
 			running,
 			finished,
-			stopped = finished,
-			error = finished
+			stopped,
+			error
 		};
 
 		/**
