@@ -32,7 +32,7 @@ namespace iridium::rclone::option::logging
 	class log_level : public basic_option
 	{
 	public:
-		enum level { DEBUG, INFO, NOTICE, ERROR };
+		enum level { debug, info, notice, error };
 
 
 		static auto uptr(level level) -> std::unique_ptr<log_level> { return std::make_unique<log_level>(level); }
@@ -43,13 +43,13 @@ namespace iridium::rclone::option::logging
 		{
 			switch (level)
 			{
-				case DEBUG:
+				case debug:
 					return "DEBUG";
-				case INFO:
+				case info:
 					return "INFO";
-				case NOTICE:
+				case notice:
 					return "NOTICE";
-				case ERROR:
+				case error:
 					return "ERROR";
 			}
 			return "INFO";
@@ -174,5 +174,5 @@ namespace iridium::rclone::option::logging
 	 * @brief Print lots more stuff (repeat for more)
 	 * @return A `basic_option` object with the option set
 	 */
-	static auto verbose() -> basic_opt_uptr { return std::make_unique<basic_option>("--verbose"); }
+	static auto verbose() -> basic_opt_uptr { return std::make_unique<basic_option>("--verbose"); };
 }; // namespace iridium::rclone::option::logging
