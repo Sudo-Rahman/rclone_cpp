@@ -3,7 +3,8 @@
 #include "entity.hpp"
 #include <iostream>
 #include <optional>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
+#include <vector>
 
 namespace iridium::rclone { namespace parser
 	{
@@ -47,7 +48,7 @@ namespace iridium::rclone { namespace parser
 
 			[[nodiscard]] auto object_type() const -> std::string { return _object_type; }
 
-			[[nodiscard]] auto time() const -> boost::posix_time::ptime { return _time; }
+			[[nodiscard]] auto time() const -> std::chrono::system_clock::time_point { return _time; }
 
 			[[nodiscard]] auto get_stats() const -> const stats * { return _stats; }
 
@@ -65,7 +66,7 @@ namespace iridium::rclone { namespace parser
 			std::string _source;
 			std::string _object;
 			std::string _object_type;
-			boost::posix_time::ptime _time;
+			std::chrono::system_clock::time_point _time;
 			stats *_stats{};
 		};
 

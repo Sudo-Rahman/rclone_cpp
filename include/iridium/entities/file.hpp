@@ -1,7 +1,8 @@
 #pragma once
 
 #include <iostream>
-#include <boost/date_time.hpp>
+#include <chrono>
+#include <vector>
 #include "remote.hpp"
 
 namespace iridium::rclone::entities
@@ -10,12 +11,7 @@ namespace iridium::rclone::entities
 	{
 	public:
 		file(file * parent, const std::string& file_name, int64_t size, bool is_dir,
-		     const boost::posix_time::ptime& mod_time,
-		     const remote_ptr& remote = nullptr);
-
-
-		file(file * parent, const std::string& file_name, int64_t size, bool is_dir,
-		     const boost::posix_time::seconds& mod_time,
+		     const std::chrono::system_clock::time_point& mod_time,
 		     const remote_ptr& remote = nullptr);
 
 		file(file * parent, const std::string& file_name,const remote_ptr& remote = nullptr);
@@ -44,7 +40,7 @@ namespace iridium::rclone::entities
 
 		[[nodiscard]] auto is_dir() const -> bool { return _is_dir; }
 
-		[[nodiscard]] auto mod_time() const -> boost::posix_time::ptime { return _mod_time; }
+		[[nodiscard]] auto mod_time() const -> std::chrono::system_clock::time_point{ return _mod_time; }
 
 		[[nodiscard]] auto pointer() -> file* { return this; }
 
@@ -56,12 +52,7 @@ namespace iridium::rclone::entities
 
 		void set_is_dir(const bool& isDir) { _is_dir = isDir; }
 
-		void set_mod_time(const boost::posix_time::ptime& mod_time) { _mod_time = mod_time; }
-
-		void set_mod_time(const boost::posix_time::seconds& mod_time)
-		{
-			_mod_time = boost::posix_time::from_time_t(mod_time.total_seconds());
-		}
+		void set_mod_time(const std::chrono::system_clock::time_point& mod_time) { _mod_time = mod_time; }
 
 		void add_child(const std::shared_ptr<file>& child);
 
@@ -81,7 +72,7 @@ namespace iridium::rclone::entities
 
 		static auto
 		create_shared_ptr(file * parent, const std::string& name_file, int64_t size, bool is_dir,
-		                  boost::posix_time::ptime mod_time, const remote_ptr& remote) -> std::shared_ptr<file>;
+		                 std::chrono::system_clock::time_point mod_time, const remote_ptr& remote) -> std::shared_ptr<file>;
 
 		file() = default;
 
@@ -100,7 +91,7 @@ namespace iridium::rclone::entities
 		file * _parent{};
 		std::vector<std::shared_ptr<file>> _children;
 		bool _is_dir{};
-		boost::posix_time::ptime _mod_time;
+		std::chrono::system_clock::time_point _mod_time;
 	};
 
 	using file_ptr = std::shared_ptr<file>;

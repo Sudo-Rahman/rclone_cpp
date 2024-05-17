@@ -1,10 +1,13 @@
 from conan import ConanFile
+from conan.tools.build import check_min_cppstd
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
+
+required_conan_version = ">=2.0.0"
 
 
 class rclone_cppRecipe(ConanFile):
     name = "rclone_cpp"
-    version = "0.3"
+    version = "0.4"
     package_type = "library"
 
     # Optional metadata
@@ -21,6 +24,10 @@ class rclone_cppRecipe(ConanFile):
 
     # Sources are located in the same place as this recipe, copy them to the recipe
     exports_sources = "CMakeLists.txt", "src/*", "include/*"
+
+    @property
+    def _min_cppstd(self):
+        return 17
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -39,6 +46,10 @@ class rclone_cppRecipe(ConanFile):
         tc = CMakeToolchain(self)
         tc.generate()
 
+    def validate(self):
+        if self.info.settings.compiler.get_safe("cppstd"):
+            check_min_cppstd(self, self._min_cppstd)
+
     def build(self):
         cmake = CMake(self)
         cmake.configure()
@@ -52,7 +63,7 @@ class rclone_cppRecipe(ConanFile):
         self.cpp_info.libs = ["rclone_cpp"]
 
     def requirements(self):
-        self.requires("boost/[>=1.80.0]")
+        self.requires("boost/[>=1.80.0 <1.86.0]")
 
     def tools_requires(self):
         self.tool_requires("cmake/[>=3.25]")

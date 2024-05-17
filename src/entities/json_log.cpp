@@ -1,5 +1,7 @@
 #include <json_log.hpp>
+#include <boost/lexical_cast.hpp>
 
+using namespace std::chrono;
 namespace iridium::rclone::entities
 {
 	json_log::json_log(const json_log &log)
@@ -42,7 +44,7 @@ namespace iridium::rclone::entities
 		_object = std::move(log._object);
 		_object_type = std::move(log._object_type);
 		_time = log._time;
-		log._time = boost::posix_time::not_a_date_time;
+		log._time = system_clock::time_point();
 		_stats = log._stats;
 		log._stats = nullptr;
 	}
@@ -60,7 +62,7 @@ namespace iridium::rclone::entities
 		_object = std::move(log._object);
 		_object_type = std::move(log._object_type);
 		_time = log._time;
-		log._time = boost::posix_time::not_a_date_time;
+		log._time = system_clock::time_point();
 		_stats = log._stats;
 		log._stats = nullptr;
 

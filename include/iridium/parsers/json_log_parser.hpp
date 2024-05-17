@@ -2,7 +2,6 @@
 
 #include "../entities/json_log.hpp"
 #include "basic_parser.hpp"
-#include <boost/json.hpp>
 
 namespace iridium::rclone::parser
 {
@@ -18,13 +17,5 @@ namespace iridium::rclone::parser
 		}
 
 		auto parse(const std::string &data) const -> void override;
-
-	private:
-		[[nodiscard]] static auto parse_stats(const boost::json::object &) -> entities::json_log::stats;
-
-		[[nodiscard]] static auto parse_transferring(
-			const boost::json::value *) -> std::vector<entities::json_log::stats::transfer>;
-
-		[[nodiscard]] static auto parse_transfer(const boost::json::object &) -> entities::json_log::stats::transfer;
 	};
 } // namespace iridium::rclone

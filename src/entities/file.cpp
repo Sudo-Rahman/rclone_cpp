@@ -3,10 +3,11 @@
 #include <boost/json.hpp>
 #include <regex>
 
+using std::chrono::system_clock;
 namespace iridium::rclone::entities
 {
 	file::file(file *parent, const std::string &file_name, int64_t size, bool is_dir,
-	                   const boost::posix_time::ptime &mod_time, const remote_ptr &remote)
+	                   const system_clock::time_point &mod_time, const remote_ptr &remote)
 	{
 		_parent = parent;
 		set_name(file_name);
@@ -16,17 +17,6 @@ namespace iridium::rclone::entities
 		_remote = remote;
 	}
 
-	file::file(file *parent, const std::string &file_name, int64_t size, bool is_dir,
-	                   const boost::posix_time::seconds &mod_time,
-	                   const remote_ptr &remote)
-	{
-		_parent = parent;
-		set_name(file_name);
-		_size = size;
-		_is_dir = is_dir;
-		_mod_time = boost::posix_time::from_time_t(mod_time.total_seconds());
-		_remote = remote;
-	}
 
 	file::file(file *parent, const std::string &file_name, const remote_ptr &remote)
 	{
@@ -80,7 +70,7 @@ namespace iridium::rclone::entities
 
 	auto
 	file::create_shared_ptr(file *parent, const std::string &name_file, int64_t size, bool is_dir,
-	                                boost::posix_time::ptime mod_time,
+	                                system_clock::time_point mod_time,
 	                                const remote_ptr &remote) -> std::shared_ptr<file>
 	{
 		return std::make_shared<file>(parent, name_file, size, is_dir, mod_time, remote);
@@ -96,7 +86,7 @@ namespace iridium::rclone::entities
 		_is_dir = file._is_dir;
 		file._is_dir = false;
 		_mod_time = file._mod_time;
-		file._mod_time = boost::posix_time::not_a_date_time;
+		file._mod_time = system_clock::time_point();
 		_remote = std::move(file._remote);
 		_children = std::move(file._children);
 	}
@@ -112,7 +102,7 @@ namespace iridium::rclone::entities
 		_is_dir = f._is_dir;
 		f._is_dir = false;
 		_mod_time = f._mod_time;
-		f._mod_time = boost::posix_time::not_a_date_time;
+		f._mod_time = system_clock::time_point();
 		_remote = std::move(f._remote);
 		_children = std::move(f._children);
 

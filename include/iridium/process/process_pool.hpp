@@ -1,8 +1,7 @@
 #pragma once
 
 #include "process.hpp"
-#include <boost/thread.hpp>
-
+#include <memory>
 
 namespace iridium::rclone
 {
@@ -19,34 +18,33 @@ namespace iridium::rclone
 
 		process_pool() = delete;
 
+		~process_pool();
+
 		/// @brief Construct a process pool with a maximum number of simultaneous processes
 		explicit process_pool(uint16_t simultaneous_processes);
 
-		~process_pool();
-
 		process_pool(const process_pool&) = delete;
 
-		process_pool(process_pool&&) = delete;
-
+		process_pool(process_pool&&) noexcept;
 
 		auto operator=(const process_pool&) -> process_pool& = delete;
 
-		auto operator=(process_pool&&) -> process_pool& = delete;
+		auto operator=(process_pool&&)noexcept -> process_pool&;
 
 		/**
 		 * @brief Add a process to the pool
 		 * @param process
 		 */
-		auto add_process(std::unique_ptr<process>&& process, priority = normal) -> void;
+		auto add_process(std::unique_ptr<process>&& process, priority = normal) const -> void;
 
-		auto add_process(process * process, priority = normal) -> void;
+		auto add_process(process * process, priority = normal) const-> void;
 
 		/**
 		 * @brief Clear all processes from the pool
 		 */
-		void clear_pool();
+		void clear_pool() const;
 
-		auto set_simultaneous_processes(uint16_t simultaneous_processes) -> void;
+		auto set_simultaneous_processes(uint16_t simultaneous_processes)const -> void;
 
 		/**
 		 * @brief Get the number of processes in the pool
@@ -63,62 +61,27 @@ namespace iridium::rclone
 		/**
 		 * @brief wait for all processes to finish
 		 */
-		void wait();
+		void wait() const;
 
 		/**
 		 * @brief stop pool and all processes
 		 */
-		void stop();
+		void stop() const;
 
 		/**
 		 * @brief stop all processes
 		 */
-		void stop_all_processes();
+		void stop_all_processes() const;
 
 		/**
 		 * @brief stop all processes and clear the pool
 		 */
-		void stop_all_processes_and_clear();
+		void stop_all_processes_and_clear() const;
 
-	private:
-		std::map<priority, std::vector<std::unique_ptr<process>>,std::greater<>> _processes;
-		uint16_t _simultaneous_processes{};
-		std::atomic<uint16_t> _running_processes = 0;
-		std::atomic<uint16_t> _executed_processes = 0;
+	protected:
 
+		class _process_pool_impl;
+		_process_pool_impl *_impl;
 
-		boost::thread _thread;
-		std::mutex _process_mutex;
-		std::condition_variable _cv_process;
-
-		std::mutex _mutex;
-		std::condition_variable _cv;
-		std::mutex _wait_mutex;
-		std::condition_variable _wait_cv;
-
-
-		enum class operation : uint8_t
-		{
-			none,
-			lock,
-		};
-
-		enum state
-		{
-			running,
-			stopped,
-		};
-
-
-		state _state = running;
-		std::atomic<operation> _operation = operation::none;
-
-		void lock();
-
-		void unlock();
-
-		auto get_process() -> process*;
-
-		auto nb_running_processes() -> uint16_t;
 	};
 } // namespace iridium::rclone

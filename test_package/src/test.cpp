@@ -37,10 +37,10 @@ auto main() -> int
 	auto lst = std::vector<remote>{};
 	auto n = new int{0};
 	auto remote = remote::create_shared_ptr(
-		"drive", remote::remote_type::google_drive, "");
+		"test", remote::remote_type::google_drive, "");
 	std::cout << *remote << std::endl;
 	auto file = ::file{
-					nullptr, "/", 0, true, boost::posix_time::second_clock::local_time(),
+					nullptr, "/", 0, true, std::chrono::system_clock::now(),
 					remote
 			};
 	rclone->add_option(
@@ -65,14 +65,14 @@ auto main() -> int
 	};
 
 	auto bureau = ::file(nullptr, "/Users/sr-71/Desktop", 0, true,
-	                     boost::posix_time::second_clock::local_time(), nullptr);
+	                     std::chrono::system_clock::now(), nullptr);
 
 	auto ser = file_parser::ptr(&file,
 	                            [](const ::file &file)
 	                            {
 		                            std::cout << file << std::endl;
 		                            // process().lsjson(file).execute().wait_for_finish();
-	                            }, parser::file_parser::lsl);
+	                            }, parser::file_parser::json);
 
 	auto parser = parser::json_log_parser::create(new parser::json_log_parser([](const json_log &log)
 	{
@@ -86,8 +86,8 @@ auto main() -> int
 			// check(bureau, file)
 			//    copy_to(bureau, file)
 			//			lsjson(bureau)
-			lsl(file)
-			// .every_line_parser<::file>(ser)
+			lsjson(file)
+			.every_line_parser<::file>(ser)
 			//.on_finish_parser<::file>(ser)
 			//            .about(*remote, [n](const about &about)
 			//            {
@@ -155,7 +155,7 @@ auto main() -> int
 	// print(file);
 
 	auto counter = int{0};
-	for (int i = 0; i < 100; ++i)
+	for (int i = 0; i < 10; ++i)
 	{
 		auto proc = std::make_unique<process>();
 		proc->list_remotes()

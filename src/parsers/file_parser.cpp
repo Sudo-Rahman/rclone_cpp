@@ -1,10 +1,12 @@
 #include <file_parser.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
 #include <boost/json.hpp>
 #include <iostream>
 #include <regex>
 
-extern auto string_to_mode_time(const std::string &time) -> boost::posix_time::ptime;
+using std::chrono::system_clock;
+
+extern auto string_to_mode_time(const std::string &time) -> system_clock::time_point;
 
 using std::cout;
 using std::endl;
