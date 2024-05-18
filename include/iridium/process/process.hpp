@@ -1,13 +1,10 @@
 #pragma once
 
 #include <string>
-#include <boost/process.hpp>
-#include <boost/asio.hpp>
 #include <functional>
 #include "../entities.hpp"
 #include "../options.hpp"
 #include "../parsers.hpp"
-#include <boost/signals2.hpp>
 
 namespace iridium::rclone
 {
@@ -20,7 +17,7 @@ namespace iridium::rclone
 
 		~process() noexcept;
 
-		enum class state : uint8_t
+		enum state
 		{
 			not_launched,
 			running,
@@ -46,27 +43,27 @@ namespace iridium::rclone
 
 		auto close_error_pipe() -> process&;
 
-		auto execute() -> process&;
+		auto execute(bool with_global_option = true) -> process&;
 
 		auto get() -> process * { return this; };
 
 		[[nodiscard]] auto exit_code() const -> int;
 
-		[[nodiscard]] auto get_state() const -> state { return _state; }
+		[[nodiscard]] auto get_state() const -> state;
 
-		[[nodiscard]] auto is_running() const -> bool { return _state == state::running; }
+		[[nodiscard]] auto is_running() const -> bool;
 
-		[[nodiscard]] auto get_output() const -> std::vector<std::string> { return _output; }
+		[[nodiscard]] auto get_output() const -> std::vector<std::string>;
 
-		[[nodiscard]] auto get_error() const -> std::vector<std::string> { return _error; }
+		[[nodiscard]] auto get_error() const -> std::vector<std::string>;
 
-		[[nodiscard]] auto options() -> std::vector<option::basic_opt_uptr>& { return _local_options; }
+		[[nodiscard]] auto options() const -> std::vector<option::basic_opt_uptr>&;
 
 		[[nodiscard]] static auto global_options() -> std::vector<option::basic_opt_uptr>& { return _global_options; }
 
 		[[nodiscard]] auto commands() const -> std::string;
 
-		auto stop() -> void;
+		auto stop() const -> void;
 
 		static const std::string endl;
 
@@ -80,7 +77,7 @@ namespace iridium::rclone
 		auto every_line_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process& requires(std::is_base_of_v<
 			entity, T>)
 		{
-			_signal_every_line->connect([this, parser = std::move(parser)](const std::string &line)
+			every_line([this, parser = std::move(parser)](const std::string &line)
 			{
 				parser->parse(line);
 			});
@@ -97,9 +94,9 @@ namespace iridium::rclone
 		auto on_finish_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process& requires(std::is_base_of_v<
 			entity, T>)
 		{
-			_signal_finish->connect([this, parser = std::move(parser)](int)
+			on_finish([this,parser = std::move(parser)](int)
 			{
-				parser->parse(boost::algorithm::join(_output, endl));
+				parser->parse(join_vector(get_output()));
 			});
 			return *this;
 		}
@@ -186,13 +183,7 @@ namespace iridium::rclone
 		 */
 		auto check(const entities::file &source, const entities::file &destination) -> process&;
 
-		template<class ...Args>
-		auto add_option(Args && ...args) -> process& requires(std::conjunction_v<std::is_convertible<Args,
-			option::basic_opt_uptr> ...>)
-		{
-			(_local_options.push_back(std::forward<Args>(args)), ...);
-			return *this;
-		}
+		auto add_option(option::basic_opt_uptr&&) -> process&;
 
 		template<class ...Args>
 		static auto add_global_option(Args && ...args) -> void requires(std::conjunction_v<std::is_convertible<Args,
@@ -205,35 +196,10 @@ namespace iridium::rclone
 		static bool _is_initialized;
 		static std::vector<option::basic_opt_uptr> _global_options;
 
-		std::mutex _mutex;
-		std::condition_variable _cv;
+		[[nodiscard]] static auto join_vector(const std::vector<std::string> &vec) -> std::string;
 
-		state _state{state::not_launched};
-
-		boost::process::child _child;
-		std::unique_ptr<boost::process::ipstream> _out;
-		std::unique_ptr<boost::process::ipstream> _err;
-		std::unique_ptr<boost::process::opstream> _in;
-
-		/// 1 thread for wait child, 1 thread for reading output,
-		/// 1 thread for reading error and 2 last threads computing the signals for every line and finish
-		boost::asio::thread_pool _pool{5};
-		std::atomic_uint8_t _counter_read{0};
-
-		std::vector<std::string> _args;
-		std::vector<std::string> _output;
-		std::vector<std::string> _error;
-
-		std::vector<option::basic_opt_uptr> _local_options;
-
-		auto read_output() -> void;
-
-		auto read_error() -> void;
-
-		std::unique_ptr<boost::signals2::signal<void(const std::string &line)>> _signal_every_line;
-		std::unique_ptr<boost::signals2::signal<void(int)>> _signal_finish;
-		std::unique_ptr<boost::signals2::signal<void()>> _signal_start;
-		std::unique_ptr<boost::signals2::signal<void()>> _signal_stop;
+		class _process_impl_;
+		_process_impl_ *_impl;
 	};
 
 	using process_ptr = std::shared_ptr<process>;

@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "/tests/path");
 
 		auto clock = system_clock::now();
-		file f(nullptr, "path", 100, false, system_clock::now(), r_ptr);
+		file f(nullptr, "path", 100, false, clock, r_ptr);
 		file fileCopy = std::move(f);
 
 		BOOST_CHECK_EQUAL(fileCopy.name(), "path");

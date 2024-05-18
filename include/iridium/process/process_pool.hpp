@@ -80,8 +80,8 @@ namespace iridium::rclone
 
 	protected:
 
-		class _process_pool_impl;
-		_process_pool_impl *_impl;
+		class _process_pool_impl_;
+		_process_pool_impl_ *_impl;
 
 	};
 } // namespace iridium::rclone

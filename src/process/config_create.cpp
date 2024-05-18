@@ -1,7 +1,7 @@
 #include "process/config_create.hpp"
 #include <string>
 #include <vector>
-#include <process/process.hpp>
+#include "process_impl.cpp"
 
 using namespace std;
 
@@ -20,16 +20,16 @@ namespace iridium::rclone
 	auto config_create::get_process() const -> process&
 	{
 		check_attributes();
-		_process->_args = {"config", "create", _name, _type};
-		_process->_args.insert(_process->_args.end(), _params.begin(), _params.end());
+		_process->_impl->_args = {"config", "create", _name, _type};
+		_process->_impl->_args.insert(_process->_impl->_args.end(), _params.begin(), _params.end());
 		return *_process;
 	}
 
 	auto config_create::execute() const -> rclone::process&
 	{
 		check_attributes();
-		_process->_args = {"config", "create", _name, _type};
-		_process->_args.insert(_process->_args.end(), _params.begin(), _params.end());
+		_process->_impl->_args = {"config", "create", _name, _type};
+		_process->_impl->_args.insert(_process->_impl->_args.end(), _params.begin(), _params.end());
 		return _process->execute();
 	}
 

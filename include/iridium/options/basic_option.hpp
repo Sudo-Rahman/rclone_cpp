@@ -52,7 +52,4 @@ namespace iridium::rclone::option
 
 		friend auto operator<<(std::ostream &os, const basic_option &obj) -> std::ostream&;
 	};
-
-	using basic_opt_uptr = std::unique_ptr<basic_option>;
-	using basic_opt_ptr = std::shared_ptr<basic_option>;
 }

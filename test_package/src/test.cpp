@@ -7,7 +7,6 @@
 #include <iridium/parsers.hpp>
 #include <iridium/process.hpp>
 
-using namespace boost::asio;
 using namespace std;
 using namespace iridium::rclone;
 using namespace option;
@@ -43,10 +42,10 @@ auto main() -> int
 					nullptr, "/", 0, true, std::chrono::system_clock::now(),
 					remote
 			};
-	rclone->add_option(
-			// filter::filter_file::uptr("+ TP4.pdf", "- *.pdf", "+ *.torrent", "- *"),
-			// listing::fast_list(),
-			// logging::use_json_log(),
+	rclone->add_option(listing::fast_list()).add_option(logging::use_json_log());
+		//	{// filter::filter_file::uptr("+ TP4.pdf", "- *.pdf", "+ *.torrent", "- *"),
+		//	listing::fast_list(),
+		//	logging::use_json_log()
 			// logging::verbose(),
 			// logging::stats("0.1"),
 			// filter::max_depth(1)
@@ -55,7 +54,8 @@ auto main() -> int
 			//        option::logging::verbose()
 			// option::filter::include("*.pdf"),
 			// option::filter::exclude("*")
-		);
+		//	}
+		//);
 
 	std::vector<std::shared_ptr<::remote>> remotes;
 	auto fn = [&](const std::vector<std::shared_ptr<::remote>> &val) -> void
@@ -67,12 +67,12 @@ auto main() -> int
 	auto bureau = ::file(nullptr, "/Users/sr-71/Desktop", 0, true,
 	                     std::chrono::system_clock::now(), nullptr);
 
-	auto ser = file_parser::ptr(&file,
+	auto ser = :file_parser::ptr(&file,
 	                            [](const ::file &file)
 	                            {
 		                            std::cout << file << std::endl;
 		                            // process().lsjson(file).execute().wait_for_finish();
-	                            }, parser::file_parser::json);
+	                            },   file_parser::json);
 
 	auto parser = parser::json_log_parser::create(new parser::json_log_parser([](const json_log &log)
 	{
@@ -82,6 +82,7 @@ auto main() -> int
 	auto parserr = parser::version_parser::ptr([](const version &version) { std::cout << version << std::endl; });
 
 	rclone->
+	//list_remotes(fn)
 			// version()
 			// check(bureau, file)
 			//    copy_to(bureau, file)
@@ -115,8 +116,8 @@ auto main() -> int
 			// config_create().name("gtg").type("drive").process()
 			//    lsjson(iridium::rclone_remote("drive",
 			//    iridium::rclone_remote::remote_type::google_drive, "/"))
-			.every_line([&](const std::string &line)
-			{
+			//.every_line([&](const std::string &line)
+			//{
 				//                *rclone << "q";
 				// std::cout << line << std::endl;
 				//                                std::cout << line <<
@@ -124,14 +125,14 @@ auto main() -> int
 				//                                std::endl << std::endl;
 				//                            std::cout << boost::this_thread::get_id()
 				//                            << std::endl;
-			})
+			//})
 			// .every_line_parser(parser)
 			// .every_line_parser(ser)
 			//            .on_finish_parser(parserr)
-			.on_stop([&]
-			{
-				std::cout << "stop" << std::endl;
-			})
+			//.on_stop([&]
+			//{
+			//	std::cout << "stop" << std::endl;
+			//})
 			.execute()
 			// .wait_for_start();
 			.wait_for_finish()
