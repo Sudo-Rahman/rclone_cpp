@@ -67,7 +67,7 @@ auto main() -> int
 	auto bureau = ::file(nullptr, "/Users/sr-71/Desktop", 0, true,
 	                     std::chrono::system_clock::now(), nullptr);
 
-	auto ser = :file_parser::ptr(&file,
+	auto ser = ::file_parser::ptr(&file,
 	                            [](const ::file &file)
 	                            {
 		                            std::cout << file << std::endl;

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <boost/json.hpp>
 #include <regex>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using std::chrono::system_clock;
 namespace iridium::rclone::entities
@@ -42,7 +43,7 @@ namespace iridium::rclone::entities
 				"\tabsolute_path: " << file.absolute_path() << "," << std::endl <<
 				"\tsize: " << file._size << "," << std::endl <<
 				"\tisDir: " << file._is_dir << "," << std::endl <<
-				"\tmodTime: " << file._mod_time << "," << std::endl <<
+				"\tmodTime: " << boost::posix_time::ptime(boost::posix_time::from_time_t(system_clock::to_time_t(file._mod_time))) << "," << std::endl <<
 				"\trclone_remote: {" << remote << "\t}" << std::endl << "}";
 		return os;
 	}

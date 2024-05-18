@@ -5,6 +5,7 @@
 #include <optional>
 #include <chrono>
 #include <vector>
+#include <cmath>
 
 namespace iridium::rclone { namespace parser
 	{

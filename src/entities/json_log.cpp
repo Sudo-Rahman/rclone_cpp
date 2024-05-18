@@ -1,5 +1,6 @@
 #include <json_log.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std::chrono;
 namespace iridium::rclone::entities
@@ -101,7 +102,7 @@ namespace iridium::rclone::entities
 				"\tsource : " << log.source() << ", " << std::endl <<
 				"\tobject : " << log.object() << ", " << std::endl <<
 				"\tobject_type : " << log.object_type() << ", " << std::endl <<
-				"\ttime : " << log.time() << ", " << std::endl <<
+				"\ttime : " << boost::posix_time::ptime(boost::posix_time::from_time_t(system_clock::to_time_t(log.time())))<< ", " << std::endl <<
 				"\tstats : {" << stats << "\t}" << std::endl <<
 				"}";
 		return os;

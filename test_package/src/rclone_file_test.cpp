@@ -1,5 +1,6 @@
 #define BOOST_TEST_MODULE RcloneFileTest
 #include <boost/test/included/unit_test.hpp>
+#include <boost/test/utils/lazy_ostream.hpp>
 #include <iridium/entities.hpp>
 
 using namespace iridium::rclone;
@@ -56,7 +57,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		BOOST_CHECK_EQUAL(file.remote()->name(), "NewRemote");
 		BOOST_CHECK_EQUAL(file.size(), 200);
 		BOOST_CHECK_EQUAL(file.is_dir(), true);
-		BOOST_CHECK_EQUAL(file.mod_time(), clock);
+		BOOST_CHECK_EQUAL(file.mod_time().time_since_epoch().count(), clock.time_since_epoch().count());
 	}
 
 	BOOST_AUTO_TEST_CASE(testRcloneFileCopyConstructor)
@@ -81,7 +82,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		BOOST_CHECK_EQUAL(fileCopy.remote()->name(), "TestRemote");
 		BOOST_CHECK_EQUAL(fileCopy.size(), 100);
 		BOOST_CHECK_EQUAL(fileCopy.is_dir(), false);
-		BOOST_CHECK_EQUAL(fileCopy.mod_time(), clock);
+        BOOST_CHECK_EQUAL(fileCopy.mod_time().time_since_epoch().count(), clock.time_since_epoch().count());
 	}
 
 	BOOST_AUTO_TEST_CASE(testRcloneFileCopyAssignment)
@@ -106,7 +107,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		BOOST_CHECK_EQUAL(fileCopy.remote()->name(), "TestRemote");
 		BOOST_CHECK_EQUAL(fileCopy.size(), 100);
 		BOOST_CHECK_EQUAL(fileCopy.is_dir(), false);
-		BOOST_CHECK_EQUAL(fileCopy.mod_time(), clock);
+        BOOST_CHECK_EQUAL(fileCopy.mod_time().time_since_epoch().count(), clock.time_since_epoch().count());
 	}
 
 	BOOST_AUTO_TEST_CASE(testRcloneFileMoveAssignmentSetter)
@@ -121,7 +122,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		BOOST_CHECK_EQUAL(fileCopy.remote()->name(), "TestRemote");
 		BOOST_CHECK_EQUAL(fileCopy.size(), 100);
 		BOOST_CHECK_EQUAL(fileCopy.is_dir(), false);
-		BOOST_CHECK_EQUAL(fileCopy.mod_time(), clock);
+        BOOST_CHECK_EQUAL(fileCopy.mod_time().time_since_epoch().count(), clock.time_since_epoch().count());
 
 		clock = system_clock::now();
 		fileCopy.set_name("new");
@@ -134,7 +135,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		BOOST_CHECK_EQUAL(fileCopy.remote()->name(), "NewRemote");
 		BOOST_CHECK_EQUAL(fileCopy.size(), 200);
 		BOOST_CHECK_EQUAL(fileCopy.is_dir(), true);
-		BOOST_CHECK_EQUAL(fileCopy.mod_time(), clock);
+        BOOST_CHECK_EQUAL(fileCopy.mod_time().time_since_epoch().count(), clock.time_since_epoch().count());
 	}
 
 	BOOST_AUTO_TEST_CASE(testRcloneFileAddChild)
