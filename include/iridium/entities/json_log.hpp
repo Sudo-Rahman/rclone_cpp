@@ -4,8 +4,8 @@
 #include <iostream>
 #include <optional>
 #include <chrono>
-#include <vector>
 #include <cmath>
+#include <vector>
 
 namespace iridium::rclone { namespace parser
 	{

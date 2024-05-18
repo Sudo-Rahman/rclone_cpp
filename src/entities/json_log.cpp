@@ -131,8 +131,7 @@ namespace iridium::rclone::entities
 				"\tdeletes : " << stats.deletes << ", " << std::endl <<
 				"\telapsed_time : " << stats.elapsed_time << ", " << std::endl <<
 				"\terrors : " << stats.errors << ", " << std::endl <<
-				"\teta : " << (not stats.eta.has_value() ? "null" : std::to_string(stats.eta.value())) << ", " <<
-				std::endl <<
+				"\teta : " << (not stats.eta.has_value() ? "null" : std::to_string(stats.eta.value())) << ", " <<std::endl <<
 				"\tfatal_error : " << boost::lexical_cast<std::string>(stats.fatal_error) << std::endl <<
 				"\tlast_error : " << stats.last_error << std::endl <<
 				"\trenames : " << stats.renames << std::endl <<
@@ -152,8 +151,7 @@ namespace iridium::rclone::entities
 	{
 		os << "transfer : {" << std::endl <<
 				"\tbytes : " << transfer.bytes << ", " << std::endl <<
-				"\teta : " << (not transfer.eta.has_value() ? "null" : std::to_string(transfer.eta.value())) << ", " <<
-				std::endl <<
+				"\teta : " << (not transfer.eta.has_value() ? "null" : std::to_string(transfer.eta.value())) << ", " <<std::endl <<
 				"\tgroup : " << transfer.group << ", " << std::endl <<
 				"\tname : " << transfer.name << std::endl <<
 				"\tsize : " << transfer.size << std::endl <<

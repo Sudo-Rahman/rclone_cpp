@@ -9,8 +9,8 @@
 #include <functional>
 #include "../entities.hpp"
 #include "../options.hpp"
-#include "../parsers.hpp"
 #include <boost/signals2.hpp>
+#include <boost/algorithm/string/join.hpp>
 
 #if defined(_WIN32)
 #include <boost/process/windows.hpp>
