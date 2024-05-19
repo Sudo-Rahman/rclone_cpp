@@ -188,8 +188,10 @@ namespace iridium::rclone
 					if (_child.exit_code() == 0)
 						_state = state::finished;
 					else _state = state::error;
+
 					while (_counter_read < 2)
 						std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
 					if (_signal_finish)
 						_signal_finish->operator()(_child.exit_code());
 				}
@@ -235,17 +237,14 @@ namespace iridium::rclone
 		auto every_line(std::function<void(const std::string &)> &&callback) -> void
 		{
 			_signal_every_line->connect(
-					[this, callback](const std::string &line) { ba::post(_pool, [callback, line] { callback(line); }); }
+					[this, callback = std::move(callback)](const std::string &line) { callback(line); }
 				);
 		}
 
 		auto on_finish(std::function<void(int)> &&callback) -> void
 		{
 			_signal_finish->connect(
-					[this, callback = std::move(callback)](const int &exit_code)
-					{
-						ba::post(_pool, [callback, exit_code] { callback(exit_code); });
-					}
+					[this, callback = std::move(callback)](const int &exit_code) { callback(exit_code); }
 				);
 		}
 

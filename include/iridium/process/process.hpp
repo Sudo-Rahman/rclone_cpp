@@ -77,10 +77,7 @@ namespace iridium::rclone
 		auto every_line_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process& requires(std::is_base_of_v<
 			entity, T>)
 		{
-			every_line([this, parser = std::move(parser)](const std::string &line)
-			{
-				parser->parse(line);
-			});
+			every_line([this, parser = std::move(parser)](const std::string &line) { parser->parse(line); });
 			return *this;
 		}
 
@@ -94,10 +91,7 @@ namespace iridium::rclone
 		auto on_finish_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process& requires(std::is_base_of_v<
 			entity, T>)
 		{
-			on_finish([this,parser = std::move(parser)](int)
-			{
-				parser->parse(join_vector(get_output()));
-			});
+			on_finish([this,parser = std::move(parser)](int) { parser->parse(join_vector(get_output())); });
 			return *this;
 		}
 
@@ -174,6 +168,14 @@ namespace iridium::rclone
 
 		auto bi_sync(const entities::file &source, const entities::file &destination) -> process&;
 
+		/**
+		 * @brief Sync the source to the destination, changing the destination only. Doesn't transfer files that are identical on source and destination, testing by size and modification time or MD5SUM. Destination is updated to match source, including deleting files if necessary (except duplicate objects, see below). If you don't want to delete files from destination, use the copy command instead.
+		 * @param source
+		 * @param destination
+		 * @return this
+		 */
+		auto sync(const entities::file &source, const entities::file &destination) -> process&;
+
 		auto clean_up(const entities::remote &remote) -> process&;
 
 		auto copy_url(const std::string &url, const entities::file &destination) -> process&;
@@ -183,7 +185,7 @@ namespace iridium::rclone
 		 */
 		auto check(const entities::file &source, const entities::file &destination) -> process&;
 
-		auto add_option(option::basic_opt_uptr&&) -> process&;
+		auto add_option(option::basic_opt_uptr &&) -> process&;
 
 		template<class ...Args>
 		static auto add_global_option(Args && ...args) -> void requires(std::conjunction_v<std::is_convertible<Args,

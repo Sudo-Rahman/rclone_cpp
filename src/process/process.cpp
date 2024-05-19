@@ -279,6 +279,12 @@ namespace iridium::rclone
 		return *this;
 	}
 
+	auto process::sync(const file &source, const file &destination) -> process&
+	{
+		_impl->_args = {"sync", source.absolute_path(), destination.absolute_path()};
+		return *this;
+	}
+
 	auto process::clean_up(const remote &remote) -> process&
 	{
 		_impl->_args = {"cleanup", remote.root_path()};
@@ -296,10 +302,11 @@ namespace iridium::rclone
 		if (not source.is_dir() or not destination.is_dir())
 			throw std::runtime_error("source or destination is not a directory");
 		_impl->_args = {
-						"check", source.absolute_path(), destination.absolute_path(), "--use-json-log",
-						"--log-level",
-						"INFO"
+						"check", source.absolute_path(), destination.absolute_path()
 				};
+		using option::logging::log_level;
+		add_option(option::logging::use_json_log())
+				.add_option(log_level::uptr(log_level::info));
 		return *this;
 	}
 
