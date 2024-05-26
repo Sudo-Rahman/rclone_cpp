@@ -2,6 +2,8 @@
 
 #include "entity.hpp"
 #include <iostream>
+#include <memory>
+#include <string>
 #include <optional>
 #include <chrono>
 #include <cmath>
