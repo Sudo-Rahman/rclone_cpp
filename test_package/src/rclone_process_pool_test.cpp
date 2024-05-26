@@ -4,6 +4,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include <iridium/rclone.hpp>
 #include <memory>
+#include <atomic>
 
 using namespace iridium::rclone;
 using namespace std;

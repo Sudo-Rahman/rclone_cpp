@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 
 		auto now = std::chrono::system_clock::now();
 		log.set_time(now);
-		BOOST_TEST(log.time() == now);
+		BOOST_TEST(log.time().time_since_epoch().count() == now.time_since_epoch().count());
 
 		auto stats = std::make_unique<json_log::stats>();
 		auto pointer = stats.get();
