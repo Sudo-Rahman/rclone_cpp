@@ -153,4 +153,50 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		BOOST_CHECK_EQUAL(file.children().at(0)->path(), "/parent/child");
 	}
 
+	BOOST_AUTO_TEST_CASE(testRcloneFileAbsolutePath)
+    {
+        auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "/tests/path");
+        file file(nullptr, "path", 100, false, system_clock::now(), r_ptr);
+
+        BOOST_CHECK_EQUAL(file.absolute_path(), "TestRemote:/tests/path/path");
+    }
+
+    BOOST_AUTO_TEST_CASE(testRcloneFilePath)
+    {
+        auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "/tests/path");
+        file file(nullptr, "path", 100, false, system_clock::now(), r_ptr);
+
+        BOOST_CHECK_EQUAL(file.path(), "/path");
+    }
+
+    BOOST_AUTO_TEST_CASE(testRcloneFileParentDir)
+    {
+        auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "/tests/path");
+        file parent(nullptr, "parent", 100, true, system_clock::now(), r_ptr);
+        file child(&parent, "child", 100, false, system_clock::now(), r_ptr);
+
+        BOOST_CHECK_EQUAL(child.parent_dir(), "/parent");
+        BOOST_CHECK_EQUAL(child.parent_absolute_dir(), "TestRemote:/tests/path/parent");
+    }
+
+    BOOST_AUTO_TEST_CASE(testRcloneFileAddChildIfNotExist)
+    {
+        auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "/tests/path");
+
+		auto clock = system_clock::now();
+        file file(nullptr, "parent", 100, true, system_clock::now(), r_ptr);
+        file.add_child_if_not_exist(file::create_shared_ptr(&file, "child", 100, false,
+                                                             clock, r_ptr));
+
+        BOOST_CHECK_EQUAL(file.nb_chilchren(), 1);
+        BOOST_CHECK_EQUAL(file.children().at(0)->parent(), &file);
+        BOOST_CHECK_EQUAL(file.children().at(0)->name(), "child");
+        BOOST_CHECK_EQUAL(file.children().at(0)->path(), "/parent/child");
+
+        file.add_child_if_not_exist(file::create_shared_ptr(&file, "child", 100, false,
+                                                             clock, r_ptr));
+
+        BOOST_CHECK_EQUAL(file.nb_chilchren(), 1); // child already exists, no new child added
+    }
+
 BOOST_AUTO_TEST_SUITE_END()

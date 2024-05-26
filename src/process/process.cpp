@@ -17,6 +17,21 @@ namespace iridium::rclone
 	std::vector<option::basic_opt_uptr> process::_global_options = {};
 	using namespace entities;
 
+	process::process(process &&p) noexcept
+	{
+		this->_impl = p._impl;
+		p._impl = nullptr;
+	}
+
+	auto process::operator=(process &&p) noexcept -> process&
+	{
+		if (this == &p) return *this;
+		delete _impl;
+		this->_impl = p._impl;
+		p._impl = nullptr;
+		return *this;
+	}
+
 	auto process::initialize(const std::string &path_rclone) -> bool
 	{
 		auto is_ok = false;
@@ -86,9 +101,16 @@ namespace iridium::rclone
 
 	auto process::write_input(const std::string &input) const -> void { _impl->write_input(input); }
 
-	auto process::execute(bool with_global_option) -> process&
+	auto process::execute(bool with_global_opt) -> process&
 	{
-		_impl->execute(with_global_option);
+		_impl->use_global_options = with_global_opt;
+		_impl->execute();
+		return *this;
+	}
+
+	auto process::with_global_options() -> process&
+	{
+		_impl->use_global_options = true;
 		return *this;
 	}
 
@@ -257,7 +279,7 @@ namespace iridium::rclone
 
 	auto process::about(const remote &remote) -> process&
 	{
-		_impl->_args = {"about", remote.root_path()};
+		_impl->_args = {"about", remote.full_path()};
 		return *this;
 	}
 
@@ -305,15 +327,20 @@ namespace iridium::rclone
 						"check", source.absolute_path(), destination.absolute_path()
 				};
 		using option::logging::log_level;
-		add_option(option::logging::use_json_log())
-				.add_option(log_level::uptr(log_level::info));
+		add_option(option::logging::use_json_log(), log_level::uptr(log_level::info));
 		return *this;
 	}
 
-	auto process::add_option(option::basic_opt_uptr &&opt) -> process&
+	auto process::touch(const entities::file &file) -> process&
 	{
-		_impl->_local_options.push_back(std::move(opt));
+		_impl->_args = {"touch", file.absolute_path()};
 		return *this;
+	}
+
+	void process::add_option(std::vector<option::basic_opt_uptr> &&opts) const
+	{
+		for (auto &opt: opts)
+			_impl->_local_options.push_back(std::move(opt));
 	}
 
 	void process::clear_global_options() { _global_options.clear(); }

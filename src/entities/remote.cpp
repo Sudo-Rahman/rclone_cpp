@@ -6,7 +6,11 @@
 namespace iridium::rclone::entities
 {
 	remote::remote(const std::string &name, remote_type type, const std::string &path) : _name(name),
-		_type(type), _path(path) {}
+		_type(type), _path(path)
+	{
+		if (type == none and not name.empty())
+			throw std::runtime_error("Name be empty with type none");
+	}
 
 	remote::remote(remote &&remote) noexcept
 	{
@@ -41,7 +45,10 @@ namespace iridium::rclone::entities
 	auto remote::root_path() const -> std::string
 	{
 		if (not _name.ends_with(":"))
+		{
+			if (_type == none or _name == "") return _name;
 			return _name + ":";
+		}
 		return _name;
 	}
 
@@ -72,14 +79,14 @@ namespace iridium::rclone::entities
 
 	auto
 	remote::create_shared_ptr(const std::string &name, remote_type type,
-	                                  const std::string &path) -> std::shared_ptr<remote>
+	                          const std::string &path) -> std::shared_ptr<remote>
 	{
 		return std::make_shared<remote>(name, type, path);
 	}
 
 	auto
 	remote::create_unique_ptr(const std::string &name, remote_type type,
-	                                  const std::string &path) -> std::unique_ptr<remote>
+	                          const std::string &path) -> std::unique_ptr<remote>
 	{
 		return std::make_unique<remote>(name, type, path);
 	}

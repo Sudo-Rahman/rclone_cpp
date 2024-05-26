@@ -14,3 +14,12 @@ target_link_libraries(rclone_file_test rclone_cpp::rclone_cpp)
 add_executable(rclone_remote_test src/rclone_remote_test.cpp)
 target_link_libraries(rclone_remote_test rclone_cpp::rclone_cpp)
 
+add_executable(rclone_json_log_test src/rclone_json_log_test.cpp)
+target_link_libraries(rclone_json_log_test rclone_cpp::rclone_cpp)
+
+add_executable(rclone_process_test src/rclone_process_test.cpp)
+target_link_libraries(rclone_process_test rclone_cpp::rclone_cpp)
+
+add_executable(rclone_process_pool_test src/rclone_process_pool_test.cpp)
+target_link_libraries(rclone_process_pool_test rclone_cpp::rclone_cpp)
+

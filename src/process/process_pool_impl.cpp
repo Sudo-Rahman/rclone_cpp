@@ -4,12 +4,15 @@
 #include <map>
 #include <condition_variable>
 #include <atomic>
+#include <thread>
+#include <mutex>
+#include <stdexcept>
 
 namespace iridium::rclone
 {
 	class process_pool::_process_pool_impl_
 	{
-	public:
+		friend process_pool;
 		std::map<priority, std::vector<std::unique_ptr<process>>, std::greater<>> _processes;
 		uint16_t _simultaneous_processes{};
 		std::atomic<uint16_t> _running_processes = 0;
@@ -20,20 +23,13 @@ namespace iridium::rclone
 		std::condition_variable _cv_process;
 
 		std::mutex _mutex;
-		std::condition_variable _cv;
 		std::mutex _wait_mutex;
 		std::condition_variable _wait_cv;
 
-		enum class operation : uint8_t
+		enum class operation
 		{
 			none,
 			lock,
-		};
-
-		enum state
-		{
-			running,
-			stopped,
 		};
 
 		state _state = running;
@@ -43,16 +39,18 @@ namespace iridium::rclone
 		{
 			_thread = boost::thread([this]
 			{
-				while (true)
+				while (_state == running)
 				{
 					std::unique_lock lock(_process_mutex);
 					_cv_process.wait(lock, [this]
 					{
 						boost::this_thread::interruption_point();
-						return _running_processes < _simultaneous_processes and get_process() not_eq nullptr;
+						return _running_processes < _simultaneous_processes && get_process() != nullptr || _state != running;
 					});
+					if (_state != running)
+						break;
 					boost::this_thread::interruption_point();
-					auto *process = get_process();
+					auto* process = get_process();
 					if (process == nullptr) { continue; }
 					process->on_finish([this](int)
 					{
@@ -69,45 +67,44 @@ namespace iridium::rclone
 
 		auto add_process(std::unique_ptr<process> &&process, priority priority) -> void
 		{
-			lock();
-			if (_state == stopped)
-				throw std::runtime_error("process pool is stopped");
-			_processes[priority].push_back(std::move(process));
+			{
+				std::lock_guard lock(_mutex);
+				if (_state == stopped)
+					throw std::runtime_error("process pool is stopped");
+				_processes[priority].push_back(std::move(process));
+			}
 			_cv_process.notify_one();
-			unlock();
 		}
-
-		auto add_process(process *process, priority priority) -> void { add_process(process_uptr(process), priority); }
 
 		void stop()
 		{
-			lock();
-			_thread.interrupt();
-			_cv_process.notify_one();
-			for (const auto &pair: _processes)
-				for (const auto &process: pair.second)
-					if (process->is_running())
-						process->stop();
-			_state = stopped;
-			unlock();
+			{
+				std::lock_guard lock(_mutex);
+				_state = stopped;
+				_thread.interrupt();
+				for (const auto &pair: _processes)
+					for (const auto &process: pair.second)
+						if (process->is_running())
+							process->stop();
+			}
+			_cv_process.notify_all();
 		}
 
 		void stop_all_processes()
 		{
-			lock();
+			std::lock_guard lock(_mutex);
 			for (const auto &pair: _processes)
 				for (const auto &process: pair.second)
 					if (process->is_running())
 						process->stop();
 			_running_processes = 0;
 			_executed_processes = 0;
-			unlock();
 		}
 
 		void wait()
 		{
-			auto unique_lock = std::unique_lock(_wait_mutex);
-			_wait_cv.wait(unique_lock, [this]
+			std::unique_lock lock(_wait_mutex);
+			_wait_cv.wait(lock, [this]
 			{
 				auto size = 0;
 				for (const auto &pair: _processes)
@@ -118,9 +115,8 @@ namespace iridium::rclone
 
 		void clear_pool()
 		{
-			lock();
+			std::lock_guard lock(_mutex);
 			_processes.clear();
-			unlock();
 		}
 
 		auto set_simultaneous_processes(uint16_t simultaneous_processes) -> void
@@ -134,43 +130,20 @@ namespace iridium::rclone
 			clear_pool();
 		}
 
-		~_process_pool_impl_() { stop(); }
-
-		void lock()
+		~_process_pool_impl_()
 		{
-			std::unique_lock lock(_mutex);
-			_cv.wait(lock, [this] { return _operation == operation::none; });
-			_operation = operation::lock;
-		}
-
-		void unlock()
-		{
-			_operation = operation::none;
-			_cv.notify_one();
+			stop();
+			_thread.join();
 		}
 
 		auto get_process() -> process *
 		{
-			lock();
-			process *result = nullptr;
+			std::lock_guard lock(_mutex);
 			for (const auto &pair: _processes)
 				for (const auto &process: pair.second)
 					if (process->get_state() == process::state::not_launched)
-						result = process.get();
-			unlock();
-			return result;
-		}
-
-		auto nb_running_processes() -> uint16_t
-		{
-			lock();
-			_running_processes = 0;
-			for (const auto &pair: _processes)
-				for (const auto &process: pair.second)
-					if (process->is_running())
-						_running_processes++;
-			unlock();
-			return _running_processes;
+						return process.get();
+			return nullptr;
 		}
 	};
 }

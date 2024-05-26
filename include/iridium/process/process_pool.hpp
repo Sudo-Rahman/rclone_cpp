@@ -16,6 +16,12 @@ namespace iridium::rclone
 			max
 		};
 
+		enum state
+		{
+			running,
+			stopped,
+		};
+
 		process_pool() = delete;
 
 		~process_pool();
@@ -37,7 +43,6 @@ namespace iridium::rclone
 		 */
 		auto add_process(std::unique_ptr<process>&& process, priority = normal) const -> void;
 
-		auto add_process(process * process, priority = normal) const-> void;
 
 		/**
 		 * @brief Clear all processes from the pool
@@ -45,6 +50,8 @@ namespace iridium::rclone
 		void clear_pool() const;
 
 		auto set_simultaneous_processes(uint16_t simultaneous_processes)const -> void;
+
+		auto simultaneous_processes() const -> uint16_t;
 
 		/**
 		 * @brief Get the number of processes in the pool
@@ -68,6 +75,8 @@ namespace iridium::rclone
 		 */
 		void stop() const;
 
+		[[nodiscard]] auto get_state() const -> state;
+
 		/**
 		 * @brief stop all processes
 		 */
@@ -77,6 +86,8 @@ namespace iridium::rclone
 		 * @brief stop all processes and clear the pool
 		 */
 		void stop_all_processes_and_clear() const;
+
+		auto finished_processes() const -> uint16_t;
 
 	protected:
 

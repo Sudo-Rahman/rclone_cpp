@@ -17,6 +17,11 @@ namespace iridium::rclone::option
 		_value = value;
 	}
 
+	auto basic_option::copy_uptr() -> basic_opt_uptr
+	{
+		return std::make_unique<basic_option>(*this);
+	}
+
 	auto basic_option::uptr(const std::string &option) -> basic_opt_uptr
 	{
 		return std::make_unique<basic_option>(option);

@@ -17,7 +17,7 @@ namespace iridium::rclone { namespace parser
 		class json_log : public entity
 		{
 		public:
-			enum class log_level : uint8_t
+			enum  log_level
 			{
 				no_level,
 				info,
@@ -40,18 +40,25 @@ namespace iridium::rclone { namespace parser
 			~json_log() override;
 
 			[[nodiscard]] auto level() const -> log_level { return _level; }
+			void set_level(log_level level) { _level = level; }
 
 			[[nodiscard]] auto message() const -> std::string { return _message; }
+			void set_message(const std::string &message) { _message = message; }
 
 			[[nodiscard]] auto source() const -> std::string { return _source; }
+			void set_source(const std::string &source) { _source = source; }
 
 			[[nodiscard]] auto object() const -> std::string { return _object; }
+			void set_object(const std::string &object) { _object = object; }
 
 			[[nodiscard]] auto object_type() const -> std::string { return _object_type; }
+			void set_object_type(const std::string &object_type) { _object_type = object_type; }
 
 			[[nodiscard]] auto time() const -> std::chrono::system_clock::time_point { return _time; }
+			void set_time(const std::chrono::system_clock::time_point &time) { _time = time; }
 
 			[[nodiscard]] auto get_stats() const -> const stats * { return _stats; }
+			void set_stats(std::unique_ptr<stats> stats) { _stats = stats.release(); }
 
 			static auto string_to_level(const std::string &level) -> log_level;
 

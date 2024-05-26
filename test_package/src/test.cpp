@@ -2,10 +2,8 @@
 // Created by sr-71 on 05/02/2024.
 //
 #include <iostream>
-#include <iridium/options.hpp>
-#include <iridium/entities.hpp>
-#include <iridium/parsers.hpp>
-#include <iridium/process.hpp>
+#include <thread>
+#include <iridium/rclone.hpp>
 
 using namespace std;
 using namespace iridium::rclone;
@@ -42,9 +40,12 @@ auto main() -> int
 					nullptr, "/", 0, true, std::chrono::system_clock::now(),
 					remote
 			};
-	rclone->add_option(listing::fast_list()).add_option(logging::use_json_log());
-		//	{// filter::filter_file::uptr("+ TP4.pdf", "- *.pdf", "+ *.torrent", "- *"),
-		//	listing::fast_list(),
+
+
+	rclone->add_option(
+		// listing::fast_list()).add_option(logging::use_json_log());
+				// filter::filter_file::uptr("+ TP4.pdf", "- *.pdf", "+ *.torrent", "- *")
+			// listing::fast_list()
 		//	logging::use_json_log()
 			// logging::verbose(),
 			// logging::stats("0.1"),
@@ -54,8 +55,7 @@ auto main() -> int
 			//        option::logging::verbose()
 			// option::filter::include("*.pdf"),
 			// option::filter::exclude("*")
-		//	}
-		//);
+		);
 
 	std::vector<std::shared_ptr<::remote>> remotes;
 	auto fn = [&](const std::vector<std::shared_ptr<::remote>> &val) -> void
@@ -70,7 +70,7 @@ auto main() -> int
 	auto ser = ::file_parser::ptr(&file,
 	                            [](const ::file &file)
 	                            {
-		                            std::cout << file << std::endl;
+		                            //std::cout << file << std::endl;
 		                            // process().lsjson(file).execute().wait_for_finish();
 	                            },   file_parser::json);
 
@@ -163,8 +163,6 @@ auto main() -> int
 				.on_finish([&](int exit) { std::cout << counter++ << std::endl; });
 		pool.add_process(std::move(proc), process_pool::priority::low);
 	}
-
-	// this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 	pool.wait();
 

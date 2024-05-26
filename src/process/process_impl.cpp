@@ -56,6 +56,8 @@ namespace iridium::rclone
 		std::unique_ptr<boost::signals2::signal<void()>> _signal_start;
 		std::unique_ptr<boost::signals2::signal<void()>> _signal_stop;
 
+		bool use_global_options{false};
+
 		_process_impl_()
 		{
 			_signal_every_line = std::make_unique<bs2::signal<void(const std::string &)>>();
@@ -72,21 +74,21 @@ namespace iridium::rclone
 
 		auto wait_for_finish() -> void { _pool.join(); }
 
-		auto close_input_pipe() -> void
+		auto close_input_pipe() const -> void
 		{
 			if (_in and _in->pipe().is_open())
 				_in->pipe().close();
 			else std::cerr << "input pipe is not open or nullptr" << std::endl;
 		}
 
-		auto close_output_pipe() -> void
+		auto close_output_pipe() const -> void
 		{
 			if (_out and _out->pipe().is_open())
 				_out->pipe().close();
 			else std::cerr << "output pipe is not open or nullptr" << std::endl;
 		}
 
-		auto close_error_pipe() -> void
+		auto close_error_pipe() const -> void
 		{
 			if (_err and _err->pipe().is_open())
 				_err->pipe().close();
@@ -129,12 +131,12 @@ namespace iridium::rclone
 			_err.reset();
 		}
 
-		auto execute(bool with_global_option = true) -> void
+		auto execute() -> void
 		{
 			if (_state != state::not_launched)
 				throw std::runtime_error("process already started");
 
-			if (with_global_option)
+			if (use_global_options)
 				option::basic_option::add_options_to_vector(_global_options, _args);
 			option::basic_option::add_options_to_vector(_local_options, _args);
 
@@ -204,7 +206,8 @@ namespace iridium::rclone
 			if (_state not_eq state::not_launched)
 				return boost::algorithm::join(_args, " ");
 			auto args = _args;
-			option::basic_option::add_options_to_vector(_global_options, args);
+			if (use_global_options)
+				option::basic_option::add_options_to_vector(_global_options, args);
 			option::basic_option::add_options_to_vector(_local_options, args);
 			return boost::algorithm::join(args, " ");
 		}

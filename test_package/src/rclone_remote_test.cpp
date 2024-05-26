@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE RemoteTest
 
 #include <boost/test/included/unit_test.hpp>
+#include <boost/test/utils/lazy_ostream.hpp>
 #include <iridium/entities.hpp>
 
 using namespace iridium::rclone;
@@ -97,6 +98,27 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		BOOST_CHECK_EQUAL(remoteCopy.name(), "NewName");
 
 		BOOST_CHECK_EQUAL(name, remoteCopy.name());
+	}
+
+	BOOST_AUTO_TEST_CASE(testRemoteRootAndFullPath)
+	{
+		remote r("TestRemote", remote::google_drive, "/tests/path");
+
+		BOOST_CHECK_EQUAL(r.root_path(), "TestRemote:");
+		BOOST_CHECK_EQUAL(r.full_path(), "TestRemote:/tests/path");
+
+	}
+
+	BOOST_AUTO_TEST_CASE(testRemoteNoneType)
+	{
+		BOOST_CHECK_THROW(remote("TestRemote", remote::none, "/tests/path"), std::runtime_error);
+
+		auto r = entities::remote::create_shared_ptr("", remote::none, "/tests/path");
+		BOOST_CHECK_EQUAL(r->name(), "");
+		BOOST_CHECK_EQUAL(r->type(), remote::none);
+		BOOST_CHECK_EQUAL(r->path(), "/tests/path");
+		BOOST_CHECK_EQUAL(r->root_path(), "");
+		BOOST_CHECK_EQUAL(r->full_path(), "/tests/path");
 	}
 
 BOOST_AUTO_TEST_SUITE_END()

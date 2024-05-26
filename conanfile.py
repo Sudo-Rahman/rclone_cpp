@@ -7,7 +7,7 @@ required_conan_version = ">=2.0.0"
 
 class rclone_cppRecipe(ConanFile):
     name = "rclone_cpp"
-    version = "0.4"
+    version = "0.5"
     package_type = "library"
 
     # Optional metadata

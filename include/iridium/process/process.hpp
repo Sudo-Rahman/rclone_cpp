@@ -1,5 +1,6 @@
 #pragma once
 
+#include <any>
 #include <string>
 #include <functional>
 #include "../entities.hpp"
@@ -16,6 +17,14 @@ namespace iridium::rclone
 		process();
 
 		~process() noexcept;
+
+		process(const process &) = delete;
+
+		process(process &&) noexcept;
+
+		auto operator=(const process &) -> process&;
+
+		auto operator=(process &&) noexcept -> process&;
 
 		enum state
 		{
@@ -43,7 +52,9 @@ namespace iridium::rclone
 
 		auto close_error_pipe() -> process&;
 
-		auto execute(bool with_global_option = true) -> process&;
+		auto execute(bool with_global_opt = false) -> process&;
+
+		auto with_global_options() -> process&;
 
 		auto get() -> process * { return this; };
 
@@ -185,8 +196,21 @@ namespace iridium::rclone
 		 */
 		auto check(const entities::file &source, const entities::file &destination) -> process&;
 
-		auto add_option(option::basic_opt_uptr &&) -> process&;
+		auto touch(const entities::file &file) -> process&;
 
+		template<class ...Args>
+		auto add_option(Args && ...args) -> void requires(std::conjunction_v<std::is_convertible<Args,
+			option::basic_opt_uptr> ...>)
+		{
+			auto vec = std::vector<option::basic_opt_uptr>{};
+			(vec.push_back(std::forward<Args>(args)), ...);
+			add_option(std::move(vec));
+		}
+
+	private:
+		void add_option(std::vector<option::basic_opt_uptr> &&) const;
+
+	public:
 		template<class ...Args>
 		static auto add_global_option(Args && ...args) -> void requires(std::conjunction_v<std::is_convertible<Args,
 			option::basic_opt_uptr> ...>) { (_global_options.push_back(std::forward<Args>(args)), ...); }

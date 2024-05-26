@@ -3,6 +3,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std::chrono;
+
 namespace iridium::rclone::entities
 {
 	json_log::json_log(const json_log &log)
@@ -37,7 +38,6 @@ namespace iridium::rclone::entities
 
 	json_log::json_log(json_log &&log) noexcept : entity(log)
 	{
-
 		_level = log._level;
 		log._level = log_level::no_level;
 		_message = std::move(log._message);
@@ -70,7 +70,11 @@ namespace iridium::rclone::entities
 		return *this;
 	}
 
-	json_log::~json_log() { delete _stats; }
+	json_log::~json_log()
+	{
+		if (_stats != nullptr)
+			delete _stats;
+	}
 
 	auto json_log::string_to_level(const std::string &level) -> log_level
 	{
@@ -102,7 +106,8 @@ namespace iridium::rclone::entities
 				"\tsource : " << log.source() << ", " << std::endl <<
 				"\tobject : " << log.object() << ", " << std::endl <<
 				"\tobject_type : " << log.object_type() << ", " << std::endl <<
-				"\ttime : " << boost::posix_time::ptime(boost::posix_time::from_time_t(system_clock::to_time_t(log.time())))<< ", " << std::endl <<
+				"\ttime : " << boost::posix_time::ptime(
+					boost::posix_time::from_time_t(system_clock::to_time_t(log.time()))) << ", " << std::endl <<
 				"\tstats : {" << stats << "\t}" << std::endl <<
 				"}";
 		return os;
@@ -131,7 +136,8 @@ namespace iridium::rclone::entities
 				"\tdeletes : " << stats.deletes << ", " << std::endl <<
 				"\telapsed_time : " << stats.elapsed_time << ", " << std::endl <<
 				"\terrors : " << stats.errors << ", " << std::endl <<
-				"\teta : " << (not stats.eta.has_value() ? "null" : std::to_string(stats.eta.value())) << ", " <<std::endl <<
+				"\teta : " << (not stats.eta.has_value() ? "null" : std::to_string(stats.eta.value())) << ", " <<
+				std::endl <<
 				"\tfatal_error : " << boost::lexical_cast<std::string>(stats.fatal_error) << std::endl <<
 				"\tlast_error : " << stats.last_error << std::endl <<
 				"\trenames : " << stats.renames << std::endl <<
@@ -151,7 +157,8 @@ namespace iridium::rclone::entities
 	{
 		os << "transfer : {" << std::endl <<
 				"\tbytes : " << transfer.bytes << ", " << std::endl <<
-				"\teta : " << (not transfer.eta.has_value() ? "null" : std::to_string(transfer.eta.value())) << ", " <<std::endl <<
+				"\teta : " << (not transfer.eta.has_value() ? "null" : std::to_string(transfer.eta.value())) << ", " <<
+				std::endl <<
 				"\tgroup : " << transfer.group << ", " << std::endl <<
 				"\tname : " << transfer.name << std::endl <<
 				"\tsize : " << transfer.size << std::endl <<

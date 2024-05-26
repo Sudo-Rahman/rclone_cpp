@@ -1,11 +1,10 @@
+#include <numeric>
+
 #include "process_pool_impl.cpp"
 
 namespace iridium::rclone
 {
-	process_pool::~process_pool()
-	{
-		delete _impl;
-	}
+	process_pool::~process_pool() { delete _impl; }
 
 	process_pool::process_pool(uint16_t simultaneous_processes)
 	{
@@ -30,20 +29,20 @@ namespace iridium::rclone
 		_impl->add_process(std::move(process), priority);
 	}
 
-	auto process_pool::add_process(process *process, priority priority) const -> void
-	{
-		add_process(process_uptr(process), priority);
-	}
-
 	void process_pool::stop() const { _impl->stop(); }
+	auto process_pool::get_state() const -> state { return _impl->_state; }
 
 	void process_pool::stop_all_processes() const { _impl->stop_all_processes(); }
 
 	void process_pool::wait() const { _impl->wait(); }
 
-	auto process_pool::empty() const -> bool { return _impl->_processes.empty(); }
+	auto process_pool::empty() const -> bool { return size()==0; }
 
-	auto process_pool::size() const -> uint16_t { return _impl->_processes.size(); }
+	auto process_pool::size() const -> uint16_t
+	{
+		return std::accumulate(_impl->_processes.begin(), _impl->_processes.end(), 0,
+		                       [](auto acc, const auto &pair) { return acc + pair.second.size(); });
+	}
 
 	void process_pool::clear_pool() const { _impl->clear_pool(); }
 
@@ -52,9 +51,12 @@ namespace iridium::rclone
 		_impl->set_simultaneous_processes(simultaneous_processes);
 	}
 
+	auto process_pool::simultaneous_processes() const -> u_int16_t { return _impl->_simultaneous_processes; }
+
 	void process_pool::stop_all_processes_and_clear() const
 	{
-		stop_all_processes();
-		clear_pool();
+		_impl->stop_all_processes_and_clear();
 	}
+
+	auto process_pool::finished_processes() const -> uint16_t { return _impl->_executed_processes; }
 }; // namespace iridium::rclone

@@ -42,7 +42,7 @@ namespace iridium::rclone::entities
 
 		[[nodiscard]] auto mod_time() const -> std::chrono::system_clock::time_point{ return _mod_time; }
 
-		[[nodiscard]] auto pointer() -> file* { return this; }
+		[[nodiscard]] auto ptr() -> file* { return this; }
 
 		void set_name(const std::string& name);
 

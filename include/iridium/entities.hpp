@@ -4,6 +4,7 @@
 #include "entities/size.hpp"
 #include "entities/entity.hpp"
 #include "entities/file.hpp"
+#include "entities/json_log.hpp"
 #include "entities/remote.hpp"
 #include "entities/version.hpp"
 
