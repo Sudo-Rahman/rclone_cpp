@@ -143,8 +143,8 @@ BOOST_FIXTURE_TEST_SUITE(ProcessTestsSuite, ProcessFixture)
 		BOOST_CHECK(found == true);
 	}
 
-	const file test_file = file(nullptr, "/", 0, true, system_clock::now(),
-	                            remote::create_shared_ptr("test", remote::ftp, ""));
+	const file test_file = file(nullptr, "", 0, true, system_clock::now(),
+	                            remote::create_shared_ptr("", remote::none,  boost::dll::program_location().parent_path().string()));
 
 	BOOST_AUTO_TEST_CASE(lsjsonTest)
 	{
