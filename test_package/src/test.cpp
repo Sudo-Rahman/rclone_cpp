@@ -70,7 +70,7 @@ auto main() -> int
 	auto ser = ::file_parser::ptr(&file,
 	                            [](const ::file &file)
 	                            {
-		                            //std::cout << file << std::endl;
+		                            // std::cout << file << std::endl;
 		                            // process().lsjson(file).execute().wait_for_finish();
 	                            },   file_parser::json);
 
@@ -80,6 +80,8 @@ auto main() -> int
 	}));
 
 	auto parserr = parser::version_parser::ptr([](const version &version) { std::cout << version << std::endl; });
+
+
 
 	rclone->
 	//list_remotes(fn)

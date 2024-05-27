@@ -111,10 +111,8 @@ BOOST_AUTO_TEST_SUITE(Suite)
 
 	BOOST_AUTO_TEST_CASE(testRemoteNoneType)
 	{
-		BOOST_CHECK_THROW(remote("TestRemote", remote::none, "/tests/path"), std::runtime_error);
-
-		auto r = entities::remote::create_shared_ptr("", remote::none, "/tests/path");
-		BOOST_CHECK_EQUAL(r->name(), "");
+		auto r = entities::remote::create_shared_ptr("TestRemote", remote::none, "/tests/path");
+		BOOST_CHECK_EQUAL(r->name(), "TestRemote");
 		BOOST_CHECK_EQUAL(r->type(), remote::none);
 		BOOST_CHECK_EQUAL(r->path(), "/tests/path");
 		BOOST_CHECK_EQUAL(r->root_path(), "");

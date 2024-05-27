@@ -2,7 +2,6 @@
 #include <process.hpp>
 #include <iostream>
 #include <parsers.hpp>
-#include <config_create.hpp>
 #include <string>
 #include <boost/process.hpp>
 #include <boost/asio.hpp>
@@ -220,7 +219,7 @@ namespace iridium::rclone
 				_signal_stop->operator()();
 			close_input_pipe();
 			_child.terminate();
-			if (is_running())
+			if (_child.running())
 			{
 				_pool.stop();
 				_pool.join();
@@ -235,63 +234,6 @@ namespace iridium::rclone
 				stop();
 				std::cerr << "process are destroyed without being stopped" << std::endl;
 			}
-		}
-
-		auto every_line(std::function<void(const std::string &)> &&callback) -> void
-		{
-			_signal_every_line->connect(
-					[this, callback = std::move(callback)](const std::string &line) { callback(line); }
-				);
-		}
-
-		auto on_finish(std::function<void(int)> &&callback) -> void
-		{
-			_signal_finish->connect(
-					[this, callback = std::move(callback)](const int &exit_code) { callback(exit_code); }
-				);
-		}
-
-		auto on_stop(std::function<void()> &&callback) -> void
-		{
-			_signal_stop->connect(
-					[this, callback = std::move(callback)]() { ba::post(_pool, [callback] { callback(); }); }
-				);
-		}
-
-		auto on_start(std::function<void()> &&callback) -> void
-		{
-			_signal_start->connect(
-					[this, callback = std::move(callback)]() { ba::post(_pool, [callback] { callback(); }); }
-				);
-		}
-
-		auto on_finish_error(std::function<void()> &&callback) -> void
-		{
-			_signal_finish->connect(
-					[this, callback = std::move(callback)](const int &exit_code)
-					{
-						if (exit_code not_eq 0)
-							ba::post(_pool, [&callback] { callback(); });
-					}
-				);
-		}
-
-		auto list_remotes(std::function<void(const std::vector<remote_ptr> &)> &&callback) -> void
-		{
-			_args = {"listremotes", "--long"};
-			on_finish([this, callback = std::move(callback)](int exit_code)
-			{
-				if (exit_code not_eq 0) throw std::runtime_error("error in listremotes");
-				auto remotes = std::vector<remote_ptr>();
-				auto parser = parser::remote_parser(
-					[&remotes](const remote &remote)
-					{
-						remotes.push_back(std::make_shared<entities::remote>(remote));
-					});
-				for (const auto &line: _output)
-					parser.parse(line);
-				callback(remotes);
-			});
 		}
 	};
 }

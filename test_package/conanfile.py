@@ -10,8 +10,8 @@ class rclone_cppTestConan(ConanFile):
     generators = "CMakeDeps", "CMakeToolchain"
 
     def requirements(self):
-        self.requires("boost/[>=1.80.0]")
-        self.requires("rclone_cpp/[>=0.1]")
+        self.requires("boost/[>=1.80.0 <1.86.0]")
+        self.requires("rclone_cpp/[0.6]")
 
     def build(self):
         cmake = CMake(self)

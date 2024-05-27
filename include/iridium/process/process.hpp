@@ -85,8 +85,7 @@ namespace iridium::rclone
 		auto every_line(std::function<void(const std::string &)> &&callback) -> process&;
 
 		template<class T>
-		auto every_line_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process& requires(std::is_base_of_v<
-			entity, T>)
+		auto every_line_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process&
 		{
 			every_line([this, parser = std::move(parser)](const std::string &line) { parser->parse(line); });
 			return *this;

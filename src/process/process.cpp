@@ -128,31 +128,41 @@ namespace iridium::rclone
 
 	auto process::every_line(std::function<void(const std::string &)> &&callback) -> process&
 	{
-		_impl->every_line(std::move(callback));
+		_impl->_signal_every_line->connect(
+				[this, callback = std::move(callback)](const std::string &line) { callback(line); }
+			);
 		return *this;
 	}
 
 	auto process::on_finish(std::function<void(int)> &&callback) -> process&
 	{
-		_impl->on_finish(std::move(callback));
+		_impl->_signal_finish->connect(
+				[this, callback = std::move(callback)](const int &exit_code) { callback(exit_code); }
+			);
 		return *this;
 	}
 
 	auto process::on_stop(std::function<void()> &&callback) -> process&
 	{
-		_impl->on_stop(std::move(callback));
+		_impl->_signal_stop->connect(
+				[this, callback = std::move(callback)]() { ba::post(_impl->_pool, [callback] { callback(); }); }
+			);
 		return *this;
 	}
 
 	auto process::on_start(std::function<void()> &&callback) -> process&
 	{
-		_impl->on_start(std::move(callback));
+		_impl->_signal_start->connect(
+				[this, callback = std::move(callback)]() { ba::post(_impl->_pool, [callback] { callback(); }); }
+			);
 		return *this;
 	}
 
 	auto process::on_finish_error(std::function<void()> &&callback) -> process&
 	{
-		_impl->on_finish_error(std::move(callback));
+		_impl->_signal_finish->connect(
+				[this, callback = std::move(callback)](const int &exit_code) { if (exit_code not_eq 0) callback(); }
+			);
 		return *this;
 	}
 
@@ -164,7 +174,17 @@ namespace iridium::rclone
 
 	auto process::list_remotes(std::function<void(const std::vector<remote_ptr> &)> &&callback) -> process&
 	{
-		_impl->list_remotes(std::move(callback));
+		_impl->_args = {"listremotes", "--long"};
+		on_finish([this, callback = std::move(callback)](int exit_code)
+		{
+			if (exit_code not_eq 0) throw std::runtime_error("error in listremotes");
+			auto remotes = std::vector<remote_ptr>();
+			auto parser = parser::remote_parser(
+				[&remotes](const remote &remote) { remotes.push_back(std::make_shared<entities::remote>(remote)); });
+			for (const auto &line: _impl->_output)
+				parser.parse(line);
+			callback(remotes);
+		});
 		return *this;
 	}
 

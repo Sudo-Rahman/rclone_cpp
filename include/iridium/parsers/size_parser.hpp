@@ -11,7 +11,7 @@ namespace iridium::rclone::parser
 		explicit size_parser(std::function<void(const entities::size &)> callback)
 			: basic_parser(std::move(callback)) {}
 
-		static auto ptr(std::function<void(const entities::size &)> callback) -> std::shared_ptr<size_parser>
+		static auto ptr(std::function<void(const entities::size &)> callback) -> std::shared_ptr<basic_parser>
 		{
 			return std::make_shared<size_parser>(std::move(callback));
 		}

@@ -11,7 +11,7 @@ namespace iridium::rclone::parser
 		explicit about_parser(std::function<void(const entities::about &)> callback)
 			: basic_parser(std::move(callback)) {}
 
-		static auto ptr(std::function<void(const entities::about &)> callback) -> std::shared_ptr<about_parser>
+		static auto ptr(std::function<void(const entities::about &)> callback) -> std::shared_ptr<basic_parser>
 		{
 			return std::make_shared<about_parser>(std::move(callback));
 		}

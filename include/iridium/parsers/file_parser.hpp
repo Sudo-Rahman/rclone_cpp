@@ -19,7 +19,7 @@ namespace iridium::rclone::parser
 			: basic_parser(std::move(callback)), _parent(parent), _type(type) {}
 
 		static auto ptr(entities::file *parent, std::function<void(entities::file)> callback, parser_type type = json)
-			-> std::shared_ptr<file_parser> { return std::make_shared<file_parser>(parent, std::move(callback), type); }
+			-> std::shared_ptr<basic_parser> { return std::make_shared<file_parser>(parent, std::move(callback), type); }
 
 		void parse(const std::string &data) const override;
 

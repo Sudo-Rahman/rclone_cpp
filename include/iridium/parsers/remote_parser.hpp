@@ -12,7 +12,7 @@ namespace iridium::rclone::parser
 		explicit remote_parser(std::function<void(const entities::remote &)> callback)
 			: basic_parser(std::move(callback)) {}
 
-		static auto ptr(std::function<void(const entities::remote &)> callback) -> std::shared_ptr<remote_parser>
+		static auto ptr(std::function<void(const entities::remote &)> callback) -> std::shared_ptr<basic_parser>
 		{
 			return std::make_shared<remote_parser>(std::move(callback));
 		}

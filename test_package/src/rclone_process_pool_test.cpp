@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		for (int i = 0; i < 100; i++)
 		{
 			auto p = std::make_unique<process>();
-			p->version();
+			p->list_remotes();
 			pool.add_process(std::move(p));
 		}
 		pool.stop();
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		for (int i = 0; i < 100; i++)
 		{
 			auto p = std::make_unique<process>();
-			p->version();
+			p->list_remotes();
 			processes.push_back(p.get());
 			pool.add_process(std::move(p));
 		}

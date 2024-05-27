@@ -7,10 +7,7 @@ namespace iridium::rclone::entities
 {
 	remote::remote(const std::string &name, remote_type type, const std::string &path) : _name(name),
 		_type(type), _path(path)
-	{
-		if (type == none and not name.empty())
-			throw std::runtime_error("Name be empty with type none");
-	}
+	{}
 
 	remote::remote(remote &&remote) noexcept
 	{
@@ -46,7 +43,7 @@ namespace iridium::rclone::entities
 	{
 		if (not _name.ends_with(":"))
 		{
-			if (_type == none or _name == "") return _name;
+			if (_type == none) return "";
 			return _name + ":";
 		}
 		return _name;

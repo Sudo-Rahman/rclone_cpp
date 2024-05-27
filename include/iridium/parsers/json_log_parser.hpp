@@ -11,7 +11,7 @@ namespace iridium::rclone::parser
 		explicit json_log_parser(std::function<void(const entities::json_log &)> callback)
 			: basic_parser(std::move(callback)) {}
 
-		static auto ptr(std::function<void(const entities::json_log &)> callback) -> std::shared_ptr<json_log_parser>
+		static auto ptr(std::function<void(const entities::json_log &)> callback) -> std::shared_ptr<basic_parser>
 		{
 			return std::make_shared<json_log_parser>(std::move(callback));
 		}

@@ -11,7 +11,7 @@ namespace iridium::rclone::parser
 		explicit version_parser(std::function<void(entities::version)> callback)
 			: basic_parser(std::move(callback)) {}
 
-		static auto ptr(std::function<void(entities::version)> callback) -> std::shared_ptr<version_parser>
+		static auto ptr(std::function<void(entities::version)> callback) -> std::shared_ptr<basic_parser>
 		{
 			return std::make_shared<version_parser>(std::move(callback));
 		}
