@@ -363,6 +363,11 @@ namespace iridium::rclone
 			_impl->_local_options.push_back(std::move(opt));
 	}
 
+	void process::join() const
+	{
+		_impl->_pool.join();
+	}
+
 	void process::clear_global_options() { _global_options.clear(); }
 
 	auto process::join_vector(const std::vector<std::string> &vec) -> std::string

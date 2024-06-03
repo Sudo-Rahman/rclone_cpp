@@ -50,9 +50,17 @@ namespace iridium::rclone
 					if (_state != running)
 						break;
 					boost::this_thread::interruption_point();
+					join_finished_processes();
 					auto* process = get_process();
 					if (process == nullptr) { continue; }
 					process->on_finish([this](int)
+					{
+						_running_processes--;
+						_executed_processes++;
+						_cv_process.notify_one();
+						_wait_cv.notify_one();
+					});
+					process->on_stop([this]
 					{
 						_running_processes--;
 						_executed_processes++;
@@ -98,7 +106,6 @@ namespace iridium::rclone
 					if (process->is_running())
 						process->stop();
 			_running_processes = 0;
-			_executed_processes = 0;
 		}
 
 		void wait()
@@ -117,6 +124,8 @@ namespace iridium::rclone
 		{
 			std::lock_guard lock(_mutex);
 			_processes.clear();
+			_running_processes = 0;
+			_executed_processes = 0;
 		}
 
 		auto set_simultaneous_processes(uint16_t simultaneous_processes) -> void
@@ -144,6 +153,15 @@ namespace iridium::rclone
 					if (process->get_state() == process::state::not_launched)
 						return process.get();
 			return nullptr;
+		}
+
+		auto join_finished_processes() -> void
+		{
+			std::lock_guard lock(_mutex);
+			for (const auto &pair: _processes)
+				for (const auto &process: pair.second)
+					if (process->get_state() == process::state::finished)
+						process->join();
 		}
 	};
 }

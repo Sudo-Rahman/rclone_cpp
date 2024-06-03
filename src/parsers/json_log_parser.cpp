@@ -23,6 +23,9 @@ namespace iridium::rclone::parser
 		transfer.size = get_from_obj<uint64_t>(obj, "size");
 		transfer.speed = get_from_obj<double_t>(obj, "speed");
 		transfer.speed_avg = get_from_obj<double_t>(obj, "speedAvg");
+		transfer.src_fs = get_from_obj_optional<std::string>(obj, "srcFs");
+		transfer.dst_fs = get_from_obj_optional<std::string>(obj, "dstFs");
+
 		return transfer;
 	}
 
@@ -63,6 +66,10 @@ namespace iridium::rclone::parser
 			stats.transfer_time = get_from_obj<double_t>(obj, "transferTime");
 			stats.transferring = parse_transferring(obj.if_contains("transferring"));
 			stats.transfers = get_from_obj<uint64_t>(obj, "transfers");
+			stats.server_side_copies = get_from_obj_optional<uint64_t>(obj, "serverSideCopies");
+			stats.server_side_copy_bytes = get_from_obj_optional<uint64_t>(obj, "serverSideCopyBytes");
+			stats.server_side_move_bytes = get_from_obj_optional<uint64_t>(obj, "serverSideMoveBytes");
+			stats.server_side_moves = get_from_obj_optional<uint64_t>(obj, "serverSideMoves");
 		}
 		catch (const std::exception &e) { std::cerr << "Error parsing stats: " << e.what() << " " << obj << std::endl; }
 		return stats;

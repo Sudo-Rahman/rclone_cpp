@@ -58,6 +58,8 @@ namespace iridium::rclone::entities
 
 		void add_child_if_not_exist(const std::shared_ptr<file>& child);
 
+		void remove_child(const std::shared_ptr<file>& child);
+
 		void set_parent(file * parent) { _parent = parent; }
 
 		[[nodiscard]] auto parent() const -> file* { return _parent; }
@@ -74,7 +76,7 @@ namespace iridium::rclone::entities
 		create_shared_ptr(file * parent, const std::string& name_file, int64_t size, bool is_dir,
 		                 std::chrono::system_clock::time_point mod_time, const remote_ptr& remote) -> std::shared_ptr<file>;
 
-		file() = default;
+		file();
 
 		~file() override = default;
 
@@ -92,6 +94,7 @@ namespace iridium::rclone::entities
 		std::vector<std::shared_ptr<file>> _children;
 		bool _is_dir{};
 		std::chrono::system_clock::time_point _mod_time;
+		std::shared_ptr<std::mutex> _mutex;
 	};
 
 	using file_ptr = std::shared_ptr<file>;

@@ -94,6 +94,10 @@ namespace iridium::rclone { namespace parser
 			std::string last_error;
 			uint64_t renames{};
 			bool retry_error{};
+			std::optional<uint64_t> server_side_copies;
+			std::optional<uint64_t> server_side_copy_bytes;
+			std::optional<uint64_t> server_side_move_bytes;
+			std::optional<uint64_t> server_side_moves;
 			double_t speed{};
 			uint64_t total_bytes{};
 			uint64_t total_checks{};
@@ -115,7 +119,10 @@ namespace iridium::rclone { namespace parser
 			uint64_t size{};
 			double_t speed{};
 			double_t speed_avg{};
+			std::optional<std::string> src_fs;
+			std::optional<std::string> dst_fs;
 
 			friend auto operator<<(std::ostream &os, const transfer &transfer) -> std::ostream&;
 		};
+
 	}} // namespace iridium::rclone::entity

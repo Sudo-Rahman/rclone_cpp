@@ -196,7 +196,6 @@ namespace iridium::rclone
 					if (_signal_finish)
 						_signal_finish->operator()(_child.exit_code());
 				}
-				_cv.notify_all();
 			});
 		}
 

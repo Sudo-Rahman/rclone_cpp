@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 	BOOST_AUTO_TEST_CASE(testRcloneFileEquality)
 	{
 		auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive,
-		                                               "/tests/path");
+		                                       "/tests/path");
 		auto r_ptr2 = remote::create_shared_ptr("AnotherRemote", remote::sftp, "/another/path");
 
 		auto clock = system_clock::now();
@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 	BOOST_AUTO_TEST_CASE(testRcloneFileOutputOperator)
 	{
 		auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive,
-		                                                       "/tests/path");
+		                                       "/tests/path");
 
 		file file(nullptr, "path", 100, false, system_clock::now(), r_ptr);
 
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 	BOOST_AUTO_TEST_CASE(testRcloneFileSetters)
 	{
 		auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive,
-		                                               "/tests/path");
+		                                       "/tests/path");
 
 		auto clock = system_clock::now();
 		file file(nullptr, "path", 100, false, system_clock::now(), r_ptr);
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		BOOST_CHECK_EQUAL(fileCopy.remote()->name(), "TestRemote");
 		BOOST_CHECK_EQUAL(fileCopy.size(), 100);
 		BOOST_CHECK_EQUAL(fileCopy.is_dir(), false);
-        BOOST_CHECK_EQUAL(fileCopy.mod_time().time_since_epoch().count(), clock.time_since_epoch().count());
+		BOOST_CHECK_EQUAL(fileCopy.mod_time().time_since_epoch().count(), clock.time_since_epoch().count());
 	}
 
 	BOOST_AUTO_TEST_CASE(testRcloneFileCopyAssignment)
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		BOOST_CHECK_EQUAL(fileCopy.remote()->name(), "TestRemote");
 		BOOST_CHECK_EQUAL(fileCopy.size(), 100);
 		BOOST_CHECK_EQUAL(fileCopy.is_dir(), false);
-        BOOST_CHECK_EQUAL(fileCopy.mod_time().time_since_epoch().count(), clock.time_since_epoch().count());
+		BOOST_CHECK_EQUAL(fileCopy.mod_time().time_since_epoch().count(), clock.time_since_epoch().count());
 	}
 
 	BOOST_AUTO_TEST_CASE(testRcloneFileMoveAssignmentSetter)
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		BOOST_CHECK_EQUAL(fileCopy.remote()->name(), "TestRemote");
 		BOOST_CHECK_EQUAL(fileCopy.size(), 100);
 		BOOST_CHECK_EQUAL(fileCopy.is_dir(), false);
-        BOOST_CHECK_EQUAL(fileCopy.mod_time().time_since_epoch().count(), clock.time_since_epoch().count());
+		BOOST_CHECK_EQUAL(fileCopy.mod_time().time_since_epoch().count(), clock.time_since_epoch().count());
 
 		clock = system_clock::now();
 		fileCopy.set_name("new");
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		BOOST_CHECK_EQUAL(fileCopy.remote()->name(), "NewRemote");
 		BOOST_CHECK_EQUAL(fileCopy.size(), 200);
 		BOOST_CHECK_EQUAL(fileCopy.is_dir(), true);
-        BOOST_CHECK_EQUAL(fileCopy.mod_time().time_since_epoch().count(), clock.time_since_epoch().count());
+		BOOST_CHECK_EQUAL(fileCopy.mod_time().time_since_epoch().count(), clock.time_since_epoch().count());
 	}
 
 	BOOST_AUTO_TEST_CASE(testRcloneFileAddChild)
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 
 		file file(nullptr, "parent", 100, true, system_clock::now(), r_ptr);
 		file.add_child(file::create_shared_ptr(&file, "child", 100, false,
-		                                               system_clock::now(), r_ptr));
+		                                       system_clock::now(), r_ptr));
 
 		BOOST_CHECK_EQUAL(file.nb_chilchren(), 1);
 		BOOST_CHECK_EQUAL(file.parent(), nullptr);
@@ -154,49 +154,68 @@ BOOST_AUTO_TEST_SUITE(Suite)
 	}
 
 	BOOST_AUTO_TEST_CASE(testRcloneFileAbsolutePath)
-    {
-        auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "/tests/path");
-        file file(nullptr, "path", 100, false, system_clock::now(), r_ptr);
+	{
+		auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "");
+		file _file_(nullptr, "", 100, true, system_clock::now(), r_ptr);
 
-        BOOST_CHECK_EQUAL(file.absolute_path(), "TestRemote:/tests/path/path");
-    }
+		file child(&_file_, "parent.jpeg", 100, false, system_clock::now(), r_ptr);
 
-    BOOST_AUTO_TEST_CASE(testRcloneFilePath)
-    {
-        auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "/tests/path");
-        file file(nullptr, "path", 100, false, system_clock::now(), r_ptr);
+		BOOST_CHECK_EQUAL(_file_.absolute_path(), "TestRemote:");
+		BOOST_CHECK_EQUAL(child.absolute_path(), "TestRemote:parent.jpeg");
+	}
 
-        BOOST_CHECK_EQUAL(file.path(), "/path");
-    }
+	BOOST_AUTO_TEST_CASE(testRcloneFilePath)
+	{
+		auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "/tests/path");
+		file file(nullptr, "path", 100, false, system_clock::now(), r_ptr);
 
-    BOOST_AUTO_TEST_CASE(testRcloneFileParentDir)
-    {
-        auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "/tests/path");
-        file parent(nullptr, "parent", 100, true, system_clock::now(), r_ptr);
-        file child(&parent, "child", 100, false, system_clock::now(), r_ptr);
+		BOOST_CHECK_EQUAL(file.path(), "/path");
+	}
 
-        BOOST_CHECK_EQUAL(child.parent_dir(), "/parent");
-        BOOST_CHECK_EQUAL(child.parent_absolute_dir(), "TestRemote:/tests/path/parent");
-    }
+	BOOST_AUTO_TEST_CASE(testRcloneFileParentDir)
+	{
+		auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "/tests/path");
+		file parent(nullptr, "parent", 100, true, system_clock::now(), r_ptr);
+		file child(&parent, "child", 100, false, system_clock::now(), r_ptr);
 
-    BOOST_AUTO_TEST_CASE(testRcloneFileAddChildIfNotExist)
-    {
-        auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "/tests/path");
+		BOOST_CHECK_EQUAL(child.parent_dir(), "/parent");
+		BOOST_CHECK_EQUAL(child.parent_absolute_dir(), "TestRemote:/tests/path/parent");
+	}
+
+	BOOST_AUTO_TEST_CASE(testRcloneFileAddChildIfNotExist)
+	{
+		auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "/tests/path");
 
 		auto clock = system_clock::now();
-        file file(nullptr, "parent", 100, true, system_clock::now(), r_ptr);
-        file.add_child_if_not_exist(file::create_shared_ptr(&file, "child", 100, false,
-                                                             clock, r_ptr));
+		file file(nullptr, "parent", 100, true, system_clock::now(), r_ptr);
+		file.add_child_if_not_exist(file::create_shared_ptr(&file, "child", 100, false,
+		                                                    clock, r_ptr));
 
-        BOOST_CHECK_EQUAL(file.nb_chilchren(), 1);
-        BOOST_CHECK_EQUAL(file.children().at(0)->parent(), &file);
-        BOOST_CHECK_EQUAL(file.children().at(0)->name(), "child");
-        BOOST_CHECK_EQUAL(file.children().at(0)->path(), "/parent/child");
+		BOOST_CHECK_EQUAL(file.nb_chilchren(), 1);
+		BOOST_CHECK_EQUAL(file.children().at(0)->parent(), &file);
+		BOOST_CHECK_EQUAL(file.children().at(0)->name(), "child");
+		BOOST_CHECK_EQUAL(file.children().at(0)->path(), "/parent/child");
 
-        file.add_child_if_not_exist(file::create_shared_ptr(&file, "child", 100, false,
-                                                             clock, r_ptr));
+		file.add_child_if_not_exist(file::create_shared_ptr(&file, "child", 100, false,
+		                                                    clock, r_ptr));
 
-        BOOST_CHECK_EQUAL(file.nb_chilchren(), 1); // child already exists, no new child added
-    }
+		BOOST_CHECK_EQUAL(file.nb_chilchren(), 1); // child already exists, no new child added
+	}
+
+	BOOST_AUTO_TEST_CASE(testRcloneFileRemoveChild)
+	{
+		auto r_ptr = remote::create_shared_ptr("TestRemote", remote::google_drive, "/tests/path");
+
+		auto clock = system_clock::now();
+		file file(nullptr, "parent", 100, true, system_clock::now(), r_ptr);
+		file.add_child_if_not_exist(file::create_shared_ptr(&file, "child", 100, false,
+		                                                    clock, r_ptr));
+
+		BOOST_CHECK_EQUAL(file.nb_chilchren(), 1);
+
+		file.remove_child(file.children().at(0));
+
+		BOOST_CHECK_EQUAL(file.nb_chilchren(), 0);
+	}
 
 BOOST_AUTO_TEST_SUITE_END()
