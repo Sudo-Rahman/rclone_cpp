@@ -57,6 +57,8 @@ namespace iridium::rclone::entities
 	{
 		std::lock_guard lock(*_mutex);
 		_children.push_back(child);
+		if (child->_parent == nullptr) child->_parent = this;
+		if (child->_parent != this) throw std::runtime_error("Parent is not the same as the child parent");
 	}
 
 	void file::add_child_if_not_exist(const std::shared_ptr<file> &child)

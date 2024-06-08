@@ -41,7 +41,7 @@ namespace iridium::rclone::option
 
 		static auto uptr(const std::string &option, const std::string &value) -> basic_opt_uptr;
 
-		auto copy_uptr() -> basic_opt_uptr;
+		virtual auto copy_uptr() -> basic_opt_uptr;
 
 
 	private:

@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 	{
 		auto pool = create_pool();
 		pool.set_simultaneous_processes(1);
-		for (int i = 0; i < 100; i++)
+		for (int i = 0; i < 10000; i++)
 		{
 			auto p = std::make_unique<process>();
 			p->list_remotes();
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		auto pool = create_pool();
 		pool.set_simultaneous_processes(1);
 		std::vector<process *> processes;
-		for (int i = 0; i < 100; i++)
+		for (int i = 0; i < 10000; i++)
 		{
 			auto p = std::make_unique<process>();
 			p->list_remotes();

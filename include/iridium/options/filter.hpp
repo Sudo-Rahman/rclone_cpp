@@ -94,6 +94,11 @@ namespace iridium::rclone::option::filter
 			// Discard the first argument (pattern for main filter)
 		}
 
+		auto copy_uptr() -> basic_opt_uptr override
+		{
+			return std::make_unique<filter_file>(*this);
+		}
+
 	private:
 		std::vector<std::string> _files;
 	};

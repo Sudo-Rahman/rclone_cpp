@@ -206,11 +206,6 @@ namespace iridium::rclone
 			add_option(std::move(vec));
 		}
 
-		/**
-		 * @brief join thread pool that execute all tasks, callbacks and parsers, this is a blocking call
-		 */
-		void join() const;
-
 	private:
 		void add_option(std::vector<option::basic_opt_uptr> &&) const;
 

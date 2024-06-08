@@ -10,6 +10,7 @@
 #include "../options.hpp"
 #include <boost/signals2.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/thread.hpp>
 
 #if defined(_WIN32)
 #include <boost/process/windows.hpp>
@@ -39,7 +40,8 @@ namespace iridium::rclone
 
 		/// 1 thread for wait child, 1 thread for reading output,
 		/// 1 thread for reading error and 2 last threads computing the signals for every line and finish
-		boost::asio::thread_pool _pool{5};
+		// boost::asio::thread_pool _pool{5};
+		std::vector<boost::thread> _threads;
 		std::atomic_uint8_t _counter_read{0};
 
 		state _state{state::not_launched};
@@ -71,7 +73,11 @@ namespace iridium::rclone
 			_cv.wait(lock, [this] { return _state == state::running; });
 		}
 
-		auto wait_for_finish() -> void { _pool.join(); }
+		auto wait_for_finish() -> void
+		{
+			for (auto &thread: _threads)
+				thread.join();
+		}
 
 		auto close_input_pipe() const -> void
 		{
@@ -110,6 +116,7 @@ namespace iridium::rclone
 			std::string line;
 			while (std::getline(*_out, line))
 			{
+				boost::this_thread::interruption_point();
 				_output.emplace_back(line);
 				if (_signal_every_line)
 					_signal_every_line->operator()(line);
@@ -122,6 +129,7 @@ namespace iridium::rclone
 			std::string line;
 			while (std::getline(*_err, line))
 			{
+				boost::this_thread::interruption_point();
 				_error.emplace_back(line);
 				_output.emplace_back(line);
 				if (_signal_every_line)
@@ -165,18 +173,19 @@ namespace iridium::rclone
 				_signal_start->operator()();
 			_cv.notify_all();
 
-			ba::post(_pool, [this]
+			_threads.push_back(boost::thread([this]
 			{
 				read_output();
 				_counter_read++;
-			});
-			ba::post(_pool, [this]
+			}));
+
+			_threads.push_back(boost::thread([this]
 			{
 				read_error();
 				_counter_read++;
-			});
+			}));
 
-			ba::post(_pool, [this]
+			_threads.push_back(boost::thread([this]
 			{
 				try
 				{
@@ -196,7 +205,7 @@ namespace iridium::rclone
 					if (_signal_finish)
 						_signal_finish->operator()(_child.exit_code());
 				}
-			});
+			}));
 		}
 
 		auto commands() const -> std::string
@@ -220,8 +229,11 @@ namespace iridium::rclone
 			_child.terminate();
 			if (_child.running())
 			{
-				_pool.stop();
-				_pool.join();
+				for (auto &thread: _threads)
+				{
+					thread.interrupt();
+					thread.join();
+				}
 			}
 			_cv.notify_all();
 		}
@@ -233,6 +245,7 @@ namespace iridium::rclone
 				stop();
 				std::cerr << "process are destroyed without being stopped" << std::endl;
 			}
+			wait_for_finish();
 		}
 	};
 }

@@ -38,6 +38,11 @@ namespace iridium::rclone::option::logging
 		static auto uptr(level level) -> std::unique_ptr<log_level> { return std::make_unique<log_level>(level); }
 		explicit log_level(level level) : basic_option("--log-level", to_string(level)) {}
 
+		auto copy_uptr() -> basic_opt_uptr override
+		{
+			return std::make_unique<log_level>(*this);
+		}
+
 	private:
 		std::string to_string(level level)
 		{

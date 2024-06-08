@@ -145,7 +145,7 @@ namespace iridium::rclone
 	auto process::on_stop(std::function<void()> &&callback) -> process&
 	{
 		_impl->_signal_stop->connect(
-				[this, callback = std::move(callback)]() { ba::post(_impl->_pool, [callback] { callback(); }); }
+				[this, callback = std::move(callback)]() { callback(); }
 			);
 		return *this;
 	}
@@ -153,7 +153,7 @@ namespace iridium::rclone
 	auto process::on_start(std::function<void()> &&callback) -> process&
 	{
 		_impl->_signal_start->connect(
-				[this, callback = std::move(callback)]() { ba::post(_impl->_pool, [callback] { callback(); }); }
+				[this, callback = std::move(callback)]() { callback(); }
 			);
 		return *this;
 	}
@@ -361,11 +361,6 @@ namespace iridium::rclone
 	{
 		for (auto &opt: opts)
 			_impl->_local_options.push_back(std::move(opt));
-	}
-
-	void process::join() const
-	{
-		_impl->_pool.join();
 	}
 
 	void process::clear_global_options() { _global_options.clear(); }

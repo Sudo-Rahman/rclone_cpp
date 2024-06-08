@@ -130,6 +130,11 @@ namespace iridium::rclone::option::tree
 		static auto uptr(sort_by sort_by) -> std::unique_ptr<sort> { return std::make_unique<sort>(sort_by); }
 		explicit sort(sort_by sort_by) : basic_option("--sort", to_string(sort_by)) {}
 
+		auto copy_uptr() -> basic_opt_uptr override
+		{
+			return std::make_unique<sort>(*this);
+		}
+
 	private:
 		auto to_string(sort_by sort_by) -> std::string
 		{
