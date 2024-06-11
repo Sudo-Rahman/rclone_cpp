@@ -98,7 +98,7 @@ namespace iridium::rclone
 	auto process::get_output() const -> std::vector<std::string> { return _impl->_output; }
 	auto process::get_error() const -> std::vector<std::string> { return _impl->_error; }
 
-	auto process::clean_data() -> void
+	auto process::clean_data()const -> void
 	{
 		_impl->_output.clear();
 		_impl->_error.clear();
