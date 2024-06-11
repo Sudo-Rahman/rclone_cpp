@@ -69,7 +69,7 @@ namespace iridium::rclone
 
 		[[nodiscard]] auto get_error() const -> std::vector<std::string>;
 
-		auto clean() const -> void;
+		auto clean_data() const -> void;
 
 		[[nodiscard]] auto options() const -> std::vector<option::basic_opt_uptr>&;
 
