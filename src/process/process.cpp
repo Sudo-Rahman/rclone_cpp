@@ -97,6 +97,13 @@ namespace iridium::rclone
 	auto process::is_running() const -> bool { return _impl->_state == running; }
 	auto process::get_output() const -> std::vector<std::string> { return _impl->_output; }
 	auto process::get_error() const -> std::vector<std::string> { return _impl->_error; }
+
+	auto process::clean() const -> void
+	{
+		_impl->_output.clear();
+		_impl->_error.clear();
+	}
+
 	auto process::options() const -> std::vector<option::basic_opt_uptr>& { return _impl->_local_options; }
 
 	auto process::write_input(const std::string &input) const -> void { _impl->write_input(input); }
@@ -134,10 +141,30 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	auto process::on_finish(std::function<void(int)> &&callback) -> process&
+	template<class ...Ts>
+	struct overloaded : Ts ...
+	{
+		using Ts::operator() ...;
+	};
+
+	template<class ...Ts>
+	overloaded(Ts ...) -> overloaded<Ts ...>;
+
+	auto process::on_finish(on_finish_callback &&callback) -> process&
 	{
 		_impl->_signal_finish->connect(
-				[this, callback = std::move(callback)](const int &exit_code) { callback(exit_code); }
+				[this, callback = std::move(callback)](const int &exit_code)
+				{
+					std::visit(overloaded{
+							           [](const std::function<void()> &callback) { callback(); },
+							           [exit_code](const std::function<void(int)> &callback) { callback(exit_code); },
+							           [exit_code, this](const std::function<void(int, process *)> &callback)
+							           {
+								           callback(exit_code, this);
+							           },
+							           [](auto &callback) { std::cout << callback << std::endl; }
+					           }, callback);
+				}
 			);
 		return *this;
 	}

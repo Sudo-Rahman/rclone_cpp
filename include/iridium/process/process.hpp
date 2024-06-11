@@ -3,6 +3,7 @@
 #include <any>
 #include <string>
 #include <functional>
+#include <variant>
 #include "../entities.hpp"
 #include "../options.hpp"
 #include "../parsers.hpp"
@@ -68,6 +69,8 @@ namespace iridium::rclone
 
 		[[nodiscard]] auto get_error() const -> std::vector<std::string>;
 
+		auto clean() const -> void;
+
 		[[nodiscard]] auto options() const -> std::vector<option::basic_opt_uptr>&;
 
 		[[nodiscard]] static auto global_options() -> std::vector<option::basic_opt_uptr>& { return _global_options; }
@@ -91,7 +94,13 @@ namespace iridium::rclone
 			return *this;
 		}
 
-		auto on_finish(std::function<void(int)> &&callback) -> process&;
+		using on_finish_callback = std::variant<
+			std::function<void()>,
+			std::function<void(int)>,
+			std::function<void(int, process *)>
+		>;
+
+		auto on_finish(on_finish_callback &&callback) -> process&;
 
 		auto on_stop(std::function<void()> &&callback) -> process&;
 

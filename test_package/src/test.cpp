@@ -34,7 +34,7 @@ auto main() -> int
 	auto lst = std::vector<remote>{};
 	auto n = new int{0};
 	auto remote = remote::create_shared_ptr(
-		"test", remote::remote_type::google_drive, "");
+		"testt", remote::remote_type::google_drive, "");
 	std::cout << *remote << std::endl;
 	auto file = ::file{
 					nullptr, "/", 0, true, std::chrono::system_clock::now(),
@@ -90,7 +90,7 @@ auto main() -> int
 			//    copy_to(bureau, file)
 			//			lsjson(bureau)
 			lsjson(file)
-			.every_line_parser<::file>(ser)
+			// .every_line_parser<::file>(ser)
 			//.on_finish_parser<::file>(ser)
 			//            .about(*remote, [n](const about &about)
 			//            {
@@ -131,10 +131,11 @@ auto main() -> int
 			// .every_line_parser(parser)
 			// .every_line_parser(ser)
 			//            .on_finish_parser(parserr)
-			//.on_stop([&]
-			//{
-			//	std::cout << "stop" << std::endl;
-			//})
+			.on_finish([&](auto, auto *p)
+			{
+				//p->get_output();
+				std::cout << "stop" << std::endl;
+			})
 			.execute()
 			// .wait_for_start();
 			.wait_for_finish()
@@ -165,7 +166,7 @@ auto main() -> int
 				.on_finish([&](int exit) { std::cout << counter++ << std::endl; });
 		pool.add_process(std::move(proc), process_pool::priority::low);
 	}
-
+	cout << "pool size = " << pool.size() << endl;
 	pool.wait();
 
 	delete rclone;

@@ -52,7 +52,7 @@ namespace iridium::rclone
 					boost::this_thread::interruption_point();
 					auto* process = get_process();
 					if (process == nullptr) { continue; }
-					process->on_finish([this](int)
+					process->on_finish([this]
 					{
 						_running_processes--;
 						_executed_processes++;
