@@ -51,7 +51,7 @@ namespace iridium::rclone
 		_impl->set_simultaneous_processes(simultaneous_processes);
 	}
 
-	auto process_pool::simultaneous_processes() const -> u_int16_t { return _impl->_simultaneous_processes; }
+	auto process_pool::simultaneous_processes() const -> uint16_t { return _impl->_simultaneous_processes; }
 
 	void process_pool::stop_all_processes_and_clear() const
 	{
