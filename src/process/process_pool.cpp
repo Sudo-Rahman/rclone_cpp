@@ -1,5 +1,3 @@
-#include <numeric>
-
 #include "process_pool_impl.cpp"
 
 namespace iridium::rclone
@@ -40,11 +38,8 @@ namespace iridium::rclone
 
 	auto process_pool::size() const -> uint16_t
 	{
-		return std::accumulate(_impl->_processes.begin(), _impl->_processes.end(), 0,
-		                       [](auto acc, const auto &pair) { return acc + pair.second.size(); });
+		return _impl->_process_counter;
 	}
-
-	void process_pool::clear_pool() const { _impl->clear_pool(); }
 
 	auto process_pool::set_simultaneous_processes(uint16_t simultaneous_processes) const -> void
 	{

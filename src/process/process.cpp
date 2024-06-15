@@ -161,8 +161,7 @@ namespace iridium::rclone
 							           [exit_code, this](const std::function<void(int, process *)> &callback)
 							           {
 								           callback(exit_code, this);
-							           },
-							           [](auto &callback) { std::cout << callback << std::endl; }
+							           }
 					           }, callback);
 				}
 			);

@@ -4,6 +4,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include <iridium/rclone.hpp>
 #include <memory>
+#include <thread>
 #include <atomic>
 
 using namespace iridium::rclone;
@@ -19,23 +20,27 @@ BOOST_AUTO_TEST_SUITE(Suite)
 
 	BOOST_AUTO_TEST_CASE(ProcessPoolInitializationTest)
 	{
-		auto pool = create_pool();
-		BOOST_CHECK_EQUAL(pool.size(), 0); // The pool should be empty initially
-		BOOST_CHECK(pool.empty()); // The pool should be empty initially
+        {
+            auto pool = create_pool();
+            BOOST_CHECK_EQUAL(pool.size(), 0); // The pool should be empty initially
+            BOOST_CHECK(pool.empty()); // The pool should be empty initially
+        }
 	}
 
 	BOOST_AUTO_TEST_CASE(ProcessPoolAddProcessTest)
 	{
-		auto pool = create_pool();
-		auto p = std::make_unique<process>();
-		p->version();
-		pool.add_process(std::move(p));
-		BOOST_CHECK_EQUAL(pool.size(), 1); // The pool should have 1 process
-		auto p2 = std::make_unique<process>();
-		p2->version();
-		pool.add_process(std::move(p2));
-		BOOST_CHECK_EQUAL(pool.size(), 2); // The pool should have 2 processes
-		BOOST_CHECK(!pool.empty()); // The pool should not be empty
+        {
+            auto pool = create_pool();
+            auto p = std::make_unique<process>();
+            p->version();
+            pool.add_process(std::move(p));
+            BOOST_CHECK_EQUAL(pool.size(), 1); // The pool should have 1 process
+            auto p2 = std::make_unique<process>();
+            p2->version();
+            pool.add_process(std::move(p2));
+            BOOST_CHECK_EQUAL(pool.size(), 2); // The pool should have 2 processes
+            BOOST_CHECK(!pool.empty()); // The pool should not be empty
+             }
 	}
 
 	BOOST_AUTO_TEST_CASE(ProcessPoolClearPoolTest)
@@ -44,7 +49,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		auto p = std::make_unique<process>();
 		p->version();
 		pool.add_process(std::move(p));
-		pool.clear_pool();
+		pool.stop_all_processes_and_clear();
 		BOOST_CHECK_EQUAL(pool.size(), 0); // The pool should be empty after clearing
 		BOOST_CHECK(pool.empty()); // The pool should be empty after clearing
 	}
@@ -121,8 +126,7 @@ BOOST_AUTO_TEST_SUITE(Suite)
 		p2->version();
 		pool.add_process(std::move(p1));
 		pool.add_process(std::move(p2));
-		pool.stop_all_processes();
-		pool.clear_pool();
+		pool.stop_all_processes_and_clear();
 		BOOST_CHECK_EQUAL(pool.size(), 0)
 		; // The pool should be empty after stopping all processes and clearing the pool
 		BOOST_CHECK(pool.empty()); // The pool should be empty after stopping all processes and clearing the pool

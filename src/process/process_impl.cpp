@@ -226,11 +226,8 @@ namespace iridium::rclone
 		{
 			if (not is_running()) throw std::runtime_error("process not running");
 			_state = state::stopped;
-			_threads.push_back(boost::thread([this]
-			{
-				if (_signal_stop)
-					_signal_stop->operator()();
-			}));
+            if (_signal_stop)
+                _signal_stop->operator()();
 			close_input_pipe();
 			_child.terminate();
 			if (_child.running())
@@ -238,7 +235,8 @@ namespace iridium::rclone
 				for (auto &thread: _threads)
 				{
 					thread.interrupt();
-					thread.join();
+                    if (thread.joinable())
+					    thread.join();
 				}
 			}
 			_cv.notify_all();
@@ -248,8 +246,8 @@ namespace iridium::rclone
 		{
 			if (_state == state::running)
 			{
-				stop();
-				std::cerr << "process are destroyed without being stopped" << std::endl;
+                std::cerr << "process are destroyed without being stopped" << std::endl;
+                stop();
 			}
 			wait_for_finish();
 		}
