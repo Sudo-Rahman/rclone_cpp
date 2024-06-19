@@ -18,5 +18,5 @@ jobs:
       - name: Conan Install and Test
         run: |
           conan profile detect --force
-          conan install . -of build --build=missing
+          conan install . --build=missing
           conan create .

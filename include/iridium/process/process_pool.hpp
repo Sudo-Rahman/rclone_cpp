@@ -18,6 +18,7 @@ namespace iridium::rclone
 
 		enum state
 		{
+            not_launched,
 			running,
 			stopped,
 		};
@@ -44,14 +45,9 @@ namespace iridium::rclone
 		auto add_process(std::unique_ptr<process>&& process, priority = normal) const -> void;
 
 
-		/**
-		 * @brief Clear all processes from the pool
-		 */
-		void clear_pool() const;
-
 		auto set_simultaneous_processes(uint16_t simultaneous_processes)const -> void;
 
-		auto simultaneous_processes() const -> uint16_t;
+		[[nodiscard]] auto simultaneous_processes() const -> uint16_t;
 
 		/**
 		 * @brief Get the number of processes in the pool
@@ -87,7 +83,7 @@ namespace iridium::rclone
 		 */
 		void stop_all_processes_and_clear() const;
 
-		auto finished_processes() const -> uint16_t;
+		[[nodiscard]] auto finished_processes() const -> uint16_t;
 
 	protected:
 

@@ -25,11 +25,11 @@ class rclone_cppTestConan(ConanFile):
         if can_run(self):
             base_cmd = os.path.join(self.cpp.build.bindir)
             tests = [
-                "rclone_file_test",
-                "rclone_remote_test",
-                "rclone_json_log_test",
-                "rclone_process_test",
-                "rclone_process_pool_test"
+                "rclone_file_test -l all",
+                "rclone_remote_test -l all",
+                "rclone_json_log_test -l all",
+                "rclone_process_test -l all",
+                "rclone_process_pool_test -l all"
             ]
             for test in tests:
                 cmd = f"{os.path.join(base_cmd, test)}"
