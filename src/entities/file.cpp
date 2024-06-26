@@ -129,6 +129,9 @@ namespace iridium::rclone::entities
 		return *this;
 	}
 
+	/**
+	 * @return returne the absolute path of the file with the remote path
+	 */
 	auto file::absolute_path() const -> std::string
 	{
 		std::string abs_path;
@@ -152,6 +155,9 @@ namespace iridium::rclone::entities
 		return std::regex_replace(abs_path, regex, "/");
 	}
 
+	/**
+	 * @return returne the path of the file withou the remote path
+	 */
 	auto file::path() const -> std::string
 	{
 		std::string path;
@@ -163,6 +169,9 @@ namespace iridium::rclone::entities
 		return std::regex_replace(path, regex, "/");
 	}
 
+	/*
+	 * @return the parent path of the file without the remote path
+	 */
 	auto file::parent_dir() const -> std::string
 	{
 		if (_parent not_eq nullptr)
@@ -170,6 +179,9 @@ namespace iridium::rclone::entities
 		return "";
 	}
 
+	/*
+	 * @return the parent path of the file with the remote path
+	 */
 	auto file::parent_absolute_dir() const -> std::string
 	{
 		if (_parent not_eq nullptr)

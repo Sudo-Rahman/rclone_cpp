@@ -6,8 +6,7 @@
 namespace iridium::rclone::entities
 {
 	remote::remote(const std::string &name, remote_type type, const std::string &path) : _name(name),
-		_type(type), _path(path)
-	{}
+		_type(type), _path(path) {}
 
 	remote::remote(remote &&remote) noexcept
 	{
@@ -109,5 +108,7 @@ namespace iridium::rclone::entities
 					{"pcloud", remote_type::pcloud},
 					{"box", remote_type::box},
 					{"smb", remote_type::smb},
+					{"alias", remote_type::alias},
+					{"crypt", remote_type::crypt},
 			};
 } // Iridium

@@ -13,5 +13,5 @@ namespace iro = iridium::rclone::option;
 namespace iridium::rclone
 {
 	/// Version of the library
-	const auto *const VERSION = "0.6";
+	const auto *const VERSION = "0.6.1";
 }

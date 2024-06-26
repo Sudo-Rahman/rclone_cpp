@@ -14,7 +14,7 @@ namespace iridium::rclone::entities
 		enum remote_type
 		{
 			google_drive, sftp, onedrive, dropbox, ftp, mega,
-			opendrive, pcloud, box, smb, cmd, none
+			opendrive, pcloud, box, smb, alias, crypt, cmd, other, none
 		};
 
 		remote() = default;

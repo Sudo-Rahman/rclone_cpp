@@ -15,15 +15,17 @@ namespace iridium::rclone::parser
 		regex pattern(R"(([^:]+):\s+([^\s]+))");
 		std::smatch match;
 
-		if (std::regex_search(data, match, pattern)) {
+		if (std::regex_search(data, match, pattern))
+		{
 			string type = match[2];
 
 			remote.set_name(match[1]);
-			remote.set_type(remote::string_to_remote_type.at( match[2]));
+			if (remote::string_to_remote_type.contains(type))
+				remote.set_type(remote::string_to_remote_type.at(type));
+			else remote.set_type(remote::none);
 
 			callback(remote);
-		} else {
-			std::cerr << "Impossible to parse remote" << endl;
 		}
+		else { std::cerr << "Impossible to parse remote" << endl; }
 	}
 } // namespace iridium::rclone::parser

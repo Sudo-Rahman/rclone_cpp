@@ -377,7 +377,7 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	auto process::touch(const entities::file &file) -> process&
+	auto process::touch(const file &file) -> process&
 	{
 		_impl->_args = {"touch", file.absolute_path()};
 		return *this;
