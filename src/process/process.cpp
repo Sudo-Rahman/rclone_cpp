@@ -1,6 +1,7 @@
 #include <memory>
 #include <process.hpp>
 #include <parsers.hpp>
+#include <boost/process/child.hpp>
 #include "process_impl.cpp"
 #include <config_create.hpp>
 
@@ -51,8 +52,16 @@ namespace iridium::rclone
 		if (boost::filesystem::exists(_path_rclone))
 			is_ok = true;
 
-		_is_initialized = true;
-		return is_ok;
+		try
+		{
+			auto c = boost::process::child(bp::exe = _path_rclone, bp::args = {"listremotes"}, bp::std_out > bp::null);
+			c.wait();
+			if (c.exit_code() not_eq 0)
+				throw;
+			_is_initialized = true;
+			return is_ok;
+		}
+		catch (...) { throw initialize_error(); }
 	}
 
 	process::process()
@@ -168,18 +177,32 @@ namespace iridium::rclone
 		return *this;
 	}
 
-	auto process::on_stop(std::function<void()> &&callback) -> process&
+	auto process::on_stop(on_stop_callback &&callback) -> process&
 	{
 		_impl->_signal_stop->connect(
-				[this, callback = std::move(callback)]() { callback(); }
+				[this, callback = std::move(callback)]()
+				{
+					std::visit(overloaded{
+									[](const std::function<void()> &callback) { callback(); },
+									[this](const std::function<void(process *)> &callback) { callback(this); }
+							},callback
+						);
+				}
 			);
 		return *this;
 	}
 
-	auto process::on_start(std::function<void()> &&callback) -> process&
+	auto process::on_start(on_start_callback &&callback) -> process&
 	{
 		_impl->_signal_start->connect(
-				[this, callback = std::move(callback)]() { callback(); }
+				[this, callback = std::move(callback)]()
+				{
+					std::visit(overloaded{
+									[](const std::function<void()> &callback) { callback(); },
+									[this](const std::function<void(process *)> &callback) { callback(this); }
+							},callback
+						);
+				}
 			);
 		return *this;
 	}

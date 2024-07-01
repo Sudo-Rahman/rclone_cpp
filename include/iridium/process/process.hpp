@@ -102,9 +102,19 @@ namespace iridium::rclone
 
 		auto on_finish(on_finish_callback &&callback) -> process&;
 
-		auto on_stop(std::function<void()> &&callback) -> process&;
+		using on_stop_callback = std::variant<
+			std::function<void()>,
+			std::function<void(process *)>
+		>;
 
-		auto on_start(std::function<void()> &&callback) -> process&;
+		auto on_stop(on_stop_callback &&callback) -> process&;
+
+		using on_start_callback = std::variant<
+			std::function<void()>,
+			std::function<void(process *)>
+		>;
+
+		auto on_start(on_start_callback &&callback) -> process&;
 
 		template<class T>
 		auto on_finish_parser(std::shared_ptr<parser::basic_parser<T>> parser) -> process& requires(std::is_base_of_v<
@@ -238,4 +248,10 @@ namespace iridium::rclone
 
 	using process_ptr = std::shared_ptr<process>;
 	using process_uptr = std::unique_ptr<process>;
+
+	class initialize_error : public std::runtime_error
+	{
+	public:
+		explicit initialize_error() : std::runtime_error("rclone not found in the path") {}
+	};
 } // namespace iridium::rclone

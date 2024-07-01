@@ -162,7 +162,7 @@ namespace iridium::rclone
 #endif
 					);
 			}
-			catch (const std::exception &e)
+			catch (boost::wrapexcept<bp::process_error> &e)
 			{
 				std::cerr << e.what() << std::endl;
 				exit(1);

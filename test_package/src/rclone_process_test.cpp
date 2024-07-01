@@ -18,7 +18,6 @@ struct ProcessFixture
 {
 	ProcessFixture()
 	{
-		// Initialisation du process
 		process::initialize();
 	}
 };
@@ -27,17 +26,22 @@ BOOST_FIXTURE_TEST_SUITE(ProcessTestsSuite, ProcessFixture)
 
 	BOOST_AUTO_TEST_CASE(ProcessInitializationTest)
 	{
-		BOOST_CHECK(process::initialize()); // Vérifie si l'initialisation a réussi
+		BOOST_CHECK(process::initialize());
+	}
+
+	BOOST_AUTO_TEST_CASE(ProcessInitializationBadFileTest)
+	{
+		BOOST_CHECK_THROW(process::initialize("bad_file"), ir::initialize_error);
 	}
 
 	BOOST_AUTO_TEST_CASE(ProcessExecutionTest)
 	{
 		process p;
-		p.version().execute(); // Exemple d'exécution d'une commande
-		BOOST_CHECK(p.is_running()); // Vérifie si le processus est en cours d'exécution
+		p.version().execute();
+		BOOST_CHECK(p.is_running());
 		p.wait_for_finish();
-		BOOST_CHECK(!p.is_running()); // Vérifie si le processus s'est terminé
-		BOOST_CHECK_EQUAL(p.exit_code(), 0); // Vérifie le code de sortie du processus
+		BOOST_CHECK(!p.is_running());
+		BOOST_CHECK_EQUAL(p.exit_code(), 0);
 	}
 
 	BOOST_AUTO_TEST_CASE(ProcessGlobalOptionsTest)
