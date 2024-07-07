@@ -1,14 +1,8 @@
 #include <json_log_parser.hpp>
-#include <boost/json.hpp>
 #include <regex>
-#include "utils.cpp"
+#include "utils.hpp"
 
 using namespace iridium::rclone::entities;
-
-template<class T>
-extern auto get_from_obj(const boost::json::object &obj, const std::string &key) -> T;
-
-extern auto string_to_mode_time(const std::string &time) -> system_clock::time_point;
 
 namespace iridium::rclone::parser
 {

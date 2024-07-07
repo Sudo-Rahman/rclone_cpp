@@ -1,9 +1,8 @@
+#pragma once
+
 #include <boost/json.hpp>
 #include <boost/date_time.hpp>
-#include <chrono>
 #include <sstream>
-#include <string>
-#include <iomanip>
 
 using std::chrono::system_clock;
 
@@ -39,8 +38,8 @@ auto string_to_mode_time(const std::string &time) -> system_clock::time_point
 	boost::posix_time::ptime abs_time;
 	iss >> abs_time;
 
-    boost::posix_time::ptime epoch(boost::gregorian::date(1970,1,1));
-    boost::posix_time::time_duration diff = abs_time - epoch;
+	boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
+	boost::posix_time::time_duration diff = abs_time - epoch;
 
-    return system_clock::from_time_t(diff.total_seconds());
+	return system_clock::from_time_t(diff.total_seconds());
 }
